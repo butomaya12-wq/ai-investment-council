@@ -1,0 +1,178 @@
+AI INVESTMENT COUNCIL — B1.2 B5 RISK SNAPSHOT MAPPING AUTHORITY DELTA
+v0.3 — 2026-08-15
+
+STATUS
+BOUNDED PLAN-LEVEL REPAIR CANDIDATE / READY_FOR_INDEPENDENT_REVIEW
+INDEPENDENT CLOSURE = NO
+NOT ACTIVATED
+PRODUCT CODE CHANGES = 0
+USER REPOSITORY CHANGES = 0
+DEPENDENCY CHANGES = 0
+STATE TOPOLOGY CHANGES = 0
+BROKER AUTHORITY CHANGES = 0
+B1.3 = NOT OPEN
+B2→B8 IMPLEMENTATION = UNAUTHORIZED
+ALPACA PAPER ORDERS = 0
+LIVE MONEY = PROHIBITED
+
+0. PREDECESSOR
+v0.1 and v0.2 of this delta were PRE-REVIEW builder drafts targeting superseded
+pre-review B5_RISK_INPUT_SNAPSHOT_V1 v0.5 / v0.5.1 resources. Neither was
+independently reviewed or activated; both have zero current authority.
+
+This v0.3 delta targets the final pre-review hardened resource:
+B5_RISK_INPUT_SNAPSHOT_V1 contract version v0.5.2.
+
+1. PURPOSE
+Close only independent v0.4 review finding R14:
+B5_RISK_INPUT_SNAPSHOT_V1 is explicitly present in the B1 canonical schema
+inventory and is cross-stage authoritative lineage, but the accepted base
+Canonical Manifest v0.5 has no dedicated row-level mapping for it.
+
+This is a PLAN-LEVEL AUTHORITY repair.
+It is not a builder normalization decision.
+It does not change B5 business/risk behavior.
+
+2. WHY A REAL MAPPING ROW IS REQUIRED
+Current Canonical Manifest v0.5 states that it supplies one row-level authority
+for every shared cross-stage concept so builders do not infer whether an object
+is canonical, persisted, a wrapper/view, or runtime-only.
+
+Current B1 compatibility authority also requires mapping_kind,
+persistence_mode, canonical ID/hash, journal payload identity and lossless
+classification, and says missing/unknown mapping => BLOCK/FAIL before
+persistence.
+
+B5_RISK_INPUT_SNAPSHOT is a shared cross-stage concept because:
+- B1 explicitly enumerates snapshot_b5_risk_v1.json in canonical schema inventory;
+- B5 creates and consumes the snapshot as authoritative risk input;
+- ACCEPTED_PROPOSAL_CANDIDATE_V1 binds exact b5_risk_input_snapshot_id/hash;
+- B6 accepts only the exact accepted B5 composite lineage.
+
+Therefore a registry-local normalization decision cannot supply this missing
+mapping authority.
+
+3. IMMUTABILITY / EVOLUTION RULE
+The accepted CANONICAL_SCHEMA_COMPATIBILITY_AND_PROMOTION_MANIFEST v0.5 remains
+byte-identical base authority for its existing 70 rows.
+
+This delta is forward-only and additive.
+It MUST NOT edit the accepted v0.5 manifest in place.
+
+M065, M066 and M067 remain RESERVED / INTENTIONALLY UNUSED / NOT ROWS.
+They MUST NOT be reused.
+
+The new mapping ID is M071, the next non-reserved mapping ID after M070.
+
+4. EFFECTIVE B1.2 MAPPING AUTHORITY
+If and only if this delta receives fresh independent PASS and is explicitly
+activated in Source of Truth, the effective B1.2 compatibility mapping set is:
+
+BASE = exact 70 active rows from Canonical Manifest v0.5
+PLUS = exact one delta row M071 below
+TOTAL = 71 active rows
+
+The compiler/evidence layer must hash:
+- exact base manifest identity;
+- exact delta identity;
+- exact sorted effective 71-row mapping set.
+
+No base row is changed, deleted, renumbered or reinterpreted.
+
+5. M071 — B5 RISK INPUT SNAPSHOT
+mapping_id = M071
+mapping_version = v0.3
+concept = B5_RISK_INPUT_SNAPSHOT
+phase_schema_name = B5_RISK_INPUT_SNAPSHOT_v0_1
+phase_schema_version = v0.1
+canonical_schema_name = B5_RISK_INPUT_SNAPSHOT_V1
+canonical_schema_version = v0.5.2
+mapping_kind = DISTINCT_CANONICAL_TYPE
+persistence_mode = CANONICAL_ROW
+capability_class_name = null
+canonical_id_field = snapshot_id
+canonical_hash_field = snapshot_hash
+journal_payload_schema = aic.snapshot.b5_risk_input.v1
+journal_payload_version = v1
+lossless_required = true
+
+Source lineage:
+- B1_SCHEMA_AND_TRANSITION_COMPATIBILITY_AMENDMENT v0.5 §3 explicitly
+  enumerates snapshot_b5_risk_v1.json in B1 canonical schema inventory.
+- P-B5_IMPLEMENTATION_PACKET v0.1 §7 defines B5_RISK_INPUT_SNAPSHOT and its
+  account/positions/open-orders/market/context groups.
+- P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT v0.5 binds exact
+  b5_risk_input_snapshot_id/hash into accepted cross-stage B5→B6 authority.
+
+6. WHY DISTINCT_CANONICAL_TYPE
+B5 risk snapshot is its own point-in-time snapshot class.
+It cannot alias:
+- B2 data snapshot (M009);
+- B3 research snapshot (M012);
+- B6 pre-submit snapshot (M039);
+- B6 commit snapshot (M043).
+
+This uses the existing snapshot-family classification pattern rather than
+inventing a new mapping kind.
+
+7. BASE-MANIFEST CLAUSE OVERRIDE — BOUNDED
+For effective B1.2 compilation only, after activation this delta supersedes
+only these base-manifest/B1 identity assertions:
+- "exactly 70 active rows" becomes "exactly 71 effective active rows";
+- "unexpected active ID" does not reject the explicitly authorized M071;
+- M065/M066/M067 remain reserved and absent.
+
+All other Canonical Manifest v0.5 and B1 compatibility v0.5 rules remain
+unchanged and normative.
+
+8. B1-VC-058 EXPECTATION OVERRIDE
+Do NOT create a duplicate B1 verification ID.
+
+The existing B1-VC-058 identity is expectation-overridden for B1.2 to require:
+- exactly 71 effective active mapping rows;
+- exact base IDs M001…M037, M038, M038A, M038B, M038C, M039…M064,
+  M068, M069, M070;
+- exact additive M071;
+- M065/M066/M067 reserved and absent;
+- zero duplicate mapping IDs.
+
+The global acceptance-inventory required-ID count does not increase merely
+because this expectation changes. Before any global B1 FINAL PASS / R1 /
+runtime / freeze claim after activation, the acceptance inventory must be
+regenerated with explicit EXPECTATION_OVERRIDE provenance for B1-VC-058 and
+must bind the exact accepted delta identity.
+
+9. FAIL-CLOSED RULE
+Before this delta receives independent PASS + explicit activation:
+- M071 has zero authority;
+- prior registry-local ND-R5-B5-001 has zero mapping authority;
+- B5_RISK_INPUT_SNAPSHOT_V1 cannot pass canonical persistence classification;
+- B1.2 remains BLOCKED.
+
+After activation:
+missing M071, changed M071 semantics/hash, reuse of M065–M067, or effective
+mapping count !=71 => MANIFEST_INTEGRITY_FAIL / no B1 PASS.
+
+10. NO SCOPE CHANGE
+No new state.
+No transition change.
+No policy threshold.
+No broker capability.
+No LLM authority.
+No provider write.
+No dependency.
+No product code.
+
+11. FUTURE CONSOLIDATION
+A future separately reviewed all-edge authority migration MAY consolidate base
+manifest v0.5 + this independently accepted delta into a new full manifest
+version. Consolidation is not required for B1.2 and must not be performed
+silently.
+
+RESULT
+BOUNDED PLAN-LEVEL REPAIR CANDIDATE /
+M071 ONLY /
+TARGET CANONICAL RESOURCE B5_RISK_INPUT_SNAPSHOT_V1 v0.5.2 /
+READY_FOR_INDEPENDENT_REVIEW /
+NOT ACTIVATED /
+B1.2 REMAINS BLOCKED.

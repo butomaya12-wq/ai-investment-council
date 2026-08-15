@@ -1,0 +1,126 @@
+{
+  "$id": "urn:aic:b1.2:schema:INVESTMENT_MANDATE_V1:v0.4",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_universe": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "concentration_policy_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "exclusions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "execution_mode": {
+      "enum": [
+        "RESEARCH_ONLY",
+        "PAPER_PROPOSAL",
+        "PAPER_APPROVAL_REQUIRED"
+      ],
+      "type": "string"
+    },
+    "frozen_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "horizon": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "liquidity_constraints": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "live_execution": {
+      "const": false,
+      "type": "boolean"
+    },
+    "mandate_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "mandate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "max_single_name_policy_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "objective": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "owner_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "risk_budget_policy_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "mandate_id",
+    "version",
+    "owner_id",
+    "frozen_at",
+    "objective",
+    "horizon",
+    "risk_budget_policy_ref",
+    "allowed_universe",
+    "exclusions",
+    "max_single_name_policy_ref",
+    "concentration_policy_ref",
+    "liquidity_constraints",
+    "execution_mode",
+    "live_execution",
+    "mandate_hash"
+  ],
+  "title": "INVESTMENT_MANDATE_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "mandate_hash",
+  "x-aic-canonical-id-field": "mandate_id",
+  "x-aic-canonical-name": "INVESTMENT_MANDATE_V1",
+  "x-aic-contract-version": "0.4",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_4",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "aic.investment_mandate.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-R5-MANDATE-001"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "mandate_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "MANDATE4-V01",
+      "rule": "execution_mode preserves all three accepted non-live V1 modes; execution authorization separately requires PAPER_APPROVAL_REQUIRED."
+    }
+  ],
+  "x-aic-source-refs": [
+    "Engineering_Spec_v0.5:INVESTMENT_MANDATE",
+    "CANONICAL_MANIFEST_v0.5:M001"
+  ]
+}

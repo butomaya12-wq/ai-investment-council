@@ -1,0 +1,178 @@
+{
+  "$id": "urn:aic:b1.2:schema:MONITOR_SUBSCRIPTION_V1:v0.3",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "decision_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "decision_lifecycle_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "decision_ttl_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "final_decision_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "invalidation_condition_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "issuer_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "last_source_cursor_refs": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "last_successful_cycle_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "monitor_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "monitor_subscription_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "next_review_trigger_at_utc": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "next_review_trigger_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "portfolio_drift_rule_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_classes": {
+      "items": {
+        "enum": [
+          "SEC_FILING",
+          "ALPACA_NEWS",
+          "CORPORATE_ACTION",
+          "PORTFOLIO_DRIFT",
+          "EXECUTION_EVENT",
+          "TTL_TIMER",
+          "EVIDENCE_CORRECTION"
+        ],
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "subscription_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "symbol": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "what_would_change_decision_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "monitor_subscription_id",
+    "decision_id",
+    "final_decision_hash",
+    "candidate_id",
+    "symbol",
+    "issuer_id",
+    "created_at",
+    "active",
+    "source_classes",
+    "invalidation_condition_refs",
+    "what_would_change_decision_refs",
+    "decision_lifecycle_policy_ref",
+    "decision_ttl_hash",
+    "next_review_trigger_hash",
+    "next_review_trigger_at_utc",
+    "portfolio_drift_rule_ref",
+    "monitor_policy_ref",
+    "last_successful_cycle_at",
+    "last_source_cursor_refs",
+    "subscription_hash"
+  ],
+  "title": "MONITOR_SUBSCRIPTION_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "subscription_hash",
+  "x-aic-canonical-id-field": "monitor_subscription_id",
+  "x-aic-canonical-name": "MONITOR_SUBSCRIPTION_V1",
+  "x-aic-contract-version": "0.3",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_3",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; candidate self-hashes/prose cannot override the external registry baseline.",
+  "x-aic-journal-payload-schema": "aic.monitor_subscription.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-S8-004"
+  ],
+  "x-aic-opaque-substructures": {
+    "paths": [
+      "/last_source_cursor_refs"
+    ],
+    "rule": "B1 validates container type only. No child-field business semantics may be inferred from this bundle; owning later-stage contract/payload_schema must define any child semantics before use."
+  },
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "subscription_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "MONITOR_SUBSCRIPTION_V1-POLREF-V03",
+      "rule": "Policy version strings are not authority; every replaced policy field is exact POLICY_REFERENCE_V1 per current M060."
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B7_THESIS_MONITOR_AND_REEVALUATION_CONTRACT_v0.2:§3",
+    "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT_v0.5:§14",
+    "CANONICAL_MANIFEST_v0.5:M050"
+  ]
+}

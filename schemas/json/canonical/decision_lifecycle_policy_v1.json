@@ -1,0 +1,78 @@
+{
+  "$id": "urn:aic:b1.2:schema:DECISION_LIFECYCLE_POLICY_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Schema freezes shape only. Concrete decision_ttl_seconds remains unset until explicit owner approval.",
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "decision_ttl_seconds": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "next_review_trigger_mode": {
+      "const": "TTL_EXPIRY",
+      "type": "string"
+    },
+    "owner_approved_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "policy_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_name": {
+      "const": "DECISION_LIFECYCLE",
+      "type": "string"
+    },
+    "ttl_anchor": {
+      "const": "APPLICATION_ASSIGNED_CANONICAL_DECISION_CREATED_AT",
+      "type": "string"
+    },
+    "validation_schema_version": {
+      "const": "DECISION_LIFECYCLE_POLICY_V1",
+      "type": "string"
+    },
+    "version": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_name",
+    "policy_id",
+    "version",
+    "owner_approved_at",
+    "active",
+    "validation_schema_version",
+    "decision_ttl_seconds",
+    "ttl_anchor",
+    "next_review_trigger_mode",
+    "policy_hash"
+  ],
+  "title": "DECISION_LIFECYCLE_POLICY_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "policy_hash",
+  "x-aic-canonical-id-field": "policy_id+version",
+  "x-aic-canonical-name": "DECISION_LIFECYCLE_POLICY_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.decision_lifecycle_policy.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "policy_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "DECISION_LIFECYCLE_POLICY_OWNER_INPUT_v0.1",
+    "CANONICAL_MANIFEST_v0.5:M068"
+  ]
+}

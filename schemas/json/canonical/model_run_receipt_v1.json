@@ -1,0 +1,282 @@
+{
+  "$id": "urn:aic:b1.2:schema:MODEL_RUN_RECEIPT_V1:v0.4",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "stage": {
+            "enum": [
+              "PLAN",
+              "SYNTHESIS",
+              "REPAIR",
+              "ESCALATION"
+            ]
+          }
+        },
+        "required": [
+          "stage"
+        ]
+      },
+      "then": {
+        "properties": {
+          "candidate_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "research_policy_version": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "research_snapshot_hash": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "candidate_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "effective_model": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "final_status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "input_bundle_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "latency_ms": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "model_policy_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "model_run_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "openai_response_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "output_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "prompt_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "reasoning_effort": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "receipt_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "repair_or_escalation_reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "requested_model": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "research_policy_version": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "research_snapshot_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "run_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "PLAN",
+        "SYNTHESIS",
+        "REPAIR",
+        "ESCALATION",
+        "BULL_INITIAL",
+        "BEAR_INITIAL",
+        "RED_TEAM_INITIAL",
+        "REBUTTAL",
+        "JUDGE"
+      ],
+      "type": "string"
+    },
+    "store": {
+      "const": false,
+      "type": "boolean"
+    },
+    "tools_enabled": {
+      "const": false,
+      "type": "boolean"
+    },
+    "usage_cached_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "usage_input_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "usage_output_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "usage_reasoning_tokens": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "validator_results": {
+      "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+    }
+  },
+  "required": [
+    "model_run_id",
+    "run_id",
+    "candidate_id",
+    "stage",
+    "prompt_version",
+    "schema_version",
+    "research_policy_version",
+    "model_policy_version",
+    "requested_model",
+    "effective_model",
+    "reasoning_effort",
+    "openai_response_id",
+    "input_bundle_hash",
+    "research_snapshot_hash",
+    "output_hash",
+    "latency_ms",
+    "usage_input_tokens",
+    "usage_output_tokens",
+    "usage_reasoning_tokens",
+    "usage_cached_tokens",
+    "validator_results",
+    "repair_or_escalation_reason",
+    "final_status",
+    "store",
+    "tools_enabled",
+    "receipt_hash"
+  ],
+  "title": "MODEL_RUN_RECEIPT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "receipt_hash",
+  "x-aic-canonical-id-field": "model_run_id",
+  "x-aic-canonical-name": "MODEL_RUN_RECEIPT_V1",
+  "x-aic-contract-version": "0.4",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_4",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "aic.model_run_receipt.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-R5-MRR-001"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "receipt_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "MRR4-V01",
+      "rule": "B3 model observability lineage is preserved: run/candidate/stage/policies/input/research/output hashes, cached usage, validators, repair/escalation reason, final status."
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B3_IMPLEMENTATION_PACKET_v0.1:§6,§21 observability",
+    "P-B4_PROMPT_AND_SCHEMA_CONTRACT_v0.2:API CONTRACT / model-call topology",
+    "CANONICAL_MANIFEST_v0.5:M016"
+  ]
+}

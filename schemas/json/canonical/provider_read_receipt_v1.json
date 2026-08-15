@@ -1,0 +1,136 @@
+{
+  "$id": "urn:aic:b1.2:schema:PROVIDER_READ_RECEIPT_V1:v0.4",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "endpoint_class": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "error_retry_metadata": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "feed": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "http_status_result_metadata": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "pagination_complete": {
+      "type": "boolean"
+    },
+    "provider": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provider_as_of": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "raw_payload_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "read_receipt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "receipt_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "record_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "request_parameters_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "request_start": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "response_received_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    }
+  },
+  "required": [
+    "read_receipt_id",
+    "provider",
+    "endpoint_class",
+    "request_start",
+    "response_received_at",
+    "request_parameters_hash",
+    "pagination_complete",
+    "provider_as_of",
+    "feed",
+    "http_status_result_metadata",
+    "raw_payload_hash",
+    "record_count",
+    "error_retry_metadata",
+    "receipt_hash"
+  ],
+  "title": "PROVIDER_READ_RECEIPT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "receipt_hash",
+  "x-aic-canonical-id-field": "read_receipt_id",
+  "x-aic-canonical-name": "PROVIDER_READ_RECEIPT_V1",
+  "x-aic-contract-version": "0.4",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_4",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "aic.provider_read_receipt.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-F1-003",
+    "ND-F1-004",
+    "ND-F1-005",
+    "ND-R8-PRR-001"
+  ],
+  "x-aic-opaque-substructures": {
+    "paths": [
+      "/http_status_result_metadata",
+      "/error_retry_metadata"
+    ],
+    "rule": "Opaque grouped metadata containers are required-present non-null maps; B1 invents no child semantics."
+  },
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "receipt_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "PRR4-V01",
+      "rule": "Only provider_as_of/feed are source-optional; grouped http/status/result and error/retry metadata are not relaxed to null."
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B2_IMPLEMENTATION_PACKET_v0.1:§10",
+    "CANONICAL_MANIFEST_v0.5:M006"
+  ]
+}

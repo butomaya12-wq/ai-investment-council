@@ -1,0 +1,296 @@
+{
+  "$id": "urn:aic:b1.2:schema:EXECUTION_INTENT_V1:v0.4",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "accepted_proposal_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "accepted_proposal_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approval_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "broker_call_started_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "broker_client_order_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "broker_order_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ca_gate_evaluation_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ca_gate_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "canonical_payload_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "commit_gate_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commit_risk_result_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commit_risk_result_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commit_snapshot_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commit_snapshot_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ea_gate_evaluation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "ea_gate_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "envelope_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "intent_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "intent_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "last_broker_status": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lock_epoch": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "mandate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "paper_account_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_lineage_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_refs": {
+      "$ref": "urn:aic:b1.2:schema:PolicyRefs10:v0.2"
+    },
+    "prepare_risk_result_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "prepare_risk_result_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "prepare_snapshot_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "prepare_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "prepared_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "proposal_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "PREPARED",
+        "PREPARED_REVALIDATION_REQUIRED",
+        "SUBMITTING",
+        "BROKER_OUTCOME_UNKNOWN",
+        "BROKER_ORDER_BOUND",
+        "REJECTED",
+        "FILLED",
+        "NO_ORDER_PROVEN",
+        "EXECUTION_BLOCKED"
+      ],
+      "type": "string"
+    },
+    "submit_attempt_count": {
+      "maximum": 1,
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "intent_id",
+    "proposal_id",
+    "canonical_payload_hash",
+    "approval_id",
+    "envelope_hash",
+    "accepted_proposal_id",
+    "accepted_proposal_hash",
+    "paper_account_id",
+    "lock_epoch",
+    "prepare_snapshot_id",
+    "prepare_snapshot_hash",
+    "prepare_risk_result_id",
+    "prepare_risk_result_hash",
+    "ea_gate_evaluation_id",
+    "ea_gate_hash",
+    "mandate_version",
+    "policy_refs",
+    "policy_lineage_hash",
+    "state",
+    "prepared_at",
+    "broker_call_started_at",
+    "submit_attempt_count",
+    "commit_snapshot_id",
+    "commit_snapshot_hash",
+    "commit_risk_result_id",
+    "commit_risk_result_hash",
+    "ca_gate_evaluation_id",
+    "ca_gate_hash",
+    "commit_gate_hash",
+    "broker_order_id",
+    "broker_client_order_id",
+    "last_broker_status",
+    "intent_hash"
+  ],
+  "title": "EXECUTION_INTENT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "intent_hash",
+  "x-aic-canonical-id-field": "intent_id",
+  "x-aic-canonical-name": "EXECUTION_INTENT_V1",
+  "x-aic-contract-version": "0.4",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_4",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "aic.execution_intent.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-R5-B6-004"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "intent_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "EI-V01",
+      "rule": "submit_attempt_count transitions 0→1 at most once and never reaches 2"
+    },
+    {
+      "id": "EI-V02",
+      "rule": "broker_call_started_at != null => no second POST for intent"
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B6_IMPLEMENTATION_PACKET_v0.1:§11 EXECUTION_INTENT",
+    "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5:§6",
+    "CANONICAL_MANIFEST_v0.5:M042"
+  ]
+}

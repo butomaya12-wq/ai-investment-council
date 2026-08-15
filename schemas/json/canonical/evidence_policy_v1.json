@@ -1,0 +1,109 @@
+{
+  "$id": "urn:aic:b1.2:schema:EVIDENCE_POLICY_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "conflict_classes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "corporate_action_degradation_rule": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "field_authority_map": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "freshness_rules": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "materiality_rules": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "minimum_required_evidence_by_dimension": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "point_in_time_rule": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "policy_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_failure_behavior": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_id",
+    "version",
+    "field_authority_map",
+    "freshness_rules",
+    "materiality_rules",
+    "conflict_classes",
+    "minimum_required_evidence_by_dimension",
+    "point_in_time_rule",
+    "corporate_action_degradation_rule",
+    "source_failure_behavior",
+    "policy_hash"
+  ],
+  "title": "EVIDENCE_POLICY_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "policy_hash",
+  "x-aic-canonical-id-field": "policy_id+version",
+  "x-aic-canonical-name": "EVIDENCE_POLICY_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.evidence_policy.v1",
+  "x-aic-opaque-substructures": {
+    "paths": [
+      "/field_authority_map",
+      "/freshness_rules",
+      "/materiality_rules",
+      "/minimum_required_evidence_by_dimension",
+      "/point_in_time_rule",
+      "/corporate_action_degradation_rule"
+    ],
+    "rule": "B1 validates container type only. No child-field business semantics may be inferred from this bundle; owning later-stage contract/payload_schema must define any child semantics before use."
+  },
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "policy_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B2_IMPLEMENTATION_PACKET_v0.1:§8",
+    "CANONICAL_MANIFEST_v0.5:M002"
+  ]
+}

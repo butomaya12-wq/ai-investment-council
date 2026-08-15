@@ -1,0 +1,135 @@
+{
+  "$id": "urn:aic:b1.2:schema:B2_DATA_SNAPSHOT_V1:v0.3",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "asset_master_as_of": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "comparison_dimension_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "computed_value_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "decision_cutoff": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "evidence_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "evidence_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "mandate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "manifest_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "market_as_of": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "portfolio_snapshot_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provider_receipt_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "screening_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "sec_filing_cutoff": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "CONFLICTED",
+        "STALE",
+        "FAILED"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "created_at",
+    "decision_cutoff",
+    "mandate_version",
+    "screening_policy_ref",
+    "evidence_policy_ref",
+    "comparison_dimension_version",
+    "provider_receipt_ids",
+    "evidence_ids",
+    "computed_value_ids",
+    "asset_master_as_of",
+    "market_as_of",
+    "sec_filing_cutoff",
+    "portfolio_snapshot_ref",
+    "manifest_hash",
+    "status"
+  ],
+  "title": "B2_DATA_SNAPSHOT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "manifest_hash",
+  "x-aic-canonical-id-field": "snapshot_id",
+  "x-aic-canonical-name": "B2_DATA_SNAPSHOT_V1",
+  "x-aic-contract-version": "0.3",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_3",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; candidate self-hashes/prose cannot override the external registry baseline.",
+  "x-aic-journal-payload-schema": "aic.snapshot.b2_data.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-S8-001"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "manifest_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "B2_DATA_SNAPSHOT_V1-POLREF-V03",
+      "rule": "Policy version strings are not authority; every replaced policy field is exact POLICY_REFERENCE_V1 per current M060."
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B2_IMPLEMENTATION_PACKET_v0.1:§11",
+    "CANONICAL_MANIFEST_v0.5:M009"
+  ]
+}

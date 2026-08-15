@@ -1,0 +1,89 @@
+{
+  "$id": "urn:aic:b1.2:schema:MONITOR_TRIGGER_MATCH_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "condition_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "decision_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "match_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "match_type": {
+      "enum": [
+        "EXACT_STRUCTURED",
+        "DETERMINISTIC_RULE",
+        "SEMANTIC_CANDIDATE"
+      ],
+      "type": "string"
+    },
+    "matched_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "matcher_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_event_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "MATCH",
+        "NO_MATCH",
+        "UNCERTAIN"
+      ],
+      "type": "string"
+    },
+    "support_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "trigger_match_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "trigger_match_id",
+    "source_event_id",
+    "decision_id",
+    "condition_ref",
+    "match_type",
+    "status",
+    "support_refs",
+    "matcher_version",
+    "matched_at",
+    "match_hash"
+  ],
+  "title": "MONITOR_TRIGGER_MATCH_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "match_hash",
+  "x-aic-canonical-id-field": "trigger_match_id",
+  "x-aic-canonical-name": "MONITOR_TRIGGER_MATCH_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.monitor_trigger_match.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "match_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B7_THESIS_MONITOR_AND_REEVALUATION_CONTRACT_v0.2:§10",
+    "CANONICAL_MANIFEST_v0.5:M052"
+  ]
+}

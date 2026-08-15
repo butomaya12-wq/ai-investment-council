@@ -1,0 +1,181 @@
+{
+  "$id": "urn:aic:b1.2:schema:MONITOR_SOURCE_EVENT_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "accepted_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "decision_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "dedupe_key": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "effective_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "event_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "point_in_time_status": {
+      "enum": [
+        "CURRENT",
+        "STALE",
+        "FUTURE",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provider_event_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "provider_read_receipt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "raw_content_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "raw_source_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "source_authority_tier": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_class": {
+      "enum": [
+        "SEC_FILING",
+        "ALPACA_NEWS",
+        "CORPORATE_ACTION",
+        "PORTFOLIO_DRIFT",
+        "EXECUTION_EVENT",
+        "TTL_TIMER",
+        "EVIDENCE_CORRECTION"
+      ],
+      "type": "string"
+    },
+    "source_event_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "symbol": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "untrusted_content_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "source_event_id",
+    "provider",
+    "source_class",
+    "provider_event_id",
+    "candidate_id",
+    "decision_id",
+    "symbol",
+    "observed_at",
+    "published_at",
+    "accepted_at",
+    "effective_at",
+    "retrieved_at",
+    "raw_source_ref",
+    "raw_content_hash",
+    "provider_read_receipt_id",
+    "point_in_time_status",
+    "source_authority_tier",
+    "untrusted_content_ref",
+    "dedupe_key",
+    "event_hash"
+  ],
+  "title": "MONITOR_SOURCE_EVENT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "event_hash",
+  "x-aic-canonical-id-field": "source_event_id",
+  "x-aic-canonical-name": "MONITOR_SOURCE_EVENT_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.monitor_source_event.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "event_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B7_IMPLEMENTATION_PACKET_v0.1:§13",
+    "CANONICAL_MANIFEST_v0.5:M051"
+  ]
+}

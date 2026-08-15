@@ -1,0 +1,319 @@
+{
+  "$id": "urn:aic:b1.2:schema:EXECUTION_GATE_EVALUATION_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "gate_family": {
+            "const": "EA"
+          }
+        },
+        "required": [
+          "gate_family"
+        ]
+      },
+      "then": {
+        "properties": {
+          "commit_risk_result_hash": {
+            "type": "null"
+          },
+          "commit_risk_result_id": {
+            "type": "null"
+          },
+          "commit_snapshot_hash": {
+            "type": "null"
+          },
+          "commit_snapshot_id": {
+            "type": "null"
+          },
+          "pre_submit_snapshot_hash": {
+            "$ref": "urn:aic:b1.2:schema:Hash256:v0.2"
+          },
+          "pre_submit_snapshot_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "prepare_risk_result_hash": {
+            "$ref": "urn:aic:b1.2:schema:Hash256:v0.2"
+          },
+          "prepare_risk_result_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gate_family": {
+            "const": "CA"
+          }
+        },
+        "required": [
+          "gate_family"
+        ]
+      },
+      "then": {
+        "properties": {
+          "commit_risk_result_hash": {
+            "$ref": "urn:aic:b1.2:schema:Hash256:v0.2"
+          },
+          "commit_risk_result_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "commit_snapshot_hash": {
+            "$ref": "urn:aic:b1.2:schema:Hash256:v0.2"
+          },
+          "commit_snapshot_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "intent_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "lock_epoch": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "accepted_proposal_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "accepted_proposal_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approval_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "canonical_payload_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "commit_risk_result_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commit_risk_result_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commit_snapshot_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commit_snapshot_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "envelope_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "evaluated_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "gate_evaluation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "gate_family": {
+      "enum": [
+        "EA",
+        "CA"
+      ],
+      "type": "string"
+    },
+    "gate_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "intent_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lock_epoch": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "per_term_results": {
+      "items": {
+        "$ref": "urn:aic:b1.2:schema:GateTermResult:v0.2"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "policy_lineage_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_refs": {
+      "$ref": "urn:aic:b1.2:schema:PolicyRefs10:v0.2"
+    },
+    "pre_submit_snapshot_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pre_submit_snapshot_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "predicate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "prepare_risk_result_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "prepare_risk_result_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "proposal_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "gate_evaluation_id",
+    "gate_family",
+    "proposal_id",
+    "canonical_payload_hash",
+    "approval_id",
+    "envelope_hash",
+    "accepted_proposal_id",
+    "accepted_proposal_hash",
+    "intent_id",
+    "pre_submit_snapshot_id",
+    "pre_submit_snapshot_hash",
+    "prepare_risk_result_id",
+    "prepare_risk_result_hash",
+    "commit_snapshot_id",
+    "commit_snapshot_hash",
+    "commit_risk_result_id",
+    "commit_risk_result_hash",
+    "lock_epoch",
+    "policy_refs",
+    "policy_lineage_hash",
+    "predicate_version",
+    "per_term_results",
+    "evaluated_at",
+    "gate_hash"
+  ],
+  "title": "EXECUTION_GATE_EVALUATION_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "gate_hash",
+  "x-aic-canonical-id-field": "gate_evaluation_id",
+  "x-aic-canonical-name": "EXECUTION_GATE_EVALUATION_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.execution_gate_evaluation.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "gate_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "EG-V01",
+      "rule": "gate_family=EA => pre_submit_snapshot+prepare_risk non-null; commit fields null"
+    },
+    {
+      "id": "EG-V02",
+      "rule": "gate_family=CA => intent_id+commit_snapshot+commit_risk+lock_epoch non-null"
+    },
+    {
+      "id": "EG-V03",
+      "rule": "PASS requires every applicable per_term_results status PASS"
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5:§5,§8",
+    "CANONICAL_MANIFEST_v0.5:M041"
+  ]
+}

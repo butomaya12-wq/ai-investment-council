@@ -1,0 +1,67 @@
+{
+  "$id": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "policy_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_reference_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_reference_id": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "version": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_name",
+    "policy_id",
+    "version",
+    "policy_hash",
+    "policy_reference_id",
+    "policy_reference_hash"
+  ],
+  "title": "POLICY_REFERENCE_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "policy_reference_hash",
+  "x-aic-canonical-id-field": "policy_reference_id",
+  "x-aic-canonical-name": "POLICY_REFERENCE_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "NONE_EMBEDDED_IN_CONTAINING_OBJECT",
+  "x-aic-persistence-class": "EMBEDDED_ONLY",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "policy_reference_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "PR-V01",
+      "rule": "policy_reference_id == SHA256(canonical tuple [policy_name,policy_id,version,policy_hash])"
+    },
+    {
+      "id": "PR-V02",
+      "rule": "policy_reference_hash == self_hash"
+    }
+  ],
+  "x-aic-source-refs": [
+    "CANONICAL_SCHEMA_COMPATIBILITY_AND_PROMOTION_MANIFEST_v0.5:M060",
+    "AIC_R0_BOUNDED_PLAN_REPAIR_AND_CROSS_PACKET_COMPATIBILITY_v0.5:P09"
+  ]
+}

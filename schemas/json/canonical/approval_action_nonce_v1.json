@@ -1,0 +1,109 @@
+{
+  "$id": "urn:aic:b1.2:schema:APPROVAL_ACTION_NONCE_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action_nonce_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "action_nonce_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "action_nonce_record_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "allowed_decision": {
+      "enum": [
+        "APPROVE",
+        "REJECT",
+        "KEEP_WATCHING"
+      ],
+      "type": "string"
+    },
+    "canonical_payload_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "consumed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "expires_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "issued_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "owner_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "proposal_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "CONSUMED",
+        "EXPIRED",
+        "REVOKED"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "action_nonce_id",
+    "action_nonce_hash",
+    "session_id",
+    "owner_id",
+    "proposal_id",
+    "canonical_payload_hash",
+    "allowed_decision",
+    "issued_at",
+    "expires_at",
+    "consumed_at",
+    "status",
+    "action_nonce_record_hash"
+  ],
+  "title": "APPROVAL_ACTION_NONCE_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "action_nonce_record_hash",
+  "x-aic-canonical-id-field": "action_nonce_id",
+  "x-aic-canonical-name": "APPROVAL_ACTION_NONCE_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.auth.approval_action_nonce.v1:SENSITIVE_FIELDS_EXCLUDED",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "action_nonce_record_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-sensitive-fields": [
+    "action_nonce_hash"
+  ],
+  "x-aic-source-refs": [
+    "P-B6_OWNER_AUTH_AND_SESSION_CONTRACT_v0.2:§11",
+    "CANONICAL_MANIFEST_v0.5:M038C"
+  ]
+}

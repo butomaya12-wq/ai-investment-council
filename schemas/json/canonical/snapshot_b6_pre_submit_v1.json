@@ -1,0 +1,187 @@
+{
+  "$id": "urn:aic:b1.2:schema:B6_PRE_SUBMIT_SNAPSHOT_V1:v0.4",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "account_as_of": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "account_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "account_read_receipt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "account_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "approval_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "canonical_payload_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "captured_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "envelope_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "lock_epoch": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "mandate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "market_as_of": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "market_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "market_read_receipt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "market_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "open_orders_as_of": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "open_orders_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "open_orders_read_receipt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "open_orders_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "paper_account_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_lineage_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_refs": {
+      "$ref": "urn:aic:b1.2:schema:PolicyRefs10:v0.2"
+    },
+    "positions_as_of": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "positions_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "positions_read_receipt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "positions_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proposal_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "snapshot_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "STALE",
+        "INCOMPLETE",
+        "CONFLICTED",
+        "FAILED"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "paper_account_id",
+    "lock_epoch",
+    "proposal_id",
+    "canonical_payload_hash",
+    "approval_id",
+    "envelope_hash",
+    "mandate_version",
+    "policy_refs",
+    "policy_lineage_hash",
+    "account_ref",
+    "account_hash",
+    "account_as_of",
+    "account_read_receipt_id",
+    "positions_ref",
+    "positions_hash",
+    "positions_as_of",
+    "positions_read_receipt_id",
+    "open_orders_ref",
+    "open_orders_hash",
+    "open_orders_as_of",
+    "open_orders_read_receipt_id",
+    "market_ref",
+    "market_hash",
+    "market_as_of",
+    "market_read_receipt_id",
+    "captured_at",
+    "snapshot_hash",
+    "status"
+  ],
+  "title": "B6_PRE_SUBMIT_SNAPSHOT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "snapshot_hash",
+  "x-aic-canonical-id-field": "snapshot_id",
+  "x-aic-canonical-name": "B6_PRE_SUBMIT_SNAPSHOT_V1",
+  "x-aic-contract-version": "0.4",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_4",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "aic.snapshot.b6_pre_submit.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-R5-B6-002"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "snapshot_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B6_IMPLEMENTATION_PACKET_v0.1:§9 PRE_SUBMIT_SNAPSHOT",
+    "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5",
+    "CANONICAL_MANIFEST_v0.5:M039"
+  ]
+}

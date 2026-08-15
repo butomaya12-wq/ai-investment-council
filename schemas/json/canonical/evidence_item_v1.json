@@ -1,0 +1,280 @@
+{
+  "$id": "urn:aic:b1.2:schema:EVIDENCE_ITEM_V1:v0.3",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "anyOf": [
+        {
+          "properties": {
+            "source_uri": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_uri"
+          ]
+        },
+        {
+          "properties": {
+            "endpoint_class": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "endpoint_class"
+          ]
+        }
+      ]
+    },
+    {
+      "anyOf": [
+        {
+          "properties": {
+            "freshness_ttl": {
+              "$ref": "urn:aic:b1.2:schema:FreshnessTTL:v0.3"
+            }
+          },
+          "required": [
+            "freshness_ttl"
+          ]
+        },
+        {
+          "properties": {
+            "freshness_rule_id": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "freshness_rule_id"
+          ]
+        }
+      ]
+    }
+  ],
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "authoritative_for": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "conflict_group": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "endpoint_class": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "entity_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "evidence_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "field_or_claim": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "freshness_rule_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "freshness_ttl": {
+      "anyOf": [
+        {
+          "$ref": "urn:aic:b1.2:schema:FreshnessTTL:v0.3"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "knowable_at_cutoff": {
+      "type": "boolean"
+    },
+    "normalization_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "normalized_value": {
+      "anyOf": [
+        {
+          "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "observed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "provider": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provider_read_receipt_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "raw_content_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "raw_value_or_record_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "request_parameters_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "source_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_uri": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "evidence_id",
+    "provider",
+    "source_type",
+    "source_uri",
+    "endpoint_class",
+    "request_parameters_ref",
+    "entity_id",
+    "field_or_claim",
+    "raw_value_or_record_ref",
+    "normalized_value",
+    "published_at",
+    "observed_at",
+    "retrieved_at",
+    "as_of",
+    "freshness_ttl",
+    "freshness_rule_id",
+    "knowable_at_cutoff",
+    "authoritative_for",
+    "conflict_group",
+    "provider_read_receipt_id",
+    "raw_content_hash",
+    "normalization_version",
+    "evidence_hash"
+  ],
+  "title": "EVIDENCE_ITEM_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "evidence_hash",
+  "x-aic-canonical-id-field": "evidence_id",
+  "x-aic-canonical-name": "EVIDENCE_ITEM_V1",
+  "x-aic-contract-version": "0.3",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_3",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; candidate self-hashes/prose cannot override the external registry baseline.",
+  "x-aic-journal-payload-schema": "aic.evidence_item.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-F1-001",
+    "ND-F1-002"
+  ],
+  "x-aic-opaque-substructures": {
+    "paths": [
+      "/normalized_value"
+    ],
+    "rule": "normalized_value is value payload only; B1 does not infer child business semantics."
+  },
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "evidence_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "EI3-V01",
+      "rule": "source_uri != null OR endpoint_class != null"
+    },
+    {
+      "id": "EI3-V02",
+      "rule": "freshness_ttl != null OR freshness_rule_id != null"
+    },
+    {
+      "id": "EI3-V03",
+      "rule": "provider_read_receipt_id resolves to canonical PROVIDER_READ_RECEIPT_V1.read_receipt_id"
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B2_IMPLEMENTATION_PACKET_v0.1:§9",
+    "CANONICAL_MANIFEST_v0.5:M003"
+  ]
+}

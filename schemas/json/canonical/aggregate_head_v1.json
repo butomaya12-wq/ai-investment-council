@@ -1,0 +1,63 @@
+{
+  "$id": "urn:aic:b1.2:schema:AGGREGATE_HEAD_V1:v0.4",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "STRUCTURAL_PROJECTION; rebuildable from journal history.",
+  "properties": {
+    "aggregate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "aggregate_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "current_state": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "current_version": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "head_event_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "aggregate_type",
+    "aggregate_id",
+    "current_version",
+    "current_state",
+    "head_event_hash"
+  ],
+  "title": "AGGREGATE_HEAD_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": null,
+  "x-aic-canonical-id-field": "aggregate_type+aggregate_id",
+  "x-aic-canonical-name": "AGGREGATE_HEAD_V1",
+  "x-aic-contract-version": "0.4",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_4",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "NONE_STRUCTURAL_PROJECTION",
+  "x-aic-mapping-kind": "STRUCTURAL_PROJECTION",
+  "x-aic-normalization-decision-ids": [
+    "ND-R5-AGG-001"
+  ],
+  "x-aic-persistence-class": "STRUCTURAL_PROJECTION",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-source-refs": [
+    "B1_IMPLEMENTATION_PLAN_v0.1:§11 aggregate_heads key properties",
+    "CANONICAL_MANIFEST_v0.5:M057"
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "$id": "urn:aic:b1.2:schema:COMPUTED_VALUE_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "algorithm_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "algorithm_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "calculated_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "computed_value_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "input_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "input_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "metric_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "metric_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "output_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "parameters_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "rounding_rule": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "unit": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "value": {
+      "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+      "type": "string",
+      "x-aic-no-exponent": true,
+      "x-aic-python-type": "decimal.Decimal"
+    }
+  },
+  "required": [
+    "computed_value_id",
+    "metric_id",
+    "metric_version",
+    "value",
+    "unit",
+    "input_refs",
+    "input_hash",
+    "algorithm_id",
+    "algorithm_version",
+    "parameters_ref",
+    "calculated_at",
+    "rounding_rule",
+    "output_hash"
+  ],
+  "title": "COMPUTED_VALUE_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "output_hash",
+  "x-aic-canonical-id-field": "computed_value_id",
+  "x-aic-canonical-name": "COMPUTED_VALUE_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.computed_value.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "output_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B2_IMPLEMENTATION_PACKET_v0.1:§14",
+    "CANONICAL_MANIFEST_v0.5:M005"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "activated_at": "2026-08-15",
+  "activation_receipt": {
+    "file_id": "1ZXGgiMsJUPAlNu_cXTJw9x8dAhsZzp2r",
+    "sha256": "4f3fc2ebf42c56b5ace98ec3cd2ea27be78081489e58000bb85603c815383f9d"
+  },
+  "activation_status": "PASS_ACTIVATED",
+  "b1_3_open": false,
+  "b2_to_b8_authorized": false,
+  "bundle": {
+    "file_id": "1ax73UY-rcEtb2nwCLbbi4vf8kX2Td0Ld",
+    "sha256": "6fc50ad4e2565c4119154e83bd5589eb73d34bf904261af273dd77e2307a172f"
+  },
+  "effective_mapping_count": 71,
+  "field_authority_amendment": {
+    "file_id": "1gZtiz05IFIUTHP18NU6nvUqEqMjd9CgK",
+    "sha256": "74b4264581f686c84854f5b6dee6eac4869be58d4fe7a878fc3038c379c63d22"
+  },
+  "independent_pass": {
+    "file_id": "1mwdpiLm_-zD-pmoL64ee3zvkVdWlJcWa",
+    "result": "12_PASS_0_FAIL_0_BLOCKED",
+    "sha256": "821993ced775f11e8cac71543094080e5392d948afaa1a7b80e44456bb4ecc9f"
+  },
+  "live_money": "PROHIBITED",
+  "mapping_delta": {
+    "file_id": "1CT4kHP8qXX5td9trrXUiM2NqQ8sHLP2J",
+    "mapping_id": "M071",
+    "sha256": "048a841c47851ebfe884b37237700029b0a07b9a0faf1b2de57cadf33ec5ca82"
+  },
+  "registry": {
+    "file_id": "1erJWjelZWUDxPQXXurodzCYZ8z39vAUM",
+    "sha256": "966d4161a1eaf0b8c690d1c040e8116782b8d3c73a98571a98bb7f6b281a9a09"
+  },
+  "schema": "AIC_B1_2_AUTHORITY_IDENTITY_V1",
+  "stale_global_expectation_after_activation": "B1-VC-058 old 70-row expectation"
+}

@@ -1,0 +1,119 @@
+{
+  "$id": "urn:aic:b1.2:schema:SECURITY_TYPE_PROOF_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "cik": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "instrument_type": {
+      "enum": [
+        "OPERATING_COMPANY_COMMON_STOCK",
+        "ETF",
+        "FUND",
+        "ADR",
+        "OTHER",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "issuer_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "proof_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "security_type_proof_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "snapshot_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_record_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_uri": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PROVEN",
+        "CONFLICT",
+        "UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "symbol": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "security_type_proof_id",
+    "symbol",
+    "issuer_id",
+    "cik",
+    "instrument_type",
+    "source_type",
+    "source_uri",
+    "source_record_ref",
+    "as_of",
+    "retrieved_at",
+    "snapshot_hash",
+    "status",
+    "proof_hash"
+  ],
+  "title": "SECURITY_TYPE_PROOF_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "proof_hash",
+  "x-aic-canonical-id-field": "security_type_proof_id",
+  "x-aic-canonical-name": "SECURITY_TYPE_PROOF_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.security_type_proof.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "proof_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B2_IMPLEMENTATION_PACKET_v0.1:§7",
+    "CANONICAL_MANIFEST_v0.5:M008"
+  ]
+}

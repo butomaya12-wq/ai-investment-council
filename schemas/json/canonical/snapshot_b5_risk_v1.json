@@ -1,0 +1,136 @@
+{
+  "$id": "urn:aic:b1.2:schema:B5_RISK_INPUT_SNAPSHOT_V1:v0.5.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "account": {
+      "$ref": "urn:aic:b1.2:schema:B5RiskAccount:v0.4"
+    },
+    "captured_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "context": {
+      "$ref": "urn:aic:b1.2:schema:B5RiskContext:v0.3"
+    },
+    "decision_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "final_decision_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "mandate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "market_asset": {
+      "$ref": "urn:aic:b1.2:schema:B5RiskMarketAsset:v0.4"
+    },
+    "open_orders": {
+      "$ref": "urn:aic:b1.2:schema:B5RiskOpenOrders:v0.5.2"
+    },
+    "paper_account_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_lineage_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_refs": {
+      "$ref": "urn:aic:b1.2:schema:PolicyRefs10:v0.2"
+    },
+    "positions": {
+      "$ref": "urn:aic:b1.2:schema:B5RiskPositions:v0.5.2"
+    },
+    "primary_candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "snapshot_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "STALE",
+        "INCOMPLETE",
+        "CONFLICTED",
+        "FAILED"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "captured_at",
+    "paper_account_id",
+    "decision_id",
+    "final_decision_hash",
+    "primary_candidate_id",
+    "mandate_version",
+    "policy_refs",
+    "policy_lineage_hash",
+    "account",
+    "positions",
+    "open_orders",
+    "market_asset",
+    "context",
+    "snapshot_hash",
+    "status"
+  ],
+  "title": "B5_RISK_INPUT_SNAPSHOT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "snapshot_hash",
+  "x-aic-canonical-id-field": "snapshot_id",
+  "x-aic-canonical-name": "B5_RISK_INPUT_SNAPSHOT_V1",
+  "x-aic-contract-version": "0.5.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_5_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "aic.snapshot.b5_risk_input.v1",
+  "x-aic-mapping-authority-delta": "B1_2_B5_RISK_SNAPSHOT_MAPPING_AUTHORITY_DELTA_v0.3_2026-08-15.txt",
+  "x-aic-mapping-id": "M071",
+  "x-aic-mapping-kind": "DISTINCT_CANONICAL_TYPE",
+  "x-aic-normalization-decision-ids": [
+    "ND-F1-006",
+    "ND-R9-B5-UNIT-001",
+    "ND-R13-B5-POSITION-001",
+    "ND-R13-B5-OPENORDER-001"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "snapshot_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "B5S5-V01",
+      "rule": "B5_RISK_INPUT_SNAPSHOT_V1 canonical persistence classification resolves through independently accepted plan-level mapping delta M071 v0.3; direct inventory or builder normalization alone is insufficient."
+    },
+    {
+      "id": "B5S5-V02",
+      "rule": "All source-backed material provider numeric fields in the canonical B5 risk projection require DecimalWithUnit or explicit null; raw provider numeric strings/numbers are schema-invalid."
+    },
+    {
+      "id": "B5S5-V03",
+      "rule": "Open-order state/side/notional/qty are fixed-present; unknown/unvalued pending exposure routes INCOMPLETE_DATA, never PASS."
+    }
+  ],
+  "x-aic-source-refs": [
+    "B1_SCHEMA_AND_TRANSITION_COMPATIBILITY_AMENDMENT_v0.5:§3 canonical schema inventory",
+    "B1_2_B5_RISK_SNAPSHOT_MAPPING_AUTHORITY_DELTA_v0.3:M071",
+    "P-B5_IMPLEMENTATION_PACKET_v0.1:§3,§7,R07",
+    "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT_v0.5:§3-§4",
+    "P-B5_RISK_AND_SIZING_POLICY_CONTRACT_v0.2:§1,§7",
+    "AIC_R0_BOUNDED_PLAN_REPAIR_AND_CROSS_PACKET_COMPATIBILITY_v0.5:§6"
+  ]
+}

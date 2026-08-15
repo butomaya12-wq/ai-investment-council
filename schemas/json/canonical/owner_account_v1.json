@@ -1,0 +1,94 @@
+{
+  "$id": "urn:aic:b1.2:schema:OWNER_ACCOUNT_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_sessions_revoked_after": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "auth_version": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "created_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "login_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "owner_account_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "owner_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "password_changed_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "password_hash_argon2id": {
+      "minLength": 1,
+      "pattern": "^\\$argon2id\\$",
+      "type": "string"
+    },
+    "password_hash_parameters_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "DISABLED"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner_id",
+    "login_name",
+    "password_hash_argon2id",
+    "password_hash_parameters_ref",
+    "auth_version",
+    "created_at",
+    "password_changed_at",
+    "status",
+    "all_sessions_revoked_after",
+    "owner_account_hash"
+  ],
+  "title": "OWNER_ACCOUNT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "owner_account_hash",
+  "x-aic-canonical-id-field": "owner_id",
+  "x-aic-canonical-name": "OWNER_ACCOUNT_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.auth.owner_account.v1:SENSITIVE_FIELDS_EXCLUDED",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "owner_account_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-sensitive-fields": [
+    "password_hash_argon2id"
+  ],
+  "x-aic-source-refs": [
+    "P-B6_OWNER_AUTH_AND_SESSION_CONTRACT_v0.2:§4",
+    "CANONICAL_MANIFEST_v0.5:M038A"
+  ]
+}

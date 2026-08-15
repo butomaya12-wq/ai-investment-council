@@ -1,0 +1,73 @@
+AI INVESTMENT COUNCIL — B1.2 v0.5.2 FIELD-AUTHORITY ACTIVATION RECEIPT
+2026-08-15
+
+STATUS
+PASS / EXACT v0.5.2 FIELD AUTHORITY ACTIVATED /
+M071 ADDITIVE PLAN-LEVEL MAPPING AUTHORITY ACTIVATED /
+B1.2 CONTRACT IMPLEMENTATION MAY OPEN /
+B1.2 IMPLEMENTATION NOT EXECUTED
+
+INDEPENDENT REVIEW
+Result: R1–R12 = 12 PASS / 0 FAIL / 0 BLOCKED
+Review result file_id: 1mwdpiLm_-zD-pmoL64ee3zvkVdWlJcWa
+Review result raw SHA-256: 821993ced775f11e8cac71543094080e5392d948afaa1a7b80e44456bb4ecc9f
+Review command file_id: 1OD7ob7iR25Xk4VNOn5XxF2FSc3eKZoPx
+
+ACTIVATED EXACT PACKAGE
+1. Executable JSON Schema field authority:
+   B1_2_CANONICAL_SCHEMA_CONTRACT_BUNDLE_v0.5.2_2026-08-15.json
+   file_id: 1ax73UY-rcEtb2nwCLbbi4vf8kX2Td0Ld
+   raw SHA-256: 6fc50ad4e2565c4119154e83bd5589eb73d34bf904261af273dd77e2307a172f
+   semantic SHA-256: 25bef67844b3cc76033c061a8317845bf09fac1b88f29355e321f30a581f5ded
+
+2. External registry/provenance/integrity oracle:
+   B1_2_CANONICAL_SCHEMA_REGISTRY_BASELINE_v0.5.2_2026-08-15.json
+   file_id: 1erJWjelZWUDxPQXXurodzCYZ8z39vAUM
+   raw SHA-256: 966d4161a1eaf0b8c690d1c040e8116782b8d3c73a98571a98bb7f6b281a9a09
+   semantic SHA-256: 0dd2f56b8cd231be54e589a061f5e8f92ed3244c33d5e1f55abf7486687a0d97
+   role: external expected-identity/provenance/certification oracle only; NOT an alternate field authority.
+
+3. Additive mapping authority:
+   B1_2_B5_RISK_SNAPSHOT_MAPPING_AUTHORITY_DELTA_v0.3_2026-08-15.txt
+   file_id: 1CT4kHP8qXX5td9trrXUiM2NqQ8sHLP2J
+   raw SHA-256: 048a841c47851ebfe884b37237700029b0a07b9a0faf1b2de57cadf33ec5ca82
+   active mapping: M071
+   mapping_kind: DISTINCT_CANONICAL_TYPE
+   persistence_mode: CANONICAL_ROW
+   canonical schema: B5_RISK_INPUT_SNAPSHOT_V1 v0.5.2
+   canonical ID/hash: snapshot_id / snapshot_hash
+   journal: aic.snapshot.b5_risk_input.v1 / v1
+   lossless_required: true
+
+4. Field-authority amendment:
+   B1_2_CANONICAL_FIELD_AUTHORITY_AMENDMENT_v0.5.2_2026-08-15.txt
+   file_id: 1gZtiz05IFIUTHP18NU6nvUqEqMjd9CgK
+   raw SHA-256: 74b4264581f686c84854f5b6dee6eac4869be58d4fe7a878fc3038c379c63d22
+
+ACTIVATION CONSEQUENCES
+- Base CANONICAL_SCHEMA_COMPATIBILITY_AND_PROMOTION_MANIFEST v0.5 remains byte-identical with 70 base rows.
+- M065/M066/M067 remain RESERVED / ABSENT.
+- Effective B1.2 mapping universe after this activation = base 70 + M071 = 71.
+- B1-VC-058 remains exactly one global check ID.
+- Its old 70-row expectation is now STALE / FORBIDDEN FOR ANY NEW GLOBAL B1 FINAL PASS, R1, runtime PASS or freeze PASS.
+- Before any such new global PASS, current acceptance inventory must be regenerated with one B1-VC-058 EXPECTATION_OVERRIDE bound to this accepted M071 identity.
+- This activation does NOT itself change the current 639 B1→B7 check-ID count or create a new check ID.
+- No duplicate B1-VC-058 is authorized.
+
+PRESERVED BOUNDARIES
+dependency changes = 0
+serializer changes = 0
+state topology = 34 states / 52 legal edges
+product code changes = 0
+user repository changes = 0
+provider/model/broker calls = 0
+paper orders = 0
+live money = PROHIBITED
+B1.3 = NOT OPEN
+B2→B8 implementation = UNAUTHORIZED
+
+DISPOSITION
+B1.2 field-authority blocker = CLOSED.
+B1.2 contract implementation may open under existing B1 owner authorization.
+B1.2 implementation has not been executed by this activation cycle.
+Global acceptance-identity regeneration remains required before any new B1 FINAL/R1/runtime/freeze PASS.

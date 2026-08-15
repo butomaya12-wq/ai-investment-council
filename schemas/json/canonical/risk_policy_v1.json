@@ -1,0 +1,289 @@
+{
+  "$id": "urn:aic:b1.2:schema:RISK_POLICY_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R01"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R02"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R03"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R04"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R05"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R06"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R07"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R08"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R09"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R10"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R13"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R16"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R17"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R18"
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "required_check_ids": {
+          "contains": {
+            "const": "R19"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "check_parameter_refs": {
+      "additionalProperties": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "object"
+    },
+    "missing_required_input_behavior": {
+      "const": "INCOMPLETE_DATA",
+      "type": "string"
+    },
+    "modify_allowed_check_ids": {
+      "items": {
+        "enum": [
+          "R08",
+          "R09",
+          "R10",
+          "R11",
+          "R13",
+          "R14",
+          "R15"
+        ],
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "optional_check_ids": {
+      "items": {
+        "enum": [
+          "R11",
+          "R12",
+          "R14",
+          "R15"
+        ],
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "owner_approved_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "policy_change_requires_owner_approval": {
+      "const": true,
+      "type": "boolean"
+    },
+    "policy_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "required_check_ids": {
+      "items": {
+        "enum": [
+          "R01",
+          "R02",
+          "R03",
+          "R04",
+          "R05",
+          "R06",
+          "R07",
+          "R08",
+          "R09",
+          "R10",
+          "R13",
+          "R16",
+          "R17",
+          "R18",
+          "R19",
+          "R11",
+          "R12",
+          "R14",
+          "R15"
+        ],
+        "type": "string"
+      },
+      "minItems": 15,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "validation_schema_version": {
+      "const": "RISK_POLICY_V1",
+      "type": "string"
+    },
+    "version": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_id",
+    "version",
+    "owner_approved_at",
+    "active",
+    "required_check_ids",
+    "optional_check_ids",
+    "check_parameter_refs",
+    "modify_allowed_check_ids",
+    "missing_required_input_behavior",
+    "policy_change_requires_owner_approval",
+    "validation_schema_version",
+    "policy_hash"
+  ],
+  "title": "RISK_POLICY_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "policy_hash",
+  "x-aic-canonical-id-field": "policy_id+version",
+  "x-aic-canonical-name": "RISK_POLICY_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.risk_policy.v1",
+  "x-aic-opaque-substructures": {
+    "paths": [
+      "/check_parameter_refs"
+    ],
+    "rule": "B1 validates container type only. No child-field business semantics may be inferred from this bundle; owning later-stage contract/payload_schema must define any child semantics before use."
+  },
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "policy_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "RP-V01",
+      "rule": "required_check_ids contains all fixed core checks R01,R02,R03,R04,R05,R06,R07,R08,R09,R10,R13,R16,R17,R18,R19"
+    },
+    {
+      "id": "RP-V02",
+      "rule": "R11,R12,R14,R15 may be enabled only by frozen owner policy before run; no post-hoc N/A"
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B5_RISK_AND_SIZING_POLICY_CONTRACT_v0.2:§2",
+    "CANONICAL_MANIFEST_v0.5:M028"
+  ]
+}

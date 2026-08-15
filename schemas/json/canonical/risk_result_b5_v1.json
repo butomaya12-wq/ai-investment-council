@@ -1,0 +1,160 @@
+{
+  "$id": "urn:aic:b1.2:schema:B5_RISK_RESULT_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approval_authority": {
+      "const": false,
+      "type": "boolean"
+    },
+    "block_reason_codes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "calculated_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "check_result_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "decision_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "execution_authority": {
+      "const": false,
+      "type": "boolean"
+    },
+    "final_decision_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "incomplete_reason_codes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "mandate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "max_allowed_notional_usd": {
+      "anyOf": [
+        {
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "type": "string",
+          "x-aic-no-exponent": true,
+          "x-aic-python-type": "decimal.Decimal"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "policy_lineage_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_refs": {
+      "$ref": "urn:aic:b1.2:schema:PolicyRefs10:v0.2"
+    },
+    "portfolio_impact_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proposal_candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proposal_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "required_modifications": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "risk_input_snapshot_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "risk_input_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "risk_result_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "risk_result_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "MODIFY",
+        "BLOCK",
+        "INCOMPLETE_DATA"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "risk_result_id",
+    "decision_id",
+    "final_decision_hash",
+    "proposal_candidate_id",
+    "proposal_hash",
+    "risk_input_snapshot_id",
+    "risk_input_snapshot_hash",
+    "mandate_version",
+    "policy_refs",
+    "policy_lineage_hash",
+    "status",
+    "check_result_ids",
+    "portfolio_impact_id",
+    "max_allowed_notional_usd",
+    "required_modifications",
+    "block_reason_codes",
+    "incomplete_reason_codes",
+    "calculated_at",
+    "risk_result_hash",
+    "execution_authority",
+    "approval_authority"
+  ],
+  "title": "B5_RISK_RESULT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "risk_result_hash",
+  "x-aic-canonical-id-field": "risk_result_id",
+  "x-aic-canonical-name": "B5_RISK_RESULT_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.risk_result.b5.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "risk_result_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B5_IMPLEMENTATION_PACKET_v0.1:§18",
+    "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT_v0.5",
+    "CANONICAL_MANIFEST_v0.5:M032"
+  ]
+}

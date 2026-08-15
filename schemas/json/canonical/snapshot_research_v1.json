@@ -1,0 +1,139 @@
+{
+  "$id": "urn:aic:b1.2:schema:B3_RESEARCH_SNAPSHOT_V1:v0.3",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "added_b3_evidence_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "base_b2_evidence_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "computed_value_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "conflict_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "deep_comparison_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "manifest_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "parent_b2_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provider_read_receipt_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "raw_content_hashes": {
+      "items": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "research_cutoff": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "research_model_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "research_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "research_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "CONFLICTED",
+        "STALE",
+        "FAILED"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "research_snapshot_id",
+    "parent_b2_snapshot_id",
+    "deep_comparison_id",
+    "research_cutoff",
+    "research_policy_ref",
+    "research_model_policy_ref",
+    "evidence_policy_ref",
+    "candidate_id",
+    "provider_read_receipt_ids",
+    "base_b2_evidence_ids",
+    "added_b3_evidence_ids",
+    "computed_value_ids",
+    "conflict_ids",
+    "raw_content_hashes",
+    "manifest_hash",
+    "status"
+  ],
+  "title": "B3_RESEARCH_SNAPSHOT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "manifest_hash",
+  "x-aic-canonical-id-field": "research_snapshot_id",
+  "x-aic-canonical-name": "B3_RESEARCH_SNAPSHOT_V1",
+  "x-aic-contract-version": "0.3",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_3",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; candidate self-hashes/prose cannot override the external registry baseline.",
+  "x-aic-journal-payload-schema": "aic.snapshot.research.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-S8-002"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "manifest_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "B3_RESEARCH_SNAPSHOT_V1-POLREF-V03",
+      "rule": "Policy version strings are not authority; every replaced policy field is exact POLICY_REFERENCE_V1 per current M060."
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B3_IMPLEMENTATION_PACKET_v0.1:§11",
+    "CANONICAL_MANIFEST_v0.5:M012"
+  ]
+}

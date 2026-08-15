@@ -1,0 +1,241 @@
+{
+  "$id": "urn:aic:b1.2:schema:CANDIDATE_PACKET_V1:v0.3",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "b2_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "business_model_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "candidate_packet_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "capital_allocation_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "catalyst_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "competitive_position_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "computed_value_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "deep_comparison_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "financial_quality_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "growth_quality_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "issuer_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "mandate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "market_context_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "material_conflicts": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "material_unknowns": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "model_run_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "packet_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "portfolio_interaction_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "research_model_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "research_policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "research_questions_resolved": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "research_questions_unresolved": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "research_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "research_status": {
+      "enum": [
+        "COMPLETE",
+        "DEGRADED",
+        "INCOMPLETE",
+        "CONFLICTED"
+      ],
+      "type": "string"
+    },
+    "risk_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source_gaps": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "symbol": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "valuation_context_claim_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "candidate_packet_id",
+    "candidate_id",
+    "symbol",
+    "issuer_id",
+    "b2_snapshot_id",
+    "research_snapshot_id",
+    "mandate_version",
+    "deep_comparison_id",
+    "research_policy_ref",
+    "research_model_policy_ref",
+    "model_run_ref",
+    "business_model_claim_ids",
+    "growth_quality_claim_ids",
+    "financial_quality_claim_ids",
+    "competitive_position_claim_ids",
+    "valuation_context_claim_ids",
+    "market_context_claim_ids",
+    "capital_allocation_claim_ids",
+    "catalyst_claim_ids",
+    "risk_claim_ids",
+    "portfolio_interaction_claim_ids",
+    "material_unknowns",
+    "material_conflicts",
+    "source_gaps",
+    "computed_value_ids",
+    "evidence_ids",
+    "research_questions_resolved",
+    "research_questions_unresolved",
+    "research_status",
+    "packet_hash"
+  ],
+  "title": "CANDIDATE_PACKET_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "packet_hash",
+  "x-aic-canonical-id-field": "candidate_packet_id",
+  "x-aic-canonical-name": "CANDIDATE_PACKET_V1",
+  "x-aic-contract-version": "0.3",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_3",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; candidate self-hashes/prose cannot override the external registry baseline.",
+  "x-aic-journal-payload-schema": "aic.candidate_packet.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-S8-003"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "packet_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "CANDIDATE_PACKET_V1-POLREF-V03",
+      "rule": "Policy version strings are not authority; every replaced policy field is exact POLICY_REFERENCE_V1 per current M060."
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B3_IMPLEMENTATION_PACKET_v0.1:§15",
+    "CANONICAL_MANIFEST_v0.5:M015"
+  ]
+}

@@ -1,0 +1,439 @@
+{
+  "$id": "urn:aic:b1.2:schema:POLICY_VALUE_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "value_type": {
+            "const": "DECIMAL"
+          }
+        },
+        "required": [
+          "value_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value_boolean": {
+            "type": "null"
+          },
+          "value_date": {
+            "type": "null"
+          },
+          "value_datetime": {
+            "type": "null"
+          },
+          "value_decimal": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "value_duration_seconds": {
+            "type": "null"
+          },
+          "value_enum_string": {
+            "type": "null"
+          },
+          "value_integer": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "value_type": {
+            "const": "INTEGER"
+          }
+        },
+        "required": [
+          "value_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value_boolean": {
+            "type": "null"
+          },
+          "value_date": {
+            "type": "null"
+          },
+          "value_datetime": {
+            "type": "null"
+          },
+          "value_decimal": {
+            "type": "null"
+          },
+          "value_duration_seconds": {
+            "type": "null"
+          },
+          "value_enum_string": {
+            "type": "null"
+          },
+          "value_integer": {
+            "not": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "value_type": {
+            "const": "DURATION_SECONDS"
+          }
+        },
+        "required": [
+          "value_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value_boolean": {
+            "type": "null"
+          },
+          "value_date": {
+            "type": "null"
+          },
+          "value_datetime": {
+            "type": "null"
+          },
+          "value_decimal": {
+            "type": "null"
+          },
+          "value_duration_seconds": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "value_enum_string": {
+            "type": "null"
+          },
+          "value_integer": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "value_type": {
+            "const": "DATETIME"
+          }
+        },
+        "required": [
+          "value_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value_boolean": {
+            "type": "null"
+          },
+          "value_date": {
+            "type": "null"
+          },
+          "value_datetime": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "value_decimal": {
+            "type": "null"
+          },
+          "value_duration_seconds": {
+            "type": "null"
+          },
+          "value_enum_string": {
+            "type": "null"
+          },
+          "value_integer": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "value_type": {
+            "const": "DATE"
+          }
+        },
+        "required": [
+          "value_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value_boolean": {
+            "type": "null"
+          },
+          "value_date": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "value_datetime": {
+            "type": "null"
+          },
+          "value_decimal": {
+            "type": "null"
+          },
+          "value_duration_seconds": {
+            "type": "null"
+          },
+          "value_enum_string": {
+            "type": "null"
+          },
+          "value_integer": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "value_type": {
+            "const": "BOOLEAN"
+          }
+        },
+        "required": [
+          "value_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value_boolean": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "value_date": {
+            "type": "null"
+          },
+          "value_datetime": {
+            "type": "null"
+          },
+          "value_decimal": {
+            "type": "null"
+          },
+          "value_duration_seconds": {
+            "type": "null"
+          },
+          "value_enum_string": {
+            "type": "null"
+          },
+          "value_integer": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "value_type": {
+            "const": "ENUM_STRING"
+          }
+        },
+        "required": [
+          "value_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "value_boolean": {
+            "type": "null"
+          },
+          "value_date": {
+            "type": "null"
+          },
+          "value_datetime": {
+            "type": "null"
+          },
+          "value_decimal": {
+            "type": "null"
+          },
+          "value_duration_seconds": {
+            "type": "null"
+          },
+          "value_enum_string": {
+            "not": {
+              "type": "null"
+            }
+          },
+          "value_integer": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "policy_ref": {
+      "$ref": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2"
+    },
+    "policy_value_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_value_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "unit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_boolean": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_datetime": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string",
+          "x-aic-require-aware-utc": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_decimal": {
+      "anyOf": [
+        {
+          "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+          "type": "string",
+          "x-aic-no-exponent": true,
+          "x-aic-python-type": "decimal.Decimal"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_duration_seconds": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_enum_string": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_integer": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_key": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "value_type": {
+      "enum": [
+        "DECIMAL",
+        "INTEGER",
+        "DURATION_SECONDS",
+        "DATETIME",
+        "DATE",
+        "BOOLEAN",
+        "ENUM_STRING"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_value_id",
+    "policy_ref",
+    "value_key",
+    "value_type",
+    "value_decimal",
+    "value_integer",
+    "value_duration_seconds",
+    "value_datetime",
+    "value_date",
+    "value_boolean",
+    "value_enum_string",
+    "unit",
+    "policy_value_hash"
+  ],
+  "title": "POLICY_VALUE_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "policy_value_hash",
+  "x-aic-canonical-id-field": "policy_value_id",
+  "x-aic-canonical-name": "POLICY_VALUE_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.policy_value.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "policy_value_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "PV-V01",
+      "rule": "exactly one typed value field is non-null and matches value_type"
+    },
+    {
+      "id": "PV-V02",
+      "rule": "typed value equals exact registered policy payload value under policy_ref"
+    }
+  ],
+  "x-aic-source-refs": [
+    "AIC_R0_BOUNDED_PLAN_REPAIR_v0.5:F09",
+    "CANONICAL_MANIFEST_v0.5:M064"
+  ]
+}

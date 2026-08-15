@@ -1,0 +1,3068 @@
+{
+  "artifact": "B1_2_CANONICAL_SCHEMA_REGISTRY_BASELINE",
+  "authority_fingerprints": [
+    {
+      "drive_file_id": "1EOmGLu9sHOSs8ceK6bSf1_pE-Gje5kNb",
+      "representation": "raw DOCX",
+      "role": "accepted build-spec semantics",
+      "sha256": "2c13bd8f55698eedcdf3155dd4bd3b57b757ee3347d395a4a877bb126901703c",
+      "source_id": "SPEC_V0_5",
+      "title": "AI_INVESTMENT_COUNCIL_ENGINEERING_SPEC_v0.5_2026-08-14.docx"
+    },
+    {
+      "drive_file_id": "1JCDhbt1IJDO6XmGjDLLmgtdptjUGYiMELLXKhKHHXS8",
+      "representation": "text/plain export 2026-08-15",
+      "role": "current cross-packet override/authority",
+      "sha256": "1b4939bb79b793d8ad477b748382316a88d413fefe6c34b13138e60893c1732c",
+      "source_id": "R0_ROOT_V0_5",
+      "title": "AIC_R0_BOUNDED_PLAN_REPAIR_AND_CROSS_PACKET_COMPATIBILITY — v0.5 — 2026-08-14"
+    },
+    {
+      "drive_file_id": "17dMr1DeJkFUACGkH4FWAihewYUahNkkbcoWMSLhZNVM",
+      "representation": "text/plain export 2026-08-15",
+      "role": "canonical mapping/id/hash authority",
+      "sha256": "b8c155d45e807c24e47618c9cc0d58043717ad2601638330be49804d38476306",
+      "source_id": "CANONICAL_MANIFEST_V0_5",
+      "title": "CANONICAL_SCHEMA_COMPATIBILITY_AND_PROMOTION_MANIFEST — v0.5 — 2026-08-14"
+    },
+    {
+      "drive_file_id": "1-iaPmoLaPkmahaCVY7Je8tQr1YUnCe1T_YOxD3xRCnk",
+      "representation": "text/plain export 2026-08-15",
+      "role": "current lifecycle schema semantics",
+      "sha256": "78fc44f1d0095210dda69f53d60c8cde0accc1b2afd2205879a895249a264291",
+      "source_id": "DECISION_LIFECYCLE_POLICY_OWNER_INPUT_V0_1",
+      "title": "DECISION_LIFECYCLE_POLICY_OWNER_INPUT — TEMPLATE — v0.1 — 2026-08-14"
+    },
+    {
+      "drive_file_id": "1Rjc3-EfC9hGrUiUzX0siAlEF0yg844mKJc0pY5YwYHg",
+      "representation": "text/plain export 2026-08-15",
+      "role": "EvalRun/EvalCase/Mutation evidence semantics",
+      "sha256": "ac022ff4ef74c6816d06d6cd5422d69c1a10cc6769ef32192453a3394d25f229",
+      "source_id": "PB8_EVAL_V0_4",
+      "title": "P-B8_EVAL_HARNESS_AND_MUTATION_CONTRACT — v0.4 — 2026-08-14"
+    }
+  ],
+  "baseline_semantic_hash": "0dd2f56b8cd231be54e589a061f5e8f92ed3244c33d5e1f55abf7486687a0d97",
+  "candidate_bundle_identity": {
+    "bytes": 363240,
+    "canonical_schema_count": 59,
+    "drive_file_id": "1ax73UY-rcEtb2nwCLbbi4vf8kX2Td0Ld",
+    "file": "B1_2_CANONICAL_SCHEMA_CONTRACT_BUNDLE_v0.5.2_2026-08-15.json",
+    "helper_resource_count": 24,
+    "raw_sha256": "6fc50ad4e2565c4119154e83bd5589eb73d34bf904261af273dd77e2307a172f",
+    "semantic_hash": "25bef67844b3cc76033c061a8317845bf09fac1b88f29355e321f30a581f5ded",
+    "total_resource_count": 83
+  },
+  "candidate_plan_authority_delta": {
+    "b1_verification_expectation_override": "B1-VC-058",
+    "base_active_mapping_count": 70,
+    "base_manifest_version": "v0.5",
+    "drive_file_id": "1CT4kHP8qXX5td9trrXUiM2NqQ8sHLP2J",
+    "effective_mapping_count_if_accepted": 71,
+    "file": "B1_2_B5_RISK_SNAPSHOT_MAPPING_AUTHORITY_DELTA_v0.3_2026-08-15.txt",
+    "mapping_id": "M071",
+    "mapping_version": "v0.3",
+    "raw_sha256": "048a841c47851ebfe884b37237700029b0a07b9a0faf1b2de57cadf33ec5ca82",
+    "reserved_mapping_ids_preserved": [
+      "M065",
+      "M066",
+      "M067"
+    ],
+    "scope": "B1.2_MAPPING_AUTHORITY_ONLY",
+    "status": "CANDIDATE_NOT_ACTIVATED"
+  },
+  "date": "2026-08-15",
+  "effective_mapping_expectation_if_accepted": {
+    "b1_vc_058": "EXPECTATION_OVERRIDE_REQUIRED",
+    "base_active_mapping_count": 70,
+    "base_manifest": "CANONICAL_SCHEMA_COMPATIBILITY_AND_PROMOTION_MANIFEST v0.5",
+    "delta_mapping_id": "M071",
+    "delta_mapping_version": "v0.3",
+    "effective_active_mapping_count": 71,
+    "global_acceptance_inventory_rule": "This scoped B1.2 delta cannot satisfy a future global B1 FINAL PASS/R1/runtime/freeze under the old 70-row expectation. Before such a global claim, regenerate the acceptance identity with explicit B1-VC-058 EXPECTATION_OVERRIDE provenance and bind the accepted delta identity.",
+    "reserved_ids": [
+      "M065",
+      "M066",
+      "M067"
+    ],
+    "reserved_ids_reused": false
+  },
+  "expected_embedded_resource_count": 83,
+  "expected_normative_helper_resource_count": 24,
+  "expected_resource_set_hash": "5154e744f291fe6e54c678ead6db9f6f37d7a46f7108f7cbe8dbd109de45e671",
+  "expected_schema_set_hash": "4838740a40f2e92dcda140579f5b8e893d51006c07001beea3f0d4e93b584ba9",
+  "field_authority": "NONE — independently accepted JSON Schema resources are executable field authority; this registry fixes expected identities/provenance/certification evidence, while M071 v0.3 is the separate candidate plan-level mapping authority.",
+  "hash_algorithms": {
+    "candidate_bundle_semantic_hash": "SHA256(canonical JSON of full bundle after removing only top-level x-aic-bundle-sha256)",
+    "resource_set_hash": "SHA256(canonical JSON array sorted by resource_name of {resource_name,resource_id,resource_sha256})",
+    "resource_sha256": "SHA256(canonical JSON of one schema resource; UTF-8; sort_keys=true; separators=(',',':'); ensure_ascii=false)",
+    "schema_set_hash": "same algorithm restricted to exact 59 canonical inventory names"
+  },
+  "historical_superseded_normalization_decisions": {
+    "ND-R5-B5-001": {
+      "authority": "NONE",
+      "classification": "CURRENT_CANONICAL_INVENTORY_CLARIFICATION",
+      "decision": "Treat B5_RISK_INPUT_SNAPSHOT_V1 as a direct B1 canonical-inventory schema. Do NOT fabricate a new Canonical Manifest M-row. Its schema authority is the explicit B1 canonical inventory + current P-B5 field contract + current B5→B6 overrides.",
+      "new_business_semantics": false,
+      "reason": "Closes the missing-M-row ambiguity without changing the independently accepted 70-row mapping manifest or state/business architecture.",
+      "schema": "B5_RISK_INPUT_SNAPSHOT_V1",
+      "source_phrase": "B1 compatibility amendment explicitly lists snapshot_b5_risk_v1.json in canonical schema inventory; P-B5 defines B5_RISK_INPUT_SNAPSHOT fields.",
+      "source_refs": [
+        "B1_SCHEMA_COMPAT_V0_5:§3",
+        "PB5_BASE_V0_1:§7",
+        "PB56_HANDOFF_V0_5:§4"
+      ],
+      "status": "SUPERSEDED_BY_PLAN_LEVEL_MAPPING_AUTHORITY_M071_V0_2"
+    }
+  },
+  "normalization_decisions": {
+    "ND-F1-001": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Preserve both source lexemes as fixed-present nullable fields source_uri and endpoint_class; require at least one non-null; neither field substitutes for the other.",
+      "new_business_semantics": false,
+      "reason": "Eliminates slash ambiguity without inventing a combined semantic field.",
+      "schema": "EVIDENCE_ITEM_V1",
+      "source_phrase": "source_uri / endpoint class",
+      "source_refs": [
+        "PB2_V0_1:§9"
+      ]
+    },
+    "ND-F1-002": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Preserve source names freshness_ttl and freshness_rule_id as fixed-present nullable fields; require at least one non-null. freshness_ttl uses FreshnessTTL{value:int>=0, unit:MILLISECONDS|SECONDS|MINUTES|HOURS|DAYS}; no unit default exists.",
+      "new_business_semantics": false,
+      "reason": "Removes the v0.2 hidden seconds assumption; exact unit is data, not builder inference.",
+      "schema": "EVIDENCE_ITEM_V1",
+      "source_phrase": "freshness_ttl / freshness_rule_id",
+      "source_refs": [
+        "PB2_V0_1:§9"
+      ]
+    },
+    "ND-F1-003": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Preserve provider_as_of and feed as separate fixed-present nullable fields; either/both may be null depending provider response.",
+      "new_business_semantics": false,
+      "reason": "Distinct metadata axes; no authority inferred from absence.",
+      "schema": "PROVIDER_READ_RECEIPT_V1",
+      "source_phrase": "provider_as_of / feed optional",
+      "source_refs": [
+        "PB2_V0_1:§10"
+      ]
+    },
+    "ND-F1-004": {
+      "classification": "GROUP_PRESERVATION_DECISION",
+      "decision": "Represent as one opaque container http_status_result_metadata; B1 validates only JSON-map container shape and does not invent child fields.",
+      "new_business_semantics": false,
+      "reason": "Avoids v0.2 decomposition into non-source-backed http_status_code/result_status.",
+      "schema": "PROVIDER_READ_RECEIPT_V1",
+      "source_phrase": "http/status/result metadata",
+      "source_refs": [
+        "PB2_V0_1:§10"
+      ]
+    },
+    "ND-F1-005": {
+      "classification": "GROUP_PRESERVATION_DECISION",
+      "decision": "Represent as one opaque container error_retry_metadata; B1 validates only JSON-map container shape and does not invent child fields.",
+      "new_business_semantics": false,
+      "reason": "Avoids v0.2 decomposition into non-source-backed error_metadata/retry_metadata.",
+      "schema": "PROVIDER_READ_RECEIPT_V1",
+      "source_phrase": "error/retry metadata",
+      "source_refs": [
+        "PB2_V0_1:§10"
+      ]
+    },
+    "ND-F1-006": {
+      "classification": "SOURCE_GROUP_PRESERVATION_DECISION",
+      "decision": "Preserve source groups as nested objects account, positions, open_orders, market_asset, context. account.status remains status inside account; snapshot-level status remains top-level status. Provider 'if available/optional' fields are fixed-present nullable leaves inside the owning group.",
+      "new_business_semantics": false,
+      "reason": "Eliminates invented account_status collision rename while preserving the source's own namespace boundaries.",
+      "schema": "B5_RISK_INPUT_SNAPSHOT_V1",
+      "source_phrase": "ACCOUNT / POSITIONS / OPEN ORDERS / MARKET / ASSET / B2/B3 CONTEXT grouped contract plus snapshot-level status",
+      "source_refs": [
+        "PB5_BASE_V0_1:§7",
+        "R0_ROOT_V0_5:§6"
+      ]
+    },
+    "ND-R13-B5-OPENORDER-001": {
+      "classification": "CLOSED_SOURCE_REQUIRED_OPEN_ORDER_RISK_PROJECTION",
+      "decision": "Each open_order_exposure_record is a closed canonical risk projection with fixed-present state,side,notional,qty. notional/qty are DecimalWithUnit or explicit null; additional provider order fields remain outside canonical risk authority.",
+      "new_business_semantics": false,
+      "reason": "P-B5 explicitly requires state/side/notional/qty for pending exposure and fail-closed INCOMPLETE_DATA when exposure cannot be valued.",
+      "schema": "B5_RISK_INPUT_SNAPSHOT_V1",
+      "source_phrase": "order state/side/notional/qty must be represented; pending exposure deterministically valued or INCOMPLETE_DATA",
+      "source_refs": [
+        "PB5_BASE_V0_1:R07 OPEN_ORDER_PENDING_EXPOSURE",
+        "PB5_BASE_V0_1:§7",
+        "PB5_POLICY_V0_2:§1"
+      ]
+    },
+    "ND-R13-B5-POSITION-001": {
+      "classification": "CLOSED_SOURCE_BACKED_POSITION_RISK_PROJECTION",
+      "decision": "portfolio_position_values[] is a closed canonical risk projection with fixed-present qty,market_value,cost_basis,current_price; each value is DecimalWithUnit or explicit null. No additional provider fields are admitted into this canonical record.",
+      "new_business_semantics": false,
+      "reason": "Current P-B5 identifies current position quantity, cost basis, market value and current price as provider facts. Raw provider payload remains traceable through positions_ref/positions_hash/provider receipts instead of leaking into deterministic risk authority.",
+      "schema": "B5_RISK_INPUT_SNAPSHOT_V1",
+      "source_phrase": "current positions expose live position quantity, cost basis, market value and current price; portfolio_position_values[]; all numeric strings use Decimal with explicit units",
+      "source_refs": [
+        "PB5_BASE_V0_1:§3,§7",
+        "PB5_POLICY_V0_2:§7"
+      ]
+    },
+    "ND-R5-AGG-001": {
+      "classification": "SOURCE_FIELD_SET_CORRECTION",
+      "decision": "Remove builder-invented updated_at from AGGREGATE_HEAD_V1. Atomic update behavior is transaction semantics, not an extra source-defined projection field.",
+      "new_business_semantics": false,
+      "reason": "B1 plan names no updated_at projection field.",
+      "schema": "AGGREGATE_HEAD_V1",
+      "source_phrase": "aggregate_heads key properties: aggregate_type+aggregate_id; current_version; current_state; head_event_hash; updated atomically with append",
+      "source_refs": [
+        "B1_IMPLEMENTATION_PLAN_v0.1:§11 aggregate_heads",
+        "CANONICAL_MANIFEST_V0_5:M057"
+      ]
+    },
+    "ND-R5-B6-001": {
+      "classification": "CURRENT_SOURCE_FIELD_RESTORATION",
+      "decision": "Restore required non-null mandate_version while retaining current exact policy_refs/policy_lineage_hash override.",
+      "new_business_semantics": false,
+      "reason": "Policy refs do not replace mandate identity.",
+      "schema": "APPROVAL_ENVELOPE_V1",
+      "source_phrase": "Approval Authority requires mandate_version",
+      "source_refs": [
+        "PB6_BASE_V0_1:§6",
+        "PB6_POLICY_LINEAGE_V0_5:§3",
+        "CANONICAL_MANIFEST_V0_5:M037"
+      ]
+    },
+    "ND-R5-B6-002": {
+      "classification": "CURRENT_SOURCE_FIELD_RESTORATION",
+      "decision": "Restore required mandate_version while current policy versions remain represented by exact policy_refs/policy_lineage_hash.",
+      "new_business_semantics": false,
+      "reason": "Mandate identity is independent of policy identity.",
+      "schema": "B6_PRE_SUBMIT_SNAPSHOT_V1",
+      "source_phrase": "PRE_SUBMIT_SNAPSHOT binds mandate/risk/evidence/sizing policy versions",
+      "source_refs": [
+        "PB6_BASE_V0_1:§9",
+        "PB6_POLICY_LINEAGE_V0_5"
+      ]
+    },
+    "ND-R5-B6-003": {
+      "classification": "CURRENT_SOURCE_FIELD_RESTORATION",
+      "decision": "Restore required mandate_version while retaining exact current policy refs and commit snapshot lineage.",
+      "new_business_semantics": false,
+      "reason": "Current execution authority requires mandate lineage through commit.",
+      "schema": "B6_COMMIT_STATE_SNAPSHOT_V1",
+      "source_phrase": "COMMIT state must preserve the same mandate lineage under fresh commit revalidation",
+      "source_refs": [
+        "PB6_BASE_V0_1:§12",
+        "PB6_EXEC_V0_2:§5",
+        "PB6_POLICY_LINEAGE_V0_5:§7"
+      ]
+    },
+    "ND-R5-B6-004": {
+      "classification": "CURRENT_SOURCE_FIELD_RESTORATION",
+      "decision": "Restore required mandate_version while current policy versions remain exact policy_refs/policy_lineage_hash.",
+      "new_business_semantics": false,
+      "reason": "Policy identity is not a substitute for mandate identity.",
+      "schema": "EXECUTION_INTENT_V1",
+      "source_phrase": "EXECUTION_INTENT stores mandate/risk/evidence/sizing policy versions and exact execution lineage",
+      "source_refs": [
+        "PB6_BASE_V0_1:§11",
+        "PB6_POLICY_LINEAGE_V0_5:§6",
+        "CANONICAL_MANIFEST_V0_5:M042"
+      ]
+    },
+    "ND-R5-BSR-001": {
+      "classification": "SOURCE_FIELD_SET_RESTORATION",
+      "decision": "Use those source fields exactly, plus canonical submit_receipt_id/receipt_hash from M046. Remove invented attempt_number/classification/provider_status/canonical_payload fields.",
+      "new_business_semantics": false,
+      "reason": "Receipt is network-result evidence, not a second execution classifier or retry authority.",
+      "schema": "BROKER_SUBMIT_RECEIPT_V1",
+      "source_phrase": "Broker Submit Receipt: intent_id, client_order_id, request_payload_hash, request_started_at, optional HTTP/status/request-id/body-hash/order/error data, transport_outcome",
+      "source_refs": [
+        "PB6_BASE_V0_1:§16",
+        "PB6_EXEC_V0_2:§7-§8",
+        "CANONICAL_MANIFEST_V0_5:M046"
+      ]
+    },
+    "ND-R5-CONFLICT-001": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Materialize conflict_id, entity_id, field_or_claim, evidence_ids, conflict_class, material, status, authoritative_evidence_id, resolution_rule_ref, conflict_hash.",
+      "new_business_semantics": false,
+      "reason": "Each field is a structural representation of an already-required conflict axis; no source winner or resolution rule is invented.",
+      "schema": "CONFLICT_RECORD_V1",
+      "source_phrase": "Store both conflicting EvidenceItems + ConflictRecord; classify material conflict; resolve by authoritative_for when a source is explicitly authoritative; unresolved material conflict remains visible.",
+      "source_refs": [
+        "PB2_V0_1:§8 conflict rule",
+        "CANONICAL_MANIFEST_V0_5:M007"
+      ]
+    },
+    "ND-R5-DCC-001": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Materialize change_condition_id, description_claim_id, matcher_id/version, source_scope_refs, freshness_rule_ref, on_match=REVIEW_REQUIRED, condition_hash.",
+      "new_business_semantics": false,
+      "reason": "Makes the non-executable review-trigger semantics machine-readable without granting deterministic invalidation or trade authority.",
+      "schema": "DECISION_CHANGE_CONDITION_V1",
+      "source_phrase": "Non-deterministic/semantic decision-change condition promotes to DECISION_CHANGE_CONDITION_V1 with on_match=REVIEW_REQUIRED; current source/matcher/freshness context must remain bound.",
+      "source_refs": [
+        "PB4_PROMOTION_V0_5:§8",
+        "PB7_WORKFLOW_V0_5:§4",
+        "CANONICAL_MANIFEST_V0_5:M025"
+      ]
+    },
+    "ND-R5-EXE-001": {
+      "classification": "ACCEPTED_SPEC_FIELD_SET_RESTORATION",
+      "decision": "Restore the accepted execution lineage/result field set and add only canonical event_hash from M047.",
+      "new_business_semantics": false,
+      "reason": "Provider-lifecycle-only representation lost the accepted proposal/snapshot/risk/request lineage.",
+      "schema": "EXECUTION_EVENT_V1",
+      "source_phrase": "ENGINEERING SPEC EXECUTION_EVENT = execution_event_id,intent_id,proposal_id,pre_submit_snapshot_id,risk_result_id,broker_request_hash,broker_order_id?,submitted_at?,confirmed_at?,result,error_code?",
+      "source_refs": [
+        "SPEC_V0_5:EXECUTION_EVENT",
+        "PB6_EXEC_V0_2:§11-§17",
+        "CANONICAL_MANIFEST_V0_5:M047"
+      ]
+    },
+    "ND-R5-IC-001": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Materialize condition_id, description_claim_id, evaluator_id/version, required_input_refs, operator, comparison_value_ref, freshness_rule_ref, on_true=THESIS_INVALIDATED, condition_hash.",
+      "new_business_semantics": false,
+      "reason": "No threshold/value is invented; comparison_value_ref must resolve exact PolicyValue/EvidenceItem/ComputedValue authority.",
+      "schema": "INVALIDATION_CONDITION_V1",
+      "source_phrase": "B4 machine-evaluable invalidation requires description claim, evaluator/source/operator/comparison-value/freshness sufficient for deterministic validation; comparison value is exact canonical authority.",
+      "source_refs": [
+        "PB4_PROMOTION_V0_5:§8",
+        "PB7_WORKFLOW_V0_5:§3",
+        "CANONICAL_MANIFEST_V0_5:M024"
+      ]
+    },
+    "ND-R5-MANDATE-001": {
+      "classification": "ACCEPTED_SPEC_ENUM_RESTORATION",
+      "decision": "Restore all three accepted execution_mode enum values. Keep live_execution=false. Capital-impacting execution remains separately gated to PAPER_APPROVAL_REQUIRED.",
+      "new_business_semantics": false,
+      "reason": "v0.3 incorrectly deleted two valid non-write mandate modes.",
+      "schema": "INVESTMENT_MANDATE_V1",
+      "source_phrase": "execution_mode: RESEARCH_ONLY|PAPER_PROPOSAL|PAPER_APPROVAL_REQUIRED",
+      "source_refs": [
+        "SPEC_V0_5:INVESTMENT_MANDATE",
+        "CANONICAL_MANIFEST_V0_5:M001"
+      ]
+    },
+    "ND-R5-MRR-001": {
+      "classification": "SOURCE_OBSERVABILITY_FIELD_SET_RESTORATION",
+      "decision": "Materialize those observability axes as fixed-present fields (nullable only where source says when available/not applicable); include store=false/tools_enabled=false safety evidence; canonical model_run_id/receipt_hash from M016.",
+      "new_business_semantics": false,
+      "reason": "Restores lost B3/B4 model-run lineage without making the receipt business or policy authority.",
+      "schema": "MODEL_RUN_RECEIPT_V1",
+      "source_phrase": "B3 per-call observability records run_id,candidate_id,stage,prompt/schema versions,research/model policy lineage,requested/effective model,reasoning,response id,input/research/output hashes,latency,usage incl cached tokens,validator results,repair/escalation reason,final status.",
+      "source_refs": [
+        "PB3_V0_1:§6,§21",
+        "PB4_PROMPT_V0_2:API CONTRACT/model call topology",
+        "CANONICAL_MANIFEST_V0_5:M016"
+      ]
+    },
+    "ND-R5-RECON-001": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Materialize reconciliation_result_id,intent_id,client_order_id,started_at,ended_at,attempt_count,read_receipt_ids,broker_order_id,provider_status,outcome,post_retry_prohibited=true,result_hash.",
+      "new_business_semantics": false,
+      "reason": "Makes the existing bounded reconciliation algorithm durable without adding retry/cancel/replace authority.",
+      "schema": "RECONCILIATION_RESULT_V1",
+      "source_phrase": "Read-only reconciliation is keyed by intent_id/client_order_id, records bounded attempts/read evidence, may bind broker order/provider status, ends BROKER_ORDER_BOUND|NO_ORDER_PROVEN|BROKER_OUTCOME_UNKNOWN, and never permits POST retry.",
+      "source_refs": [
+        "PB6_EXEC_V0_2:§9-§10",
+        "CANONICAL_MANIFEST_V0_5:M048"
+      ]
+    },
+    "ND-R5-REOPEN-001": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Materialize reopen_request_id,parent_run_id,parent_decision_id,trigger_bundle_id,reason_codes,source_ref_ids,requested_at,new_run_start_state=S00,request_hash.",
+      "new_business_semantics": false,
+      "reason": "Captures required lineage/rationale while preserving 'request, not transition edge' semantics.",
+      "schema": "RESEARCH_REOPEN_REQUEST_V1",
+      "source_phrase": "research_reopen_required produces a durable reopen request; a new linked evaluation starts S00 with parent/reopen lineage; old aggregate is not directly transitioned.",
+      "source_refs": [
+        "PB4_PROMOTION_V0_5:§10",
+        "PB7_WORKFLOW_V0_5:§7",
+        "CANONICAL_MANIFEST_V0_5:M026"
+      ]
+    },
+    "ND-R5-RNV-001": {
+      "classification": "EXPLICIT_SCHEMA_REPRESENTATION_DECISION",
+      "decision": "Materialize raw_numeric_value_id,evidence_id,field_or_claim,value Decimal,unit,as_of,normalization_version,value_hash. RawNumericValue contains no derived arithmetic.",
+      "new_business_semantics": false,
+      "reason": "Uses source lexeme field_or_claim and preserves explicit numeric unit/provenance.",
+      "schema": "RAW_NUMERIC_VALUE_V1",
+      "source_phrase": "B2 EvidenceItem uses field_or_claim and normalized/direct numeric values with unit/context; M004 names RawNumericValue ID/hash.",
+      "source_refs": [
+        "PB2_V0_1:§9,§14",
+        "SPEC_V0_5:numeric provenance",
+        "CANONICAL_MANIFEST_V0_5:M004"
+      ]
+    },
+    "ND-R5-SIZE-001": {
+      "classification": "CURRENT_SOURCE_VARIABLE_NAME_MATERIALIZATION",
+      "decision": "Use those current variable names exactly; retain sizing policy ref, algorithm/input/hash/rounding/time and canonical computation ID/hash. No numeric policy value/default is embedded by builder.",
+      "new_business_semantics": false,
+      "reason": "Removes v0.3 builder-only absolute_base_cap_usd/final_notional_usd naming.",
+      "schema": "SIZING_COMPUTATION_V1",
+      "source_phrase": "TARGET_WEIGHT_CAPPED_V1 algorithm variables target_position_notional,current_long_exposure,pending_buy_exposure,raw_increment; optional_absolute_base_notional_cap_usd; emit notional_usd + provenance.",
+      "source_refs": [
+        "PB5_POLICY_V0_2:§1",
+        "PB5_BASE_V0_1:§8",
+        "CANONICAL_MANIFEST_V0_5:M029"
+      ]
+    },
+    "ND-R8-PRR-001": {
+      "classification": "SOURCE_PRESENCE_CORRECTION",
+      "decision": "Only provider_as_of/feed are nullable because source marks them optional. The two grouped metadata containers remain required-present non-null JSON maps; their child semantics stay opaque.",
+      "new_business_semantics": false,
+      "reason": "v0.3 incorrectly generalized optionality to the grouped metadata containers.",
+      "schema": "PROVIDER_READ_RECEIPT_V1",
+      "source_phrase": "provider_as_of / feed optional; http/status/result metadata; error/retry metadata",
+      "source_refs": [
+        "PB2_V0_1:§10",
+        "CANONICAL_MANIFEST_V0_5:M006"
+      ]
+    },
+    "ND-R9-B5-UNIT-001": {
+      "classification": "EXPLICIT_UNIT_PRESERVATION",
+      "decision": "Every provider-derived numeric semantic admitted into the closed B5 canonical risk projection is represented as DecimalWithUnit{value,unit}; unit is required and has no default. Raw provider DTO extras do not enter canonical risk authority.",
+      "new_business_semantics": false,
+      "reason": "Closes v0.4 bare numeric-string paths and avoids implicit units or generic untyped provider subtrees.",
+      "schema": "B5_RISK_INPUT_SNAPSHOT_V1",
+      "source_phrase": "all numeric strings from provider are normalized to Decimal with explicit units",
+      "source_refs": [
+        "PB5_BASE_V0_1:§7 Rules",
+        "PB5_POLICY_V0_2:§7"
+      ]
+    },
+    "ND-S8-001": {
+      "classification": "CURRENT_OVERRIDE_NORMALIZATION",
+      "decision": "Replace screening_policy_version/evidence_policy_version authority with exact screening_policy_ref/evidence_policy_ref: POLICY_REFERENCE_V1.",
+      "new_business_semantics": false,
+      "schema": "B2_DATA_SNAPSHOT_V1",
+      "source_refs": [
+        "PB2_V0_1:§11",
+        "CANONICAL_MANIFEST_V0_5:M060",
+        "R0_ROOT_V0_5:§6"
+      ]
+    },
+    "ND-S8-002": {
+      "classification": "CURRENT_OVERRIDE_NORMALIZATION",
+      "decision": "Replace research_policy_version/model_policy_version/evidence_policy_version authority with research_policy_ref/research_model_policy_ref/evidence_policy_ref: POLICY_REFERENCE_V1.",
+      "new_business_semantics": false,
+      "schema": "B3_RESEARCH_SNAPSHOT_V1",
+      "source_refs": [
+        "PB3_V0_1:§11",
+        "CANONICAL_MANIFEST_V0_5:M060",
+        "R0_ROOT_V0_5:§6"
+      ]
+    },
+    "ND-S8-003": {
+      "classification": "CURRENT_OVERRIDE_NORMALIZATION",
+      "decision": "Replace research_policy_version/model_policy_version authority with research_policy_ref/research_model_policy_ref: POLICY_REFERENCE_V1.",
+      "new_business_semantics": false,
+      "schema": "CANDIDATE_PACKET_V1",
+      "source_refs": [
+        "PB3_V0_1:§15",
+        "CANONICAL_MANIFEST_V0_5:M060",
+        "R0_ROOT_V0_5:§6"
+      ]
+    },
+    "ND-S8-004": {
+      "classification": "CURRENT_OVERRIDE_NORMALIZATION",
+      "decision": "Replace monitor_policy_version authority with monitor_policy_ref: POLICY_REFERENCE_V1; immutable FinalDecision lifecycle fields remain unchanged.",
+      "new_business_semantics": false,
+      "schema": "MONITOR_SUBSCRIPTION_V1",
+      "source_refs": [
+        "PB7_MONITOR_V0_2:§3",
+        "CANONICAL_MANIFEST_V0_5:M060"
+      ]
+    },
+    "ND-S8-005": {
+      "classification": "CURRENT_OVERRIDE_NORMALIZATION",
+      "decision": "Replace monitor_policy_version authority with monitor_policy_ref: POLICY_REFERENCE_V1; monitor stage restrictions remain unchanged.",
+      "new_business_semantics": false,
+      "schema": "THESIS_EVENT_V1",
+      "source_refs": [
+        "PB7_MONITOR_V0_2:§13",
+        "CANONICAL_MANIFEST_V0_5:M060"
+      ]
+    }
+  },
+  "pre_review_revision_history": {
+    "reason": "Internal pre-review self-red-team simplified the B5 canonical risk boundary to closed source-backed records. v0.5.2 is the first independent-review target.",
+    "superseded_pre_review_artifacts": [
+      "B1_2_CANONICAL_SCHEMA_CONTRACT_BUNDLE_v0.5_2026-08-15.json",
+      "B1_2_CANONICAL_SCHEMA_REGISTRY_BASELINE_v0.5_2026-08-15.json",
+      "B1_2_B5_RISK_SNAPSHOT_MAPPING_AUTHORITY_DELTA_v0.1_2026-08-15.txt",
+      "B1_2_CANONICAL_SCHEMA_CONTRACT_BUNDLE_v0.5.1_2026-08-15.json",
+      "B1_2_CANONICAL_SCHEMA_REGISTRY_BASELINE_v0.5.1_2026-08-15.json",
+      "B1_2_B5_RISK_SNAPSHOT_MAPPING_AUTHORITY_DELTA_v0.2_2026-08-15.txt"
+    ]
+  },
+  "predecessor": {
+    "architecture_disposition": "EXTERNAL_REGISTRY_PATTERN_RETAINED; B5_TYPED_NORMALIZATION_BOUNDARY_PLUS_PLAN_MAPPING_DELTA_ONLY",
+    "bundle_v0_4_raw_sha256": "96bd81f91974ad7bb467de5693aff488ca45ed60821a1008a84a360d6a1e8ac2",
+    "bundle_v0_4_semantic_hash": "216f29cfe3500e638109d96f5f0e5381e52f15646c12f715749a6098b6a9ea65",
+    "independent_result": "19 PASS / 3 FAIL gates; canonical schema ledger 58 PASS / B5_RISK_INPUT_SNAPSHOT_V1 FAIL",
+    "independent_review_drive_file_id": "1rbtv2WCY-6Zc-opaXmoheilVuPiWQCQq",
+    "independent_review_file": "B1_2_SCHEMA_REGISTRY_INDEPENDENT_REVIEW_RESULT_4_FAIL_2026-08-15.md",
+    "independent_review_sha256": "27f438364fceb5d1754dbebf8edbecee670d33b1136f3a13835d8b9878c2fdb2",
+    "registry_v0_4_raw_sha256": "701059e1277f8d36329efaa6ff09504a7511594d65dc3308e27034fc0c9263ac"
+  },
+  "release_strategy": {
+    "canonical_inventory_count": 59,
+    "changed_canonical_schema_count": 1,
+    "changed_canonical_schemas": [
+      "B5_RISK_INPUT_SNAPSHOT_V1"
+    ],
+    "changed_preexisting_helper_resource_count": 2,
+    "changed_preexisting_helper_resources": [
+      "B5RiskOpenOrders",
+      "B5RiskPositions"
+    ],
+    "new_helper_resource_count": 2,
+    "new_helper_resources": [
+      "B5PortfolioPositionRecord",
+      "B5OpenOrderExposureRecord"
+    ],
+    "resource_version_rule": "No release-wide fake version bumps. Only changed resources receive new resource IDs; reserved mapping IDs stay reserved.",
+    "unchanged_helper_resource_count": 20,
+    "unchanged_independently_passed_canonical_schema_count": 58,
+    "unchanged_independently_passed_canonical_schemas": [
+      "INVESTMENT_MANDATE_V1",
+      "EVIDENCE_POLICY_V1",
+      "EVIDENCE_ITEM_V1",
+      "RAW_NUMERIC_VALUE_V1",
+      "COMPUTED_VALUE_V1",
+      "PROVIDER_READ_RECEIPT_V1",
+      "CONFLICT_RECORD_V1",
+      "SECURITY_TYPE_PROOF_V1",
+      "B2_DATA_SNAPSHOT_V1",
+      "DEEP_COMPARISON_RESULT_V1",
+      "B3_RESEARCH_SNAPSHOT_V1",
+      "MATERIAL_CLAIM_V1",
+      "CANDIDATE_PACKET_V1",
+      "MODEL_RUN_RECEIPT_V1",
+      "COUNCIL_OPINION_V1",
+      "FINAL_DECISION_V1",
+      "INVALIDATION_CONDITION_V1",
+      "DECISION_CHANGE_CONDITION_V1",
+      "RESEARCH_REOPEN_REQUEST_V1",
+      "SIZING_POLICY_V1",
+      "RISK_POLICY_V1",
+      "SIZING_COMPUTATION_V1",
+      "PROPOSAL_CANDIDATE_V1",
+      "RISK_CHECK_RESULT_V1",
+      "B5_RISK_RESULT_V1",
+      "PORTFOLIO_IMPACT_V1",
+      "ACCEPTED_PROPOSAL_CANDIDATE_V1",
+      "TRADE_PROPOSAL_V1",
+      "APPROVAL_ENVELOPE_V1",
+      "OWNER_ACCOUNT_V1",
+      "OWNER_SESSION_V1",
+      "APPROVAL_ACTION_NONCE_V1",
+      "B6_PRE_SUBMIT_SNAPSHOT_V1",
+      "B6_PREPARE_RISK_RESULT_V1",
+      "EXECUTION_GATE_EVALUATION_V1",
+      "EXECUTION_INTENT_V1",
+      "B6_COMMIT_STATE_SNAPSHOT_V1",
+      "B6_COMMIT_RISK_RESULT_V1",
+      "BROKER_SUBMIT_RECEIPT_V1",
+      "EXECUTION_EVENT_V1",
+      "RECONCILIATION_RESULT_V1",
+      "MONITOR_SUBSCRIPTION_V1",
+      "MONITOR_SOURCE_EVENT_V1",
+      "MONITOR_TRIGGER_MATCH_V1",
+      "THESIS_EVENT_V1",
+      "REVIEW_WORK_ITEM_V1",
+      "JOURNAL_EVENT_ENVELOPE_V1",
+      "AGGREGATE_HEAD_V1",
+      "SCHEMA_REGISTRY_ENTRY_V1",
+      "RUN_ENVELOPE_V1",
+      "POLICY_REFERENCE_V1",
+      "EVAL_RUN_V1",
+      "EVAL_CASE_RESULT_V1",
+      "MUTATION_RESULT_V1",
+      "POLICY_VALUE_V1",
+      "DECISION_LIFECYCLE_POLICY_V1",
+      "DECISION_TTL_V1",
+      "NEXT_REVIEW_TRIGGER_V1"
+    ]
+  },
+  "resource_registry": {
+    "ACCEPTED_PROPOSAL_CANDIDATE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "edd17452fdb118c75bbece324a0f144d8e6cb26c1838e60b5ecd9a9f6f4fadcd",
+      "predecessor_resource_sha256": "edd17452fdb118c75bbece324a0f144d8e6cb26c1838e60b5ecd9a9f6f4fadcd",
+      "resource_id": "urn:aic:b1.2:schema:ACCEPTED_PROPOSAL_CANDIDATE_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "AGGREGATE_HEAD_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "3f35bc376dc0703caa5acbc59258ac8818c6c2acc2bac2ca0615297a6258e449",
+      "predecessor_resource_sha256": "3f35bc376dc0703caa5acbc59258ac8818c6c2acc2bac2ca0615297a6258e449",
+      "resource_id": "urn:aic:b1.2:schema:AGGREGATE_HEAD_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "APPROVAL_ACTION_NONCE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "41aa52f03c1712957159294f8e4254517b5ad7dedc3da6a402a6e67b1c45c02a",
+      "predecessor_resource_sha256": "41aa52f03c1712957159294f8e4254517b5ad7dedc3da6a402a6e67b1c45c02a",
+      "resource_id": "urn:aic:b1.2:schema:APPROVAL_ACTION_NONCE_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "APPROVAL_ENVELOPE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "3c01dd7601ca2bb7c38a9a0b226409df1e6984462c93d1fe1bcc43416146c343",
+      "predecessor_resource_sha256": "3c01dd7601ca2bb7c38a9a0b226409df1e6984462c93d1fe1bcc43416146c343",
+      "resource_id": "urn:aic:b1.2:schema:APPROVAL_ENVELOPE_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "B2_DATA_SNAPSHOT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "4a6b8491c5834e7b06efffe74ec4c3ebf86ddb8c31b83aa30a3ace2ff4ec7b7b",
+      "predecessor_resource_sha256": "4a6b8491c5834e7b06efffe74ec4c3ebf86ddb8c31b83aa30a3ace2ff4ec7b7b",
+      "resource_id": "urn:aic:b1.2:schema:B2_DATA_SNAPSHOT_V1:v0.3",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "B3_RESEARCH_SNAPSHOT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "38bc41a299bd75c7d47d9b4fa03ffd2f96fba27a0cc2cb25c9707e96eb2af24f",
+      "predecessor_resource_sha256": "38bc41a299bd75c7d47d9b4fa03ffd2f96fba27a0cc2cb25c9707e96eb2af24f",
+      "resource_id": "urn:aic:b1.2:schema:B3_RESEARCH_SNAPSHOT_V1:v0.3",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "B5OpenOrderExposureRecord": {
+      "changed_from_v0_4": true,
+      "expected_resource_sha256": "9f02f3b968cbbbdb099b131b8eb7371cc0f3fc6424658ee2a4c051ed3f5fe5db",
+      "predecessor_resource_sha256": null,
+      "resource_id": "urn:aic:b1.2:schema:B5OpenOrderExposureRecord:v0.5.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "B5PortfolioPositionRecord": {
+      "changed_from_v0_4": true,
+      "expected_resource_sha256": "20db964312dd0d7ee8fe09098931b7cdfb3642abb10b7b20d33098ab5891e9fa",
+      "predecessor_resource_sha256": null,
+      "resource_id": "urn:aic:b1.2:schema:B5PortfolioPositionRecord:v0.5.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "B5RiskAccount": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "2b260c1ccc50e5c03562f4b5b8cae718409244e9531e01824882ab154e7233be",
+      "predecessor_resource_sha256": "2b260c1ccc50e5c03562f4b5b8cae718409244e9531e01824882ab154e7233be",
+      "resource_id": "urn:aic:b1.2:schema:B5RiskAccount:v0.4",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "B5RiskContext": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "23e58bebec4bbc95986410609ac9cd06e5e01921820aad639addf3ee97dcb963",
+      "predecessor_resource_sha256": "23e58bebec4bbc95986410609ac9cd06e5e01921820aad639addf3ee97dcb963",
+      "resource_id": "urn:aic:b1.2:schema:B5RiskContext:v0.3",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "B5RiskMarketAsset": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "21cd705708101b4db8752ac94e4c90411d1a3b681736365eb39d9818cb9eb31c",
+      "predecessor_resource_sha256": "21cd705708101b4db8752ac94e4c90411d1a3b681736365eb39d9818cb9eb31c",
+      "resource_id": "urn:aic:b1.2:schema:B5RiskMarketAsset:v0.4",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "B5RiskOpenOrders": {
+      "changed_from_v0_4": true,
+      "expected_resource_sha256": "461852b37287b581c0378983892502099de1223277958119fd9193918ff5cf16",
+      "predecessor_resource_sha256": "3406a4568577b35f2972fff4a682d25f005e4ed0c46454d5d01b21f53c47f7cd",
+      "resource_id": "urn:aic:b1.2:schema:B5RiskOpenOrders:v0.5.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "B5RiskPositions": {
+      "changed_from_v0_4": true,
+      "expected_resource_sha256": "df8dc973a26cc928789d41c97432aeb7dc8aa05702efbd571b31f59220feb0a7",
+      "predecessor_resource_sha256": "c9d0a60c14501bb90701b2e2113c4a9d42580c12d57fb4fd086731a0365b8392",
+      "resource_id": "urn:aic:b1.2:schema:B5RiskPositions:v0.5.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "B5_RISK_INPUT_SNAPSHOT_V1": {
+      "changed_from_v0_4": true,
+      "expected_resource_sha256": "b9032e4073f416465cdbefb4b049f1b209b4a9055048320f784cb7217e3f38b3",
+      "predecessor_resource_sha256": "3df659601b04f0f02f0e220803940489e9087813913da519b6cb3352bee54ddc",
+      "resource_id": "urn:aic:b1.2:schema:B5_RISK_INPUT_SNAPSHOT_V1:v0.5.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "B5_RISK_RESULT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "f913bf9c3b610001aeeaf8d806e5abc577341e3fb4ed8ed946ef11f855781bef",
+      "predecessor_resource_sha256": "f913bf9c3b610001aeeaf8d806e5abc577341e3fb4ed8ed946ef11f855781bef",
+      "resource_id": "urn:aic:b1.2:schema:B5_RISK_RESULT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "B6_COMMIT_RISK_RESULT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "1db2696b97171dc6e61792b180b4fd949d3951d809ed2f1fa4a4fa436f960d10",
+      "predecessor_resource_sha256": "1db2696b97171dc6e61792b180b4fd949d3951d809ed2f1fa4a4fa436f960d10",
+      "resource_id": "urn:aic:b1.2:schema:B6_COMMIT_RISK_RESULT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "B6_COMMIT_STATE_SNAPSHOT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "f501e78938b312845fb5679eb1a808965abaced8b540a84fac4403b6b29f589c",
+      "predecessor_resource_sha256": "f501e78938b312845fb5679eb1a808965abaced8b540a84fac4403b6b29f589c",
+      "resource_id": "urn:aic:b1.2:schema:B6_COMMIT_STATE_SNAPSHOT_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "B6_PREPARE_RISK_RESULT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "faa02628fb0d64569f9c44fe2a023d0242a3413977b54c9a6054ecdadc3f2dac",
+      "predecessor_resource_sha256": "faa02628fb0d64569f9c44fe2a023d0242a3413977b54c9a6054ecdadc3f2dac",
+      "resource_id": "urn:aic:b1.2:schema:B6_PREPARE_RISK_RESULT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "B6_PRE_SUBMIT_SNAPSHOT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "bf11831a49f564d94e2c310235d38c52118502053aaa4df750646cad6aab254f",
+      "predecessor_resource_sha256": "bf11831a49f564d94e2c310235d38c52118502053aaa4df750646cad6aab254f",
+      "resource_id": "urn:aic:b1.2:schema:B6_PRE_SUBMIT_SNAPSHOT_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "BROKER_SUBMIT_RECEIPT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e751f865e9bce264ebe4846f9a424758bfd307ae0ff3f259729919ab1f99b8f8",
+      "predecessor_resource_sha256": "e751f865e9bce264ebe4846f9a424758bfd307ae0ff3f259729919ab1f99b8f8",
+      "resource_id": "urn:aic:b1.2:schema:BROKER_SUBMIT_RECEIPT_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "CANDIDATE_PACKET_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "fa8e81ab5a3d91bd4c95ffce2e51980ee4e097407aa7b82a55f0985b92597457",
+      "predecessor_resource_sha256": "fa8e81ab5a3d91bd4c95ffce2e51980ee4e097407aa7b82a55f0985b92597457",
+      "resource_id": "urn:aic:b1.2:schema:CANDIDATE_PACKET_V1:v0.3",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "COMPUTED_VALUE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "2c918d873b9e0b6174bdf2d73aed1d438d6fa55bbe29a1cd04c0dbfa4715b9fd",
+      "predecessor_resource_sha256": "2c918d873b9e0b6174bdf2d73aed1d438d6fa55bbe29a1cd04c0dbfa4715b9fd",
+      "resource_id": "urn:aic:b1.2:schema:COMPUTED_VALUE_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "CONFLICT_RECORD_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "5fe7e1994604b8aa84cfdb2b25776bd039277a4b81a96086584ba7686254c221",
+      "predecessor_resource_sha256": "5fe7e1994604b8aa84cfdb2b25776bd039277a4b81a96086584ba7686254c221",
+      "resource_id": "urn:aic:b1.2:schema:CONFLICT_RECORD_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "COUNCIL_OPINION_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "0fd41a4861d4388b71f4d842fe82ab7c5180bc63041fb4ad9eb33742a04999af",
+      "predecessor_resource_sha256": "0fd41a4861d4388b71f4d842fe82ab7c5180bc63041fb4ad9eb33742a04999af",
+      "resource_id": "urn:aic:b1.2:schema:COUNCIL_OPINION_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "CanonicalAuthorityRef": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "24c012491271cecb20243955932b10839c95cb607ab8a0f9e98c827e9c12cd3b",
+      "predecessor_resource_sha256": "24c012491271cecb20243955932b10839c95cb607ab8a0f9e98c827e9c12cd3b",
+      "resource_id": "urn:aic:b1.2:schema:CanonicalAuthorityRef:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "CanonicalDecimal": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "1bc15f1d14c51a66c04c901b8bb14009ae33fce2855870ff364e5912bfbaabc2",
+      "predecessor_resource_sha256": "1bc15f1d14c51a66c04c901b8bb14009ae33fce2855870ff364e5912bfbaabc2",
+      "resource_id": "urn:aic:b1.2:schema:CanonicalDecimal:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "CanonicalId": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "47ee65312394a2e7d59d682f59de5675ad0f63f4829da51dcd2f9a51640f70b8",
+      "predecessor_resource_sha256": "47ee65312394a2e7d59d682f59de5675ad0f63f4829da51dcd2f9a51640f70b8",
+      "resource_id": "urn:aic:b1.2:schema:CanonicalId:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "ComparisonValueRef": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "4c7dda572bac0725396ca8d3f69a5cb263e4ec895d313877a4cd9d8bcaa0e612",
+      "predecessor_resource_sha256": "4c7dda572bac0725396ca8d3f69a5cb263e4ec895d313877a4cd9d8bcaa0e612",
+      "resource_id": "urn:aic:b1.2:schema:ComparisonValueRef:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "DECISION_CHANGE_CONDITION_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "bd68286a65c64b89d62ed4af4a203b8abd808db8b48ea55342c12e95b28f7e40",
+      "predecessor_resource_sha256": "bd68286a65c64b89d62ed4af4a203b8abd808db8b48ea55342c12e95b28f7e40",
+      "resource_id": "urn:aic:b1.2:schema:DECISION_CHANGE_CONDITION_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "DECISION_LIFECYCLE_POLICY_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "2203e4068bf32230088d581ad1fa781a7a15bdeff7c7600a97dc50d653052447",
+      "predecessor_resource_sha256": "2203e4068bf32230088d581ad1fa781a7a15bdeff7c7600a97dc50d653052447",
+      "resource_id": "urn:aic:b1.2:schema:DECISION_LIFECYCLE_POLICY_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "DECISION_TTL_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "184d8400dedf92c79c8933434bb2e63b9fa333b8ef3d9c94ee021e329c4c7380",
+      "predecessor_resource_sha256": "184d8400dedf92c79c8933434bb2e63b9fa333b8ef3d9c94ee021e329c4c7380",
+      "resource_id": "urn:aic:b1.2:schema:DECISION_TTL_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "DEEP_COMPARISON_RESULT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "91fde9e5abcf53c8d062c6a65b778a1583e2a0593d9586c10de84771d9f9cd6e",
+      "predecessor_resource_sha256": "91fde9e5abcf53c8d062c6a65b778a1583e2a0593d9586c10de84771d9f9cd6e",
+      "resource_id": "urn:aic:b1.2:schema:DEEP_COMPARISON_RESULT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "DecimalWithUnit": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "f9de49723550c18925b3c57bfac3119cc80d2cc53e25463260a1229b16e312b3",
+      "predecessor_resource_sha256": "f9de49723550c18925b3c57bfac3119cc80d2cc53e25463260a1229b16e312b3",
+      "resource_id": "urn:aic:b1.2:schema:DecimalWithUnit:v0.4",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "DeepComparisonCandidateSlot": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "54bd8d3b0a0594a57850a82e638c7a1e3659b394ef8ecad12e18bb48dbf76a1f",
+      "predecessor_resource_sha256": "54bd8d3b0a0594a57850a82e638c7a1e3659b394ef8ecad12e18bb48dbf76a1f",
+      "resource_id": "urn:aic:b1.2:schema:DeepComparisonCandidateSlot:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "DeepComparisonDimension": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "7db4fd75942db465d580fc1bd51d5fc2f0670d7be2beffe8a604437cc5ce68de",
+      "predecessor_resource_sha256": "7db4fd75942db465d580fc1bd51d5fc2f0670d7be2beffe8a604437cc5ce68de",
+      "resource_id": "urn:aic:b1.2:schema:DeepComparisonDimension:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "DeepComparisonTradeoff": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "9fb80a322aad43ec1bb878289428a9f379bb75a12cd6d76e78336f293b6a2a76",
+      "predecessor_resource_sha256": "9fb80a322aad43ec1bb878289428a9f379bb75a12cd6d76e78336f293b6a2a76",
+      "resource_id": "urn:aic:b1.2:schema:DeepComparisonTradeoff:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "EVAL_CASE_RESULT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "1276fea011086685b28aff7036dd5f44fdcf79ee41d883a29b938eeb3d82a616",
+      "predecessor_resource_sha256": "1276fea011086685b28aff7036dd5f44fdcf79ee41d883a29b938eeb3d82a616",
+      "resource_id": "urn:aic:b1.2:schema:EVAL_CASE_RESULT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "EVAL_RUN_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "f5af6e87b28316200ac60fad7d118952bbf9b3b5b90b32721649145c1babf8ec",
+      "predecessor_resource_sha256": "f5af6e87b28316200ac60fad7d118952bbf9b3b5b90b32721649145c1babf8ec",
+      "resource_id": "urn:aic:b1.2:schema:EVAL_RUN_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "EVIDENCE_ITEM_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "04b1ce896599b57861c5dd61dcc0f3081c050b73cd501713338f272b52326a1f",
+      "predecessor_resource_sha256": "04b1ce896599b57861c5dd61dcc0f3081c050b73cd501713338f272b52326a1f",
+      "resource_id": "urn:aic:b1.2:schema:EVIDENCE_ITEM_V1:v0.3",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "EVIDENCE_POLICY_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "b720181b09aee4e4f316cdcb779022b80a690c9304bec83bdbce17399d9f39eb",
+      "predecessor_resource_sha256": "b720181b09aee4e4f316cdcb779022b80a690c9304bec83bdbce17399d9f39eb",
+      "resource_id": "urn:aic:b1.2:schema:EVIDENCE_POLICY_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "EXECUTION_EVENT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "57e43aadb1930148f6918db37bcde9e1c27c21483ce20f29924b951150300d77",
+      "predecessor_resource_sha256": "57e43aadb1930148f6918db37bcde9e1c27c21483ce20f29924b951150300d77",
+      "resource_id": "urn:aic:b1.2:schema:EXECUTION_EVENT_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "EXECUTION_GATE_EVALUATION_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e935b18b7e903e3399a10076f87c9c0d08c44f2404fc795623f937db8d0ee9be",
+      "predecessor_resource_sha256": "e935b18b7e903e3399a10076f87c9c0d08c44f2404fc795623f937db8d0ee9be",
+      "resource_id": "urn:aic:b1.2:schema:EXECUTION_GATE_EVALUATION_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "EXECUTION_INTENT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "8f07ba537bf2a9717f517ee99df967b55aa5b2cb08c73c97ba6db5236cdc9c59",
+      "predecessor_resource_sha256": "8f07ba537bf2a9717f517ee99df967b55aa5b2cb08c73c97ba6db5236cdc9c59",
+      "resource_id": "urn:aic:b1.2:schema:EXECUTION_INTENT_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "FINAL_DECISION_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "ada548e99c4e688b1310a05f81ae841ee5f58aa1b76315e3c209ca9ec6cb1d82",
+      "predecessor_resource_sha256": "ada548e99c4e688b1310a05f81ae841ee5f58aa1b76315e3c209ca9ec6cb1d82",
+      "resource_id": "urn:aic:b1.2:schema:FINAL_DECISION_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "FreshnessTTL": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "24ea82bc6e2adaa1928b689db0345a41ad302da054111c6d7623c6a49c51082e",
+      "predecessor_resource_sha256": "24ea82bc6e2adaa1928b689db0345a41ad302da054111c6d7623c6a49c51082e",
+      "resource_id": "urn:aic:b1.2:schema:FreshnessTTL:v0.3",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "GateTermResult": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "14a727bd388d50f57a7751c54bcbc4fffca883a928290a10837aede05c20c343",
+      "predecessor_resource_sha256": "14a727bd388d50f57a7751c54bcbc4fffca883a928290a10837aede05c20c343",
+      "resource_id": "urn:aic:b1.2:schema:GateTermResult:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "Hash256": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "a4fe4b5d91197c818af191023b2c3f76f3102e8c981520b30bc81423baf5fa44",
+      "predecessor_resource_sha256": "a4fe4b5d91197c818af191023b2c3f76f3102e8c981520b30bc81423baf5fa44",
+      "resource_id": "urn:aic:b1.2:schema:Hash256:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "INVALIDATION_CONDITION_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "455c1e3647afe175d9fc2cdb72096e6d24dcbe7e1ce8917985845b1eebe39dc7",
+      "predecessor_resource_sha256": "455c1e3647afe175d9fc2cdb72096e6d24dcbe7e1ce8917985845b1eebe39dc7",
+      "resource_id": "urn:aic:b1.2:schema:INVALIDATION_CONDITION_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "INVESTMENT_MANDATE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "ba1c5c08715224ca3c2d1db6abf231ee40c6381f2440712c6e27de2cb912f0b3",
+      "predecessor_resource_sha256": "ba1c5c08715224ca3c2d1db6abf231ee40c6381f2440712c6e27de2cb912f0b3",
+      "resource_id": "urn:aic:b1.2:schema:INVESTMENT_MANDATE_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "JOURNAL_EVENT_ENVELOPE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "1eaa020043265ab5da81ca45f0dd0c0339643da2a32da61b78c674c23108e437",
+      "predecessor_resource_sha256": "1eaa020043265ab5da81ca45f0dd0c0339643da2a32da61b78c674c23108e437",
+      "resource_id": "urn:aic:b1.2:schema:JOURNAL_EVENT_ENVELOPE_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "JsonValue": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "b152dbe2582f3fec423d9b49410e42fe3c1e51a69de7eb598cb28ba492f2634d",
+      "predecessor_resource_sha256": "b152dbe2582f3fec423d9b49410e42fe3c1e51a69de7eb598cb28ba492f2634d",
+      "resource_id": "urn:aic:b1.2:schema:JsonValue:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "MATERIAL_CLAIM_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "5d16ec74d58c187badab0a2ad98bc89593642c35271457f02e7aaa626b4478b5",
+      "predecessor_resource_sha256": "5d16ec74d58c187badab0a2ad98bc89593642c35271457f02e7aaa626b4478b5",
+      "resource_id": "urn:aic:b1.2:schema:MATERIAL_CLAIM_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "MODEL_RUN_RECEIPT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "ec71b04f09a42958270003f85788004b9d097666851cb2effbdab3101918da37",
+      "predecessor_resource_sha256": "ec71b04f09a42958270003f85788004b9d097666851cb2effbdab3101918da37",
+      "resource_id": "urn:aic:b1.2:schema:MODEL_RUN_RECEIPT_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "MONITOR_SOURCE_EVENT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "523c4a284b992e789a54e29092cb7b4ffaf04a771f07fe8fb57526c0303be4d5",
+      "predecessor_resource_sha256": "523c4a284b992e789a54e29092cb7b4ffaf04a771f07fe8fb57526c0303be4d5",
+      "resource_id": "urn:aic:b1.2:schema:MONITOR_SOURCE_EVENT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "MONITOR_SUBSCRIPTION_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "b5d38b1f2195f125ae9b8759f24210511bb0aa2ad8b7726c19a42b82fa95c391",
+      "predecessor_resource_sha256": "b5d38b1f2195f125ae9b8759f24210511bb0aa2ad8b7726c19a42b82fa95c391",
+      "resource_id": "urn:aic:b1.2:schema:MONITOR_SUBSCRIPTION_V1:v0.3",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "MONITOR_TRIGGER_MATCH_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "6f480e2e297bed78a27f305b327bf3908d2aea351a0a5afea1e96f6cdf275a54",
+      "predecessor_resource_sha256": "6f480e2e297bed78a27f305b327bf3908d2aea351a0a5afea1e96f6cdf275a54",
+      "resource_id": "urn:aic:b1.2:schema:MONITOR_TRIGGER_MATCH_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "MUTATION_RESULT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "745b212e8a45f95f11ff3b36f195ffc122be9eb98b16f88f082beb68ad7b93fa",
+      "predecessor_resource_sha256": "745b212e8a45f95f11ff3b36f195ffc122be9eb98b16f88f082beb68ad7b93fa",
+      "resource_id": "urn:aic:b1.2:schema:MUTATION_RESULT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "NEXT_REVIEW_TRIGGER_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "189d7cc4c934dbd4c7f1fc7b4b1a947e08215c75ca5f4eea8a9aae9e8fc8daee",
+      "predecessor_resource_sha256": "189d7cc4c934dbd4c7f1fc7b4b1a947e08215c75ca5f4eea8a9aae9e8fc8daee",
+      "resource_id": "urn:aic:b1.2:schema:NEXT_REVIEW_TRIGGER_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "OWNER_ACCOUNT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "d482b76bd53da6fb4b2e57f8e971ce8f7a381999cef8a636a182e45f91c1c75c",
+      "predecessor_resource_sha256": "d482b76bd53da6fb4b2e57f8e971ce8f7a381999cef8a636a182e45f91c1c75c",
+      "resource_id": "urn:aic:b1.2:schema:OWNER_ACCOUNT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "OWNER_SESSION_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "37acad2e6e7c1e0d9ba42972bff8edc7df7ea783a9646b19caf66e5f28d9b17b",
+      "predecessor_resource_sha256": "37acad2e6e7c1e0d9ba42972bff8edc7df7ea783a9646b19caf66e5f28d9b17b",
+      "resource_id": "urn:aic:b1.2:schema:OWNER_SESSION_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "POLICY_REFERENCE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "8afc329f8444c4c3c96caa292377ff404cb15c24d080d0f2e3d6759e54977208",
+      "predecessor_resource_sha256": "8afc329f8444c4c3c96caa292377ff404cb15c24d080d0f2e3d6759e54977208",
+      "resource_id": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "POLICY_VALUE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "328a9dccb24143e4fd50d2c19841f8846cced1797ac9bdd1fab04a231c555f75",
+      "predecessor_resource_sha256": "328a9dccb24143e4fd50d2c19841f8846cced1797ac9bdd1fab04a231c555f75",
+      "resource_id": "urn:aic:b1.2:schema:POLICY_VALUE_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "PORTFOLIO_IMPACT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "0f26321b8248ead1ac0256d8920615d00b8df4432793666df6723d04efee4a56",
+      "predecessor_resource_sha256": "0f26321b8248ead1ac0256d8920615d00b8df4432793666df6723d04efee4a56",
+      "resource_id": "urn:aic:b1.2:schema:PORTFOLIO_IMPACT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "PROPOSAL_CANDIDATE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "64d391d7688071f680b957817ed161e0d89c3b761e0f177f7ac8a56aea6e9931",
+      "predecessor_resource_sha256": "64d391d7688071f680b957817ed161e0d89c3b761e0f177f7ac8a56aea6e9931",
+      "resource_id": "urn:aic:b1.2:schema:PROPOSAL_CANDIDATE_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "PROVIDER_READ_RECEIPT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "441457ab37d406e9090fea64afbb1c65a27156e9d5950ce5e73c260c1a701a2f",
+      "predecessor_resource_sha256": "441457ab37d406e9090fea64afbb1c65a27156e9d5950ce5e73c260c1a701a2f",
+      "resource_id": "urn:aic:b1.2:schema:PROVIDER_READ_RECEIPT_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "PolicyRefs10": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "afb00e06bd3d4383fbb34df82b8274c8bc517bc49f89bf1101ce584864dd4734",
+      "predecessor_resource_sha256": "afb00e06bd3d4383fbb34df82b8274c8bc517bc49f89bf1101ce584864dd4734",
+      "resource_id": "urn:aic:b1.2:schema:PolicyRefs10:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "PolicyRefs8": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "47c2a4bf13143bc220da449d7fb64cbe62dbacf31d46bf385738fbeeedaa317c",
+      "predecessor_resource_sha256": "47c2a4bf13143bc220da449d7fb64cbe62dbacf31d46bf385738fbeeedaa317c",
+      "resource_id": "urn:aic:b1.2:schema:PolicyRefs8:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "RAW_NUMERIC_VALUE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "644c74cf7025a73e605c5c56229ebc3ac5ade5afb17968837c3553d7a9bbfad9",
+      "predecessor_resource_sha256": "644c74cf7025a73e605c5c56229ebc3ac5ade5afb17968837c3553d7a9bbfad9",
+      "resource_id": "urn:aic:b1.2:schema:RAW_NUMERIC_VALUE_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "RECONCILIATION_RESULT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "77e3f6fdaeba9584a91c6830d90af66eeab228209de2ae35c3b738c7c9c4b8b9",
+      "predecessor_resource_sha256": "77e3f6fdaeba9584a91c6830d90af66eeab228209de2ae35c3b738c7c9c4b8b9",
+      "resource_id": "urn:aic:b1.2:schema:RECONCILIATION_RESULT_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "RESEARCH_REOPEN_REQUEST_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "ae708a332b4be9cb32ba5a029e142c359561aec4beef751df1910b19b5592352",
+      "predecessor_resource_sha256": "ae708a332b4be9cb32ba5a029e142c359561aec4beef751df1910b19b5592352",
+      "resource_id": "urn:aic:b1.2:schema:RESEARCH_REOPEN_REQUEST_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "REVIEW_WORK_ITEM_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e8c1571f0f0c4eaf70e2c10563852d7b2117b4b645046ac1c6468c413d78415a",
+      "predecessor_resource_sha256": "e8c1571f0f0c4eaf70e2c10563852d7b2117b4b645046ac1c6468c413d78415a",
+      "resource_id": "urn:aic:b1.2:schema:REVIEW_WORK_ITEM_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "RISK_CHECK_RESULT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e28e19b593b3c135157d1cdddbab9ca58fcc3ba639fe9e415679ca38bef45f8a",
+      "predecessor_resource_sha256": "e28e19b593b3c135157d1cdddbab9ca58fcc3ba639fe9e415679ca38bef45f8a",
+      "resource_id": "urn:aic:b1.2:schema:RISK_CHECK_RESULT_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "RISK_POLICY_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "cf960777b8ec33ffdebf48daaf4e9fd08b82be597e4eac4a8969a910dad266c7",
+      "predecessor_resource_sha256": "cf960777b8ec33ffdebf48daaf4e9fd08b82be597e4eac4a8969a910dad266c7",
+      "resource_id": "urn:aic:b1.2:schema:RISK_POLICY_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "RUN_ENVELOPE_CONTEXT_VALIDATION_INPUT": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "20bb95a83604bdf63baa91c7b2aba328451e6a4859a44f51655c8695d9176e33",
+      "predecessor_resource_sha256": "20bb95a83604bdf63baa91c7b2aba328451e6a4859a44f51655c8695d9176e33",
+      "resource_id": "urn:aic:b1.2:schema:RUN_ENVELOPE_CONTEXT_VALIDATION_INPUT:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "RUN_ENVELOPE_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e9798cb98e5616fcde07b3463f622665ac3362404be232288134268f85bb0604",
+      "predecessor_resource_sha256": "e9798cb98e5616fcde07b3463f622665ac3362404be232288134268f85bb0604",
+      "resource_id": "urn:aic:b1.2:schema:RUN_ENVELOPE_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "SCHEMA_REGISTRY_ENTRY_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "c9cf963f94b780d3afc345934769e3aa4da95caf20e25f9f713e06ba840709dc",
+      "predecessor_resource_sha256": "c9cf963f94b780d3afc345934769e3aa4da95caf20e25f9f713e06ba840709dc",
+      "resource_id": "urn:aic:b1.2:schema:SCHEMA_REGISTRY_ENTRY_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "SECURITY_TYPE_PROOF_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "0844766a6bbf068e1af8d034ca716bca7678b7b896036e1415e3d2f9d4682b9a",
+      "predecessor_resource_sha256": "0844766a6bbf068e1af8d034ca716bca7678b7b896036e1415e3d2f9d4682b9a",
+      "resource_id": "urn:aic:b1.2:schema:SECURITY_TYPE_PROOF_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "SIZING_COMPUTATION_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "b07165651d85fed19b09cefae5287385fb5620f89125b4ebffb2eb2223a05b1f",
+      "predecessor_resource_sha256": "b07165651d85fed19b09cefae5287385fb5620f89125b4ebffb2eb2223a05b1f",
+      "resource_id": "urn:aic:b1.2:schema:SIZING_COMPUTATION_V1:v0.4",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "SIZING_POLICY_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "20a845fc49d91f8b25ae3f24c79efed6bb9037ad5fbbe64ef83fa8c2bccd4d6f",
+      "predecessor_resource_sha256": "20a845fc49d91f8b25ae3f24c79efed6bb9037ad5fbbe64ef83fa8c2bccd4d6f",
+      "resource_id": "urn:aic:b1.2:schema:SIZING_POLICY_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "THESIS_EVENT_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "494a9ed49f2b1519f99bf9ba7ac665b5d29ea76938bf636778cd0c225d5f1475",
+      "predecessor_resource_sha256": "494a9ed49f2b1519f99bf9ba7ac665b5d29ea76938bf636778cd0c225d5f1475",
+      "resource_id": "urn:aic:b1.2:schema:THESIS_EVENT_V1:v0.3",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "TRADE_PROPOSAL_V1": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "8722ce160984ef9f6c48141ecc985a6fcfce9e26fb28f77494f4676c73936765",
+      "predecessor_resource_sha256": "8722ce160984ef9f6c48141ecc985a6fcfce9e26fb28f77494f4676c73936765",
+      "resource_id": "urn:aic:b1.2:schema:TRADE_PROPOSAL_V1:v0.2",
+      "role": "CANONICAL_DURABLE_OR_EMBEDDED"
+    },
+    "UtcDateTime": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "8ce795817202e2ad99838b812c1960960186885ef746808433e2355794fd77e8",
+      "predecessor_resource_sha256": "8ce795817202e2ad99838b812c1960960186885ef746808433e2355794fd77e8",
+      "resource_id": "urn:aic:b1.2:schema:UtcDateTime:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    },
+    "WhyNotCandidate": {
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "34f46f0412b5ef8115489498fcad7b247c30effcb4db96b2200863b28735d08b",
+      "predecessor_resource_sha256": "34f46f0412b5ef8115489498fcad7b247c30effcb4db96b2200863b28735d08b",
+      "resource_id": "urn:aic:b1.2:schema:WhyNotCandidate:v0.2",
+      "role": "NORMATIVE_HELPER_RESOURCE"
+    }
+  },
+  "role": "EXTERNAL_EXPECTATION_ORACLE_SOURCE_PROVENANCE_INCREMENTAL_SEMANTIC_CERTIFICATION_AND_PLAN_DELTA_BINDING",
+  "schema_registry": {
+    "ACCEPTED_PROPOSAL_CANDIDATE_V1": {
+      "canonical_hash_field": "accepted_hash",
+      "canonical_id_field": "accepted_proposal_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "edd17452fdb118c75bbece324a0f144d8e6cb26c1838e60b5ecd9a9f6f4fadcd",
+      "journal_payload_schema": "aic.accepted_proposal_candidate.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "edd17452fdb118c75bbece324a0f144d8e6cb26c1838e60b5ecd9a9f6f4fadcd",
+      "resource_id": "urn:aic:b1.2:schema:ACCEPTED_PROPOSAL_CANDIDATE_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT_v0.5:§3,§11",
+        "CANONICAL_MANIFEST_v0.5:M034"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "AGGREGATE_HEAD_V1": {
+      "canonical_hash_field": null,
+      "canonical_id_field": "aggregate_type+aggregate_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "3f35bc376dc0703caa5acbc59258ac8818c6c2acc2bac2ca0615297a6258e449",
+      "journal_payload_schema": "NONE_STRUCTURAL_PROJECTION",
+      "normalization_decision_ids": [
+        "ND-R5-AGG-001"
+      ],
+      "persistence_class": "STRUCTURAL_PROJECTION",
+      "predecessor_resource_sha256": "3f35bc376dc0703caa5acbc59258ac8818c6c2acc2bac2ca0615297a6258e449",
+      "resource_id": "urn:aic:b1.2:schema:AGGREGATE_HEAD_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "B1_IMPLEMENTATION_PLAN_v0.1:§11 aggregate_heads key properties",
+        "CANONICAL_MANIFEST_v0.5:M057"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "APPROVAL_ACTION_NONCE_V1": {
+      "canonical_hash_field": "action_nonce_record_hash",
+      "canonical_id_field": "action_nonce_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "41aa52f03c1712957159294f8e4254517b5ad7dedc3da6a402a6e67b1c45c02a",
+      "journal_payload_schema": "aic.auth.approval_action_nonce.v1:SENSITIVE_FIELDS_EXCLUDED",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "41aa52f03c1712957159294f8e4254517b5ad7dedc3da6a402a6e67b1c45c02a",
+      "resource_id": "urn:aic:b1.2:schema:APPROVAL_ACTION_NONCE_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B6_OWNER_AUTH_AND_SESSION_CONTRACT_v0.2:§11",
+        "CANONICAL_MANIFEST_v0.5:M038C"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "APPROVAL_ENVELOPE_V1": {
+      "canonical_hash_field": "envelope_hash",
+      "canonical_id_field": "approval_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "3c01dd7601ca2bb7c38a9a0b226409df1e6984462c93d1fe1bcc43416146c343",
+      "journal_payload_schema": "aic.approval_envelope.v1",
+      "normalization_decision_ids": [
+        "ND-R5-B6-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "3c01dd7601ca2bb7c38a9a0b226409df1e6984462c93d1fe1bcc43416146c343",
+      "resource_id": "urn:aic:b1.2:schema:APPROVAL_ENVELOPE_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B6_IMPLEMENTATION_PACKET_v0.1:§6 APPROVAL AUTHORITY",
+        "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5:§3",
+        "P-B6_OWNER_AUTH_AND_SESSION_CONTRACT_v0.2:§14",
+        "CANONICAL_MANIFEST_v0.5:M037"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "B2_DATA_SNAPSHOT_V1": {
+      "canonical_hash_field": "manifest_hash",
+      "canonical_id_field": "snapshot_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "4a6b8491c5834e7b06efffe74ec4c3ebf86ddb8c31b83aa30a3ace2ff4ec7b7b",
+      "journal_payload_schema": "aic.snapshot.b2_data.v1",
+      "normalization_decision_ids": [
+        "ND-S8-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "4a6b8491c5834e7b06efffe74ec4c3ebf86ddb8c31b83aa30a3ace2ff4ec7b7b",
+      "resource_id": "urn:aic:b1.2:schema:B2_DATA_SNAPSHOT_V1:v0.3",
+      "resource_version": "0.3",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§11",
+        "CANONICAL_MANIFEST_v0.5:M009"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "B3_RESEARCH_SNAPSHOT_V1": {
+      "canonical_hash_field": "manifest_hash",
+      "canonical_id_field": "research_snapshot_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "38bc41a299bd75c7d47d9b4fa03ffd2f96fba27a0cc2cb25c9707e96eb2af24f",
+      "journal_payload_schema": "aic.snapshot.research.v1",
+      "normalization_decision_ids": [
+        "ND-S8-002"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "38bc41a299bd75c7d47d9b4fa03ffd2f96fba27a0cc2cb25c9707e96eb2af24f",
+      "resource_id": "urn:aic:b1.2:schema:B3_RESEARCH_SNAPSHOT_V1:v0.3",
+      "resource_version": "0.3",
+      "source_refs": [
+        "P-B3_IMPLEMENTATION_PACKET_v0.1:§11",
+        "CANONICAL_MANIFEST_v0.5:M012"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "B5_RISK_INPUT_SNAPSHOT_V1": {
+      "canonical_hash_field": "snapshot_hash",
+      "canonical_id_field": "snapshot_id",
+      "changed_from_v0_4": true,
+      "expected_resource_sha256": "b9032e4073f416465cdbefb4b049f1b209b4a9055048320f784cb7217e3f38b3",
+      "journal_payload_schema": "aic.snapshot.b5_risk_input.v1",
+      "mapping_authority": "B1_2_B5_RISK_SNAPSHOT_MAPPING_AUTHORITY_DELTA_v0.3_2026-08-15.txt",
+      "mapping_id": "M071",
+      "mapping_kind": "DISTINCT_CANONICAL_TYPE",
+      "mapping_version": "v0.3",
+      "normalization_decision_ids": [
+        "ND-F1-006",
+        "ND-R9-B5-UNIT-001",
+        "ND-R13-B5-POSITION-001",
+        "ND-R13-B5-OPENORDER-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "3df659601b04f0f02f0e220803940489e9087813913da519b6cb3352bee54ddc",
+      "resource_id": "urn:aic:b1.2:schema:B5_RISK_INPUT_SNAPSHOT_V1:v0.5.2",
+      "resource_version": "0.5.2",
+      "source_refs": [
+        "B1_SCHEMA_AND_TRANSITION_COMPATIBILITY_AMENDMENT_v0.5:§3 canonical schema inventory",
+        "B1_2_B5_RISK_SNAPSHOT_MAPPING_AUTHORITY_DELTA_v0.3:M071",
+        "P-B5_IMPLEMENTATION_PACKET_v0.1:§3,§7,R07",
+        "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT_v0.5:§3-§4",
+        "P-B5_RISK_AND_SIZING_POLICY_CONTRACT_v0.2:§1,§7",
+        "AIC_R0_BOUNDED_PLAN_REPAIR_AND_CROSS_PACKET_COMPATIBILITY_v0.5:§6"
+      ],
+      "v0_4_independent_semantic_result": "FAIL"
+    },
+    "B5_RISK_RESULT_V1": {
+      "canonical_hash_field": "risk_result_hash",
+      "canonical_id_field": "risk_result_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "f913bf9c3b610001aeeaf8d806e5abc577341e3fb4ed8ed946ef11f855781bef",
+      "journal_payload_schema": "aic.risk_result.b5.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "f913bf9c3b610001aeeaf8d806e5abc577341e3fb4ed8ed946ef11f855781bef",
+      "resource_id": "urn:aic:b1.2:schema:B5_RISK_RESULT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B5_IMPLEMENTATION_PACKET_v0.1:§18",
+        "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT_v0.5",
+        "CANONICAL_MANIFEST_v0.5:M032"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "B6_COMMIT_RISK_RESULT_V1": {
+      "canonical_hash_field": "commit_risk_result_hash",
+      "canonical_id_field": "commit_risk_result_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "1db2696b97171dc6e61792b180b4fd949d3951d809ed2f1fa4a4fa436f960d10",
+      "journal_payload_schema": "aic.risk_result.b6_commit.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "1db2696b97171dc6e61792b180b4fd949d3951d809ed2f1fa4a4fa436f960d10",
+      "resource_id": "urn:aic:b1.2:schema:B6_COMMIT_RISK_RESULT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5:§7",
+        "CANONICAL_MANIFEST_v0.5:M044"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "B6_COMMIT_STATE_SNAPSHOT_V1": {
+      "canonical_hash_field": "commit_snapshot_hash",
+      "canonical_id_field": "commit_snapshot_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "f501e78938b312845fb5679eb1a808965abaced8b540a84fac4403b6b29f589c",
+      "journal_payload_schema": "aic.snapshot.b6_commit.v1",
+      "normalization_decision_ids": [
+        "ND-R5-B6-003"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "f501e78938b312845fb5679eb1a808965abaced8b540a84fac4403b6b29f589c",
+      "resource_id": "urn:aic:b1.2:schema:B6_COMMIT_STATE_SNAPSHOT_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B6_IMPLEMENTATION_PACKET_v0.1:§12 COMMIT-TIME CONTRACT",
+        "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5",
+        "CANONICAL_MANIFEST_v0.5:M043"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "B6_PREPARE_RISK_RESULT_V1": {
+      "canonical_hash_field": "risk_result_hash",
+      "canonical_id_field": "risk_result_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "faa02628fb0d64569f9c44fe2a023d0242a3413977b54c9a6054ecdadc3f2dac",
+      "journal_payload_schema": "aic.risk_result.b6_prepare.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "faa02628fb0d64569f9c44fe2a023d0242a3413977b54c9a6054ecdadc3f2dac",
+      "resource_id": "urn:aic:b1.2:schema:B6_PREPARE_RISK_RESULT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5:§4",
+        "CANONICAL_MANIFEST_v0.5:M040"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "B6_PRE_SUBMIT_SNAPSHOT_V1": {
+      "canonical_hash_field": "snapshot_hash",
+      "canonical_id_field": "snapshot_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "bf11831a49f564d94e2c310235d38c52118502053aaa4df750646cad6aab254f",
+      "journal_payload_schema": "aic.snapshot.b6_pre_submit.v1",
+      "normalization_decision_ids": [
+        "ND-R5-B6-002"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "bf11831a49f564d94e2c310235d38c52118502053aaa4df750646cad6aab254f",
+      "resource_id": "urn:aic:b1.2:schema:B6_PRE_SUBMIT_SNAPSHOT_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B6_IMPLEMENTATION_PACKET_v0.1:§9 PRE_SUBMIT_SNAPSHOT",
+        "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5",
+        "CANONICAL_MANIFEST_v0.5:M039"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "BROKER_SUBMIT_RECEIPT_V1": {
+      "canonical_hash_field": "receipt_hash",
+      "canonical_id_field": "submit_receipt_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e751f865e9bce264ebe4846f9a424758bfd307ae0ff3f259729919ab1f99b8f8",
+      "journal_payload_schema": "aic.broker_submit_receipt.v1",
+      "normalization_decision_ids": [
+        "ND-R5-BSR-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "e751f865e9bce264ebe4846f9a424758bfd307ae0ff3f259729919ab1f99b8f8",
+      "resource_id": "urn:aic:b1.2:schema:BROKER_SUBMIT_RECEIPT_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B6_IMPLEMENTATION_PACKET_v0.1:§16 BROKER SUBMIT RECEIPT",
+        "P-B6_EXECUTION_COMMIT_AND_RECONCILIATION_CONTRACT_v0.2:§7-§8",
+        "CANONICAL_MANIFEST_v0.5:M046"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "CANDIDATE_PACKET_V1": {
+      "canonical_hash_field": "packet_hash",
+      "canonical_id_field": "candidate_packet_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "fa8e81ab5a3d91bd4c95ffce2e51980ee4e097407aa7b82a55f0985b92597457",
+      "journal_payload_schema": "aic.candidate_packet.v1",
+      "normalization_decision_ids": [
+        "ND-S8-003"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "fa8e81ab5a3d91bd4c95ffce2e51980ee4e097407aa7b82a55f0985b92597457",
+      "resource_id": "urn:aic:b1.2:schema:CANDIDATE_PACKET_V1:v0.3",
+      "resource_version": "0.3",
+      "source_refs": [
+        "P-B3_IMPLEMENTATION_PACKET_v0.1:§15",
+        "CANONICAL_MANIFEST_v0.5:M015"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "COMPUTED_VALUE_V1": {
+      "canonical_hash_field": "output_hash",
+      "canonical_id_field": "computed_value_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "2c918d873b9e0b6174bdf2d73aed1d438d6fa55bbe29a1cd04c0dbfa4715b9fd",
+      "journal_payload_schema": "aic.computed_value.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "2c918d873b9e0b6174bdf2d73aed1d438d6fa55bbe29a1cd04c0dbfa4715b9fd",
+      "resource_id": "urn:aic:b1.2:schema:COMPUTED_VALUE_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§14",
+        "CANONICAL_MANIFEST_v0.5:M005"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "CONFLICT_RECORD_V1": {
+      "canonical_hash_field": "conflict_hash",
+      "canonical_id_field": "conflict_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "5fe7e1994604b8aa84cfdb2b25776bd039277a4b81a96086584ba7686254c221",
+      "journal_payload_schema": "aic.conflict_record.v1",
+      "normalization_decision_ids": [
+        "ND-R5-CONFLICT-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "5fe7e1994604b8aa84cfdb2b25776bd039277a4b81a96086584ba7686254c221",
+      "resource_id": "urn:aic:b1.2:schema:CONFLICT_RECORD_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§8 conflict rule",
+        "CANONICAL_MANIFEST_v0.5:M007"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "COUNCIL_OPINION_V1": {
+      "canonical_hash_field": "opinion_hash",
+      "canonical_id_field": "opinion_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "0fd41a4861d4388b71f4d842fe82ab7c5180bc63041fb4ad9eb33742a04999af",
+      "journal_payload_schema": "aic.council_opinion.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "0fd41a4861d4388b71f4d842fe82ab7c5180bc63041fb4ad9eb33742a04999af",
+      "resource_id": "urn:aic:b1.2:schema:COUNCIL_OPINION_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§4",
+        "CANONICAL_MANIFEST_v0.5:M019"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "DECISION_CHANGE_CONDITION_V1": {
+      "canonical_hash_field": "condition_hash",
+      "canonical_id_field": "change_condition_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "bd68286a65c64b89d62ed4af4a203b8abd808db8b48ea55342c12e95b28f7e40",
+      "journal_payload_schema": "aic.decision_change_condition.v1",
+      "normalization_decision_ids": [
+        "ND-R5-DCC-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "bd68286a65c64b89d62ed4af4a203b8abd808db8b48ea55342c12e95b28f7e40",
+      "resource_id": "urn:aic:b1.2:schema:DECISION_CHANGE_CONDITION_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§8",
+        "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT_v0.5:§4",
+        "CANONICAL_MANIFEST_v0.5:M025"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "DECISION_LIFECYCLE_POLICY_V1": {
+      "canonical_hash_field": "policy_hash",
+      "canonical_id_field": "policy_id+version",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "2203e4068bf32230088d581ad1fa781a7a15bdeff7c7600a97dc50d653052447",
+      "journal_payload_schema": "aic.decision_lifecycle_policy.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "2203e4068bf32230088d581ad1fa781a7a15bdeff7c7600a97dc50d653052447",
+      "resource_id": "urn:aic:b1.2:schema:DECISION_LIFECYCLE_POLICY_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "DECISION_LIFECYCLE_POLICY_OWNER_INPUT_v0.1",
+        "CANONICAL_MANIFEST_v0.5:M068"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "DECISION_TTL_V1": {
+      "canonical_hash_field": "ttl_hash",
+      "canonical_id_field": null,
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "184d8400dedf92c79c8933434bb2e63b9fa333b8ef3d9c94ee021e329c4c7380",
+      "journal_payload_schema": "NONE_EMBEDDED_IN_DECISION",
+      "normalization_decision_ids": [],
+      "persistence_class": "EMBEDDED_ONLY",
+      "predecessor_resource_sha256": "184d8400dedf92c79c8933434bb2e63b9fa333b8ef3d9c94ee021e329c4c7380",
+      "resource_id": "urn:aic:b1.2:schema:DECISION_TTL_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "DECISION_LIFECYCLE_POLICY_OWNER_INPUT_v0.1",
+        "CANONICAL_MANIFEST_v0.5:M069"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "DEEP_COMPARISON_RESULT_V1": {
+      "canonical_hash_field": "comparison_hash",
+      "canonical_id_field": "deep_comparison_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "91fde9e5abcf53c8d062c6a65b778a1583e2a0593d9586c10de84771d9f9cd6e",
+      "journal_payload_schema": "aic.deep_comparison_result.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "91fde9e5abcf53c8d062c6a65b778a1583e2a0593d9586c10de84771d9f9cd6e",
+      "resource_id": "urn:aic:b1.2:schema:DEEP_COMPARISON_RESULT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§19",
+        "CANONICAL_MANIFEST_v0.5:M010"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "EVAL_CASE_RESULT_V1": {
+      "canonical_hash_field": "result_hash",
+      "canonical_id_field": "eval_case_result_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "1276fea011086685b28aff7036dd5f44fdcf79ee41d883a29b938eeb3d82a616",
+      "journal_payload_schema": "aic.eval_case_result.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "1276fea011086685b28aff7036dd5f44fdcf79ee41d883a29b938eeb3d82a616",
+      "resource_id": "urn:aic:b1.2:schema:EVAL_CASE_RESULT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B8_EVAL_HARNESS_AND_MUTATION_CONTRACT_v0.4:§4,§16",
+        "CANONICAL_MANIFEST_v0.5:M062"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "EVAL_RUN_V1": {
+      "canonical_hash_field": "eval_run_hash",
+      "canonical_id_field": "eval_run_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "f5af6e87b28316200ac60fad7d118952bbf9b3b5b90b32721649145c1babf8ec",
+      "journal_payload_schema": "aic.eval_run.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "f5af6e87b28316200ac60fad7d118952bbf9b3b5b90b32721649145c1babf8ec",
+      "resource_id": "urn:aic:b1.2:schema:EVAL_RUN_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B8_EVAL_HARNESS_AND_MUTATION_CONTRACT_v0.4:§2,§16",
+        "CANONICAL_MANIFEST_v0.5:M061"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "EVIDENCE_ITEM_V1": {
+      "canonical_hash_field": "evidence_hash",
+      "canonical_id_field": "evidence_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "04b1ce896599b57861c5dd61dcc0f3081c050b73cd501713338f272b52326a1f",
+      "journal_payload_schema": "aic.evidence_item.v1",
+      "normalization_decision_ids": [
+        "ND-F1-001",
+        "ND-F1-002"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "04b1ce896599b57861c5dd61dcc0f3081c050b73cd501713338f272b52326a1f",
+      "resource_id": "urn:aic:b1.2:schema:EVIDENCE_ITEM_V1:v0.3",
+      "resource_version": "0.3",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§9",
+        "CANONICAL_MANIFEST_v0.5:M003"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "EVIDENCE_POLICY_V1": {
+      "canonical_hash_field": "policy_hash",
+      "canonical_id_field": "policy_id+version",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "b720181b09aee4e4f316cdcb779022b80a690c9304bec83bdbce17399d9f39eb",
+      "journal_payload_schema": "aic.evidence_policy.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "b720181b09aee4e4f316cdcb779022b80a690c9304bec83bdbce17399d9f39eb",
+      "resource_id": "urn:aic:b1.2:schema:EVIDENCE_POLICY_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§8",
+        "CANONICAL_MANIFEST_v0.5:M002"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "EXECUTION_EVENT_V1": {
+      "canonical_hash_field": "event_hash",
+      "canonical_id_field": "execution_event_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "57e43aadb1930148f6918db37bcde9e1c27c21483ce20f29924b951150300d77",
+      "journal_payload_schema": "aic.execution_event.v1",
+      "normalization_decision_ids": [
+        "ND-R5-EXE-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "57e43aadb1930148f6918db37bcde9e1c27c21483ce20f29924b951150300d77",
+      "resource_id": "urn:aic:b1.2:schema:EXECUTION_EVENT_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "Engineering_Spec_v0.5:EXECUTION_EVENT",
+        "P-B6_EXECUTION_COMMIT_AND_RECONCILIATION_CONTRACT_v0.2:§11-§17",
+        "CANONICAL_MANIFEST_v0.5:M047"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "EXECUTION_GATE_EVALUATION_V1": {
+      "canonical_hash_field": "gate_hash",
+      "canonical_id_field": "gate_evaluation_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e935b18b7e903e3399a10076f87c9c0d08c44f2404fc795623f937db8d0ee9be",
+      "journal_payload_schema": "aic.execution_gate_evaluation.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "e935b18b7e903e3399a10076f87c9c0d08c44f2404fc795623f937db8d0ee9be",
+      "resource_id": "urn:aic:b1.2:schema:EXECUTION_GATE_EVALUATION_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5:§5,§8",
+        "CANONICAL_MANIFEST_v0.5:M041"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "EXECUTION_INTENT_V1": {
+      "canonical_hash_field": "intent_hash",
+      "canonical_id_field": "intent_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "8f07ba537bf2a9717f517ee99df967b55aa5b2cb08c73c97ba6db5236cdc9c59",
+      "journal_payload_schema": "aic.execution_intent.v1",
+      "normalization_decision_ids": [
+        "ND-R5-B6-004"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "8f07ba537bf2a9717f517ee99df967b55aa5b2cb08c73c97ba6db5236cdc9c59",
+      "resource_id": "urn:aic:b1.2:schema:EXECUTION_INTENT_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B6_IMPLEMENTATION_PACKET_v0.1:§11 EXECUTION_INTENT",
+        "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5:§6",
+        "CANONICAL_MANIFEST_v0.5:M042"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "FINAL_DECISION_V1": {
+      "canonical_hash_field": "final_decision_hash",
+      "canonical_id_field": "decision_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "ada548e99c4e688b1310a05f81ae841ee5f58aa1b76315e3c209ca9ec6cb1d82",
+      "journal_payload_schema": "aic.final_decision.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "ada548e99c4e688b1310a05f81ae841ee5f58aa1b76315e3c209ca9ec6cb1d82",
+      "resource_id": "urn:aic:b1.2:schema:FINAL_DECISION_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§7,§9,§14",
+        "CANONICAL_MANIFEST_v0.5:M023"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "INVALIDATION_CONDITION_V1": {
+      "canonical_hash_field": "condition_hash",
+      "canonical_id_field": "condition_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "455c1e3647afe175d9fc2cdb72096e6d24dcbe7e1ce8917985845b1eebe39dc7",
+      "journal_payload_schema": "aic.invalidation_condition.v1",
+      "normalization_decision_ids": [
+        "ND-R5-IC-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "455c1e3647afe175d9fc2cdb72096e6d24dcbe7e1ce8917985845b1eebe39dc7",
+      "resource_id": "urn:aic:b1.2:schema:INVALIDATION_CONDITION_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§8",
+        "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT_v0.5:§3",
+        "CANONICAL_MANIFEST_v0.5:M024"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "INVESTMENT_MANDATE_V1": {
+      "canonical_hash_field": "mandate_hash",
+      "canonical_id_field": "mandate_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "ba1c5c08715224ca3c2d1db6abf231ee40c6381f2440712c6e27de2cb912f0b3",
+      "journal_payload_schema": "aic.investment_mandate.v1",
+      "normalization_decision_ids": [
+        "ND-R5-MANDATE-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "ba1c5c08715224ca3c2d1db6abf231ee40c6381f2440712c6e27de2cb912f0b3",
+      "resource_id": "urn:aic:b1.2:schema:INVESTMENT_MANDATE_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "Engineering_Spec_v0.5:INVESTMENT_MANDATE",
+        "CANONICAL_MANIFEST_v0.5:M001"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "JOURNAL_EVENT_ENVELOPE_V1": {
+      "canonical_hash_field": "event_hash",
+      "canonical_id_field": "event_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "1eaa020043265ab5da81ca45f0dd0c0339643da2a32da61b78c674c23108e437",
+      "journal_payload_schema": "AUTHORITATIVE_EVENT_HISTORY",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "1eaa020043265ab5da81ca45f0dd0c0339643da2a32da61b78c674c23108e437",
+      "resource_id": "urn:aic:b1.2:schema:JOURNAL_EVENT_ENVELOPE_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "B1_IMPLEMENTATION_PLAN_v0.1:§11.2",
+        "CANONICAL_MANIFEST_v0.5:M056"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "MATERIAL_CLAIM_V1": {
+      "canonical_hash_field": "claim_hash",
+      "canonical_id_field": "claim_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "5d16ec74d58c187badab0a2ad98bc89593642c35271457f02e7aaa626b4478b5",
+      "journal_payload_schema": "aic.material_claim.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "5d16ec74d58c187badab0a2ad98bc89593642c35271457f02e7aaa626b4478b5",
+      "resource_id": "urn:aic:b1.2:schema:MATERIAL_CLAIM_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B3_IMPLEMENTATION_PACKET_v0.1:§13",
+        "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§1-2",
+        "CANONICAL_MANIFEST_v0.5:M014"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "MODEL_RUN_RECEIPT_V1": {
+      "canonical_hash_field": "receipt_hash",
+      "canonical_id_field": "model_run_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "ec71b04f09a42958270003f85788004b9d097666851cb2effbdab3101918da37",
+      "journal_payload_schema": "aic.model_run_receipt.v1",
+      "normalization_decision_ids": [
+        "ND-R5-MRR-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "ec71b04f09a42958270003f85788004b9d097666851cb2effbdab3101918da37",
+      "resource_id": "urn:aic:b1.2:schema:MODEL_RUN_RECEIPT_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B3_IMPLEMENTATION_PACKET_v0.1:§6,§21 observability",
+        "P-B4_PROMPT_AND_SCHEMA_CONTRACT_v0.2:API CONTRACT / model-call topology",
+        "CANONICAL_MANIFEST_v0.5:M016"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "MONITOR_SOURCE_EVENT_V1": {
+      "canonical_hash_field": "event_hash",
+      "canonical_id_field": "source_event_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "523c4a284b992e789a54e29092cb7b4ffaf04a771f07fe8fb57526c0303be4d5",
+      "journal_payload_schema": "aic.monitor_source_event.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "523c4a284b992e789a54e29092cb7b4ffaf04a771f07fe8fb57526c0303be4d5",
+      "resource_id": "urn:aic:b1.2:schema:MONITOR_SOURCE_EVENT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B7_IMPLEMENTATION_PACKET_v0.1:§13",
+        "CANONICAL_MANIFEST_v0.5:M051"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "MONITOR_SUBSCRIPTION_V1": {
+      "canonical_hash_field": "subscription_hash",
+      "canonical_id_field": "monitor_subscription_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "b5d38b1f2195f125ae9b8759f24210511bb0aa2ad8b7726c19a42b82fa95c391",
+      "journal_payload_schema": "aic.monitor_subscription.v1",
+      "normalization_decision_ids": [
+        "ND-S8-004"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "b5d38b1f2195f125ae9b8759f24210511bb0aa2ad8b7726c19a42b82fa95c391",
+      "resource_id": "urn:aic:b1.2:schema:MONITOR_SUBSCRIPTION_V1:v0.3",
+      "resource_version": "0.3",
+      "source_refs": [
+        "P-B7_THESIS_MONITOR_AND_REEVALUATION_CONTRACT_v0.2:§3",
+        "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT_v0.5:§14",
+        "CANONICAL_MANIFEST_v0.5:M050"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "MONITOR_TRIGGER_MATCH_V1": {
+      "canonical_hash_field": "match_hash",
+      "canonical_id_field": "trigger_match_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "6f480e2e297bed78a27f305b327bf3908d2aea351a0a5afea1e96f6cdf275a54",
+      "journal_payload_schema": "aic.monitor_trigger_match.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "6f480e2e297bed78a27f305b327bf3908d2aea351a0a5afea1e96f6cdf275a54",
+      "resource_id": "urn:aic:b1.2:schema:MONITOR_TRIGGER_MATCH_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B7_THESIS_MONITOR_AND_REEVALUATION_CONTRACT_v0.2:§10",
+        "CANONICAL_MANIFEST_v0.5:M052"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "MUTATION_RESULT_V1": {
+      "canonical_hash_field": "result_hash",
+      "canonical_id_field": "mutation_result_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "745b212e8a45f95f11ff3b36f195ffc122be9eb98b16f88f082beb68ad7b93fa",
+      "journal_payload_schema": "aic.mutation_result.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "745b212e8a45f95f11ff3b36f195ffc122be9eb98b16f88f082beb68ad7b93fa",
+      "resource_id": "urn:aic:b1.2:schema:MUTATION_RESULT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B8_EVAL_HARNESS_AND_MUTATION_CONTRACT_v0.4:§6",
+        "CANONICAL_MANIFEST_v0.5:M063"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "NEXT_REVIEW_TRIGGER_V1": {
+      "canonical_hash_field": "trigger_hash",
+      "canonical_id_field": null,
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "189d7cc4c934dbd4c7f1fc7b4b1a947e08215c75ca5f4eea8a9aae9e8fc8daee",
+      "journal_payload_schema": "NONE_EMBEDDED_IN_DECISION",
+      "normalization_decision_ids": [],
+      "persistence_class": "EMBEDDED_ONLY",
+      "predecessor_resource_sha256": "189d7cc4c934dbd4c7f1fc7b4b1a947e08215c75ca5f4eea8a9aae9e8fc8daee",
+      "resource_id": "urn:aic:b1.2:schema:NEXT_REVIEW_TRIGGER_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§14",
+        "CANONICAL_MANIFEST_v0.5:M070"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "OWNER_ACCOUNT_V1": {
+      "canonical_hash_field": "owner_account_hash",
+      "canonical_id_field": "owner_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "d482b76bd53da6fb4b2e57f8e971ce8f7a381999cef8a636a182e45f91c1c75c",
+      "journal_payload_schema": "aic.auth.owner_account.v1:SENSITIVE_FIELDS_EXCLUDED",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "d482b76bd53da6fb4b2e57f8e971ce8f7a381999cef8a636a182e45f91c1c75c",
+      "resource_id": "urn:aic:b1.2:schema:OWNER_ACCOUNT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B6_OWNER_AUTH_AND_SESSION_CONTRACT_v0.2:§4",
+        "CANONICAL_MANIFEST_v0.5:M038A"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "OWNER_SESSION_V1": {
+      "canonical_hash_field": "session_hash",
+      "canonical_id_field": "session_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "37acad2e6e7c1e0d9ba42972bff8edc7df7ea783a9646b19caf66e5f28d9b17b",
+      "journal_payload_schema": "aic.auth.owner_session.v1:SENSITIVE_FIELDS_EXCLUDED",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "37acad2e6e7c1e0d9ba42972bff8edc7df7ea783a9646b19caf66e5f28d9b17b",
+      "resource_id": "urn:aic:b1.2:schema:OWNER_SESSION_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B6_OWNER_AUTH_AND_SESSION_CONTRACT_v0.2:§7,§23",
+        "CANONICAL_MANIFEST_v0.5:M038B"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "POLICY_REFERENCE_V1": {
+      "canonical_hash_field": "policy_reference_hash",
+      "canonical_id_field": "policy_reference_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "8afc329f8444c4c3c96caa292377ff404cb15c24d080d0f2e3d6759e54977208",
+      "journal_payload_schema": "NONE_EMBEDDED_IN_CONTAINING_OBJECT",
+      "normalization_decision_ids": [],
+      "persistence_class": "EMBEDDED_ONLY",
+      "predecessor_resource_sha256": "8afc329f8444c4c3c96caa292377ff404cb15c24d080d0f2e3d6759e54977208",
+      "resource_id": "urn:aic:b1.2:schema:POLICY_REFERENCE_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "CANONICAL_SCHEMA_COMPATIBILITY_AND_PROMOTION_MANIFEST_v0.5:M060",
+        "AIC_R0_BOUNDED_PLAN_REPAIR_AND_CROSS_PACKET_COMPATIBILITY_v0.5:P09"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "POLICY_VALUE_V1": {
+      "canonical_hash_field": "policy_value_hash",
+      "canonical_id_field": "policy_value_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "328a9dccb24143e4fd50d2c19841f8846cced1797ac9bdd1fab04a231c555f75",
+      "journal_payload_schema": "aic.policy_value.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "328a9dccb24143e4fd50d2c19841f8846cced1797ac9bdd1fab04a231c555f75",
+      "resource_id": "urn:aic:b1.2:schema:POLICY_VALUE_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "AIC_R0_BOUNDED_PLAN_REPAIR_v0.5:F09",
+        "CANONICAL_MANIFEST_v0.5:M064"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "PORTFOLIO_IMPACT_V1": {
+      "canonical_hash_field": "impact_hash",
+      "canonical_id_field": "portfolio_impact_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "0f26321b8248ead1ac0256d8920615d00b8df4432793666df6723d04efee4a56",
+      "journal_payload_schema": "aic.portfolio_impact.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "0f26321b8248ead1ac0256d8920615d00b8df4432793666df6723d04efee4a56",
+      "resource_id": "urn:aic:b1.2:schema:PORTFOLIO_IMPACT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B5_IMPLEMENTATION_PACKET_v0.1:§15",
+        "CANONICAL_MANIFEST_v0.5:M033"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "PROPOSAL_CANDIDATE_V1": {
+      "canonical_hash_field": "canonical_payload_hash",
+      "canonical_id_field": "proposal_candidate_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "64d391d7688071f680b957817ed161e0d89c3b761e0f177f7ac8a56aea6e9931",
+      "journal_payload_schema": "aic.proposal_candidate.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "64d391d7688071f680b957817ed161e0d89c3b761e0f177f7ac8a56aea6e9931",
+      "resource_id": "urn:aic:b1.2:schema:PROPOSAL_CANDIDATE_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B5_IMPLEMENTATION_PACKET_v0.1:§9",
+        "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT_v0.5:§4",
+        "CANONICAL_MANIFEST_v0.5:M030"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "PROVIDER_READ_RECEIPT_V1": {
+      "canonical_hash_field": "receipt_hash",
+      "canonical_id_field": "read_receipt_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "441457ab37d406e9090fea64afbb1c65a27156e9d5950ce5e73c260c1a701a2f",
+      "journal_payload_schema": "aic.provider_read_receipt.v1",
+      "normalization_decision_ids": [
+        "ND-F1-003",
+        "ND-F1-004",
+        "ND-F1-005",
+        "ND-R8-PRR-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "441457ab37d406e9090fea64afbb1c65a27156e9d5950ce5e73c260c1a701a2f",
+      "resource_id": "urn:aic:b1.2:schema:PROVIDER_READ_RECEIPT_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§10",
+        "CANONICAL_MANIFEST_v0.5:M006"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "RAW_NUMERIC_VALUE_V1": {
+      "canonical_hash_field": "value_hash",
+      "canonical_id_field": "raw_numeric_value_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "644c74cf7025a73e605c5c56229ebc3ac5ade5afb17968837c3553d7a9bbfad9",
+      "journal_payload_schema": "aic.raw_numeric_value.v1",
+      "normalization_decision_ids": [
+        "ND-R5-RNV-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "644c74cf7025a73e605c5c56229ebc3ac5ade5afb17968837c3553d7a9bbfad9",
+      "resource_id": "urn:aic:b1.2:schema:RAW_NUMERIC_VALUE_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§9 EvidenceItem field_or_claim + §14 numeric provenance",
+        "Engineering_Spec_v0.5 numeric provenance",
+        "CANONICAL_MANIFEST_v0.5:M004"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "RECONCILIATION_RESULT_V1": {
+      "canonical_hash_field": "result_hash",
+      "canonical_id_field": "reconciliation_result_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "77e3f6fdaeba9584a91c6830d90af66eeab228209de2ae35c3b738c7c9c4b8b9",
+      "journal_payload_schema": "aic.reconciliation_result.v1",
+      "normalization_decision_ids": [
+        "ND-R5-RECON-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "77e3f6fdaeba9584a91c6830d90af66eeab228209de2ae35c3b738c7c9c4b8b9",
+      "resource_id": "urn:aic:b1.2:schema:RECONCILIATION_RESULT_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B6_EXECUTION_COMMIT_AND_RECONCILIATION_CONTRACT_v0.2:§9-§10",
+        "CANONICAL_MANIFEST_v0.5:M048"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "RESEARCH_REOPEN_REQUEST_V1": {
+      "canonical_hash_field": "request_hash",
+      "canonical_id_field": "reopen_request_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "ae708a332b4be9cb32ba5a029e142c359561aec4beef751df1910b19b5592352",
+      "journal_payload_schema": "aic.research_reopen_request.v1",
+      "normalization_decision_ids": [
+        "ND-R5-REOPEN-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "ae708a332b4be9cb32ba5a029e142c359561aec4beef751df1910b19b5592352",
+      "resource_id": "urn:aic:b1.2:schema:RESEARCH_REOPEN_REQUEST_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§10",
+        "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT_v0.5:§7",
+        "CANONICAL_MANIFEST_v0.5:M026"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "REVIEW_WORK_ITEM_V1": {
+      "canonical_hash_field": "work_item_hash",
+      "canonical_id_field": "review_work_item_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e8c1571f0f0c4eaf70e2c10563852d7b2117b4b645046ac1c6468c413d78415a",
+      "journal_payload_schema": "aic.review_work_item.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "e8c1571f0f0c4eaf70e2c10563852d7b2117b4b645046ac1c6468c413d78415a",
+      "resource_id": "urn:aic:b1.2:schema:REVIEW_WORK_ITEM_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B7_IMPLEMENTATION_PACKET_v0.1:§21",
+        "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT_v0.5:§9",
+        "CANONICAL_MANIFEST_v0.5:M054"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "RISK_CHECK_RESULT_V1": {
+      "canonical_hash_field": "check_hash",
+      "canonical_id_field": "check_result_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e28e19b593b3c135157d1cdddbab9ca58fcc3ba639fe9e415679ca38bef45f8a",
+      "journal_payload_schema": "aic.risk_check_result.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "e28e19b593b3c135157d1cdddbab9ca58fcc3ba639fe9e415679ca38bef45f8a",
+      "resource_id": "urn:aic:b1.2:schema:RISK_CHECK_RESULT_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B5_IMPLEMENTATION_PACKET_v0.1:§17",
+        "CANONICAL_MANIFEST_v0.5:M031"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "RISK_POLICY_V1": {
+      "canonical_hash_field": "policy_hash",
+      "canonical_id_field": "policy_id+version",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "cf960777b8ec33ffdebf48daaf4e9fd08b82be597e4eac4a8969a910dad266c7",
+      "journal_payload_schema": "aic.risk_policy.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "cf960777b8ec33ffdebf48daaf4e9fd08b82be597e4eac4a8969a910dad266c7",
+      "resource_id": "urn:aic:b1.2:schema:RISK_POLICY_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B5_RISK_AND_SIZING_POLICY_CONTRACT_v0.2:§2",
+        "CANONICAL_MANIFEST_v0.5:M028"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "RUN_ENVELOPE_V1": {
+      "canonical_hash_field": "run_hash",
+      "canonical_id_field": "run_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "e9798cb98e5616fcde07b3463f622665ac3362404be232288134268f85bb0604",
+      "journal_payload_schema": "aic.run_envelope.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "e9798cb98e5616fcde07b3463f622665ac3362404be232288134268f85bb0604",
+      "resource_id": "urn:aic:b1.2:schema:RUN_ENVELOPE_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "Engineering_Spec_v0.5:RUN_ENVELOPE",
+        "CANONICAL_MANIFEST_v0.5:M059",
+        "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT_v0.5:§7"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "SCHEMA_REGISTRY_ENTRY_V1": {
+      "canonical_hash_field": "schema_hash",
+      "canonical_id_field": "schema_name+schema_version",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "c9cf963f94b780d3afc345934769e3aa4da95caf20e25f9f713e06ba840709dc",
+      "journal_payload_schema": "schema_registry",
+      "normalization_decision_ids": [],
+      "persistence_class": "SCHEMA_REGISTRY",
+      "predecessor_resource_sha256": "c9cf963f94b780d3afc345934769e3aa4da95caf20e25f9f713e06ba840709dc",
+      "resource_id": "urn:aic:b1.2:schema:SCHEMA_REGISTRY_ENTRY_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "B1_SCHEMA_AND_TRANSITION_COMPATIBILITY_AMENDMENT_v0.5",
+        "CANONICAL_MANIFEST_v0.5:M058"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "SECURITY_TYPE_PROOF_V1": {
+      "canonical_hash_field": "proof_hash",
+      "canonical_id_field": "security_type_proof_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "0844766a6bbf068e1af8d034ca716bca7678b7b896036e1415e3d2f9d4682b9a",
+      "journal_payload_schema": "aic.security_type_proof.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "0844766a6bbf068e1af8d034ca716bca7678b7b896036e1415e3d2f9d4682b9a",
+      "resource_id": "urn:aic:b1.2:schema:SECURITY_TYPE_PROOF_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B2_IMPLEMENTATION_PACKET_v0.1:§7",
+        "CANONICAL_MANIFEST_v0.5:M008"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "SIZING_COMPUTATION_V1": {
+      "canonical_hash_field": "computation_hash",
+      "canonical_id_field": "sizing_computation_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "b07165651d85fed19b09cefae5287385fb5620f89125b4ebffb2eb2223a05b1f",
+      "journal_payload_schema": "aic.sizing_computation.v1",
+      "normalization_decision_ids": [
+        "ND-R5-SIZE-001"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "b07165651d85fed19b09cefae5287385fb5620f89125b4ebffb2eb2223a05b1f",
+      "resource_id": "urn:aic:b1.2:schema:SIZING_COMPUTATION_V1:v0.4",
+      "resource_version": "0.4",
+      "source_refs": [
+        "P-B5_RISK_AND_SIZING_POLICY_CONTRACT_v0.2:§1 deterministic algorithm",
+        "P-B5_IMPLEMENTATION_PACKET_v0.1:§8 D09 algorithm",
+        "CANONICAL_MANIFEST_v0.5:M029"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "SIZING_POLICY_V1": {
+      "canonical_hash_field": "policy_hash",
+      "canonical_id_field": "policy_id+version",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "20a845fc49d91f8b25ae3f24c79efed6bb9037ad5fbbe64ef83fa8c2bccd4d6f",
+      "journal_payload_schema": "aic.sizing_policy.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "20a845fc49d91f8b25ae3f24c79efed6bb9037ad5fbbe64ef83fa8c2bccd4d6f",
+      "resource_id": "urn:aic:b1.2:schema:SIZING_POLICY_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B5_RISK_AND_SIZING_POLICY_CONTRACT_v0.2:§1",
+        "CANONICAL_MANIFEST_v0.5:M027"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "THESIS_EVENT_V1": {
+      "canonical_hash_field": "event_hash",
+      "canonical_id_field": "thesis_event_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "494a9ed49f2b1519f99bf9ba7ac665b5d29ea76938bf636778cd0c225d5f1475",
+      "journal_payload_schema": "aic.thesis_event.v1",
+      "normalization_decision_ids": [
+        "ND-S8-005"
+      ],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "494a9ed49f2b1519f99bf9ba7ac665b5d29ea76938bf636778cd0c225d5f1475",
+      "resource_id": "urn:aic:b1.2:schema:THESIS_EVENT_V1:v0.3",
+      "resource_version": "0.3",
+      "source_refs": [
+        "P-B7_THESIS_MONITOR_AND_REEVALUATION_CONTRACT_v0.2:§13",
+        "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT_v0.5:§2-§3",
+        "CANONICAL_MANIFEST_v0.5:M053"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    },
+    "TRADE_PROPOSAL_V1": {
+      "canonical_hash_field": "canonical_payload_hash",
+      "canonical_id_field": "proposal_id",
+      "changed_from_v0_4": false,
+      "expected_resource_sha256": "8722ce160984ef9f6c48141ecc985a6fcfce9e26fb28f77494f4676c73936765",
+      "journal_payload_schema": "aic.trade_proposal.v1",
+      "normalization_decision_ids": [],
+      "persistence_class": "DURABLE_CANONICAL",
+      "predecessor_resource_sha256": "8722ce160984ef9f6c48141ecc985a6fcfce9e26fb28f77494f4676c73936765",
+      "resource_id": "urn:aic:b1.2:schema:TRADE_PROPOSAL_V1:v0.2",
+      "resource_version": "0.2",
+      "source_refs": [
+        "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT_v0.5:§5,§11",
+        "CANONICAL_MANIFEST_v0.5:M035"
+      ],
+      "v0_4_independent_semantic_result": "PASS"
+    }
+  },
+  "scope_boundary": {
+    "B1_3_open": false,
+    "B2_to_B8_authorized": false,
+    "dependencies_changed": 0,
+    "legal_edge_count": 52,
+    "live_money": "PROHIBITED",
+    "paper_orders": 0,
+    "product_code_changes": 0,
+    "provider_model_broker_calls": 0,
+    "state_count": 34,
+    "user_repository_changes": 0
+  },
+  "semantic_certification_ledger_v0_3": {
+    "ACCEPTED_PROPOSAL_CANDIDATE_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "edd17452fdb118c75bbece324a0f144d8e6cb26c1838e60b5ecd9a9f6f4fadcd"
+    },
+    "AGGREGATE_HEAD_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "696030d509d2b21b447a8381a17d7509d938982cccaa2c8f58b4226859a05fa6"
+    },
+    "APPROVAL_ACTION_NONCE_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "41aa52f03c1712957159294f8e4254517b5ad7dedc3da6a402a6e67b1c45c02a"
+    },
+    "APPROVAL_ENVELOPE_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "0e40ee413c469c03c07c1e3956e2bf8a9d661df6a43becc8ab1de89c9a3236d9"
+    },
+    "B2_DATA_SNAPSHOT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "4a6b8491c5834e7b06efffe74ec4c3ebf86ddb8c31b83aa30a3ace2ff4ec7b7b"
+    },
+    "B3_RESEARCH_SNAPSHOT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "38bc41a299bd75c7d47d9b4fa03ffd2f96fba27a0cc2cb25c9707e96eb2af24f"
+    },
+    "B5_RISK_INPUT_SNAPSHOT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "73792bba979ae454f8af565fc5d41381d629e456a0b50b065802e51a08ef4485"
+    },
+    "B5_RISK_RESULT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "f913bf9c3b610001aeeaf8d806e5abc577341e3fb4ed8ed946ef11f855781bef"
+    },
+    "B6_COMMIT_RISK_RESULT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "1db2696b97171dc6e61792b180b4fd949d3951d809ed2f1fa4a4fa436f960d10"
+    },
+    "B6_COMMIT_STATE_SNAPSHOT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "27ca5f17ce81a5465dcac60d16833fe345b4598db1ae34d5e01f3987af123f3b"
+    },
+    "B6_PREPARE_RISK_RESULT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "faa02628fb0d64569f9c44fe2a023d0242a3413977b54c9a6054ecdadc3f2dac"
+    },
+    "B6_PRE_SUBMIT_SNAPSHOT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "8b94a1f8e46b7551def984051e0dcb533c322e828aa1b85a67f93d1424e49598"
+    },
+    "BROKER_SUBMIT_RECEIPT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "fe0f3d09aed5731b23fcee2adc8b324637b00e96ea66379a247a31f96d9479a7"
+    },
+    "CANDIDATE_PACKET_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "fa8e81ab5a3d91bd4c95ffce2e51980ee4e097407aa7b82a55f0985b92597457"
+    },
+    "COMPUTED_VALUE_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "2c918d873b9e0b6174bdf2d73aed1d438d6fa55bbe29a1cd04c0dbfa4715b9fd"
+    },
+    "CONFLICT_RECORD_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "9275966266aa4770d744c82ba2ce79ccbab7c93346672df564c74f5114552828"
+    },
+    "COUNCIL_OPINION_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "0fd41a4861d4388b71f4d842fe82ab7c5180bc63041fb4ad9eb33742a04999af"
+    },
+    "DECISION_CHANGE_CONDITION_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "c7a78b66fd03a4145f8d24200b12aaedcda51e01a4afa881b5b229d9105a6525"
+    },
+    "DECISION_LIFECYCLE_POLICY_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "2203e4068bf32230088d581ad1fa781a7a15bdeff7c7600a97dc50d653052447"
+    },
+    "DECISION_TTL_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "184d8400dedf92c79c8933434bb2e63b9fa333b8ef3d9c94ee021e329c4c7380"
+    },
+    "DEEP_COMPARISON_RESULT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "91fde9e5abcf53c8d062c6a65b778a1583e2a0593d9586c10de84771d9f9cd6e"
+    },
+    "EVAL_CASE_RESULT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "1276fea011086685b28aff7036dd5f44fdcf79ee41d883a29b938eeb3d82a616"
+    },
+    "EVAL_RUN_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "f5af6e87b28316200ac60fad7d118952bbf9b3b5b90b32721649145c1babf8ec"
+    },
+    "EVIDENCE_ITEM_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "04b1ce896599b57861c5dd61dcc0f3081c050b73cd501713338f272b52326a1f"
+    },
+    "EVIDENCE_POLICY_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "b720181b09aee4e4f316cdcb779022b80a690c9304bec83bdbce17399d9f39eb"
+    },
+    "EXECUTION_EVENT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "e82bfe6be131590ca4045753d0c9da5fc59799215600e9a26fdb277372c33829"
+    },
+    "EXECUTION_GATE_EVALUATION_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "e935b18b7e903e3399a10076f87c9c0d08c44f2404fc795623f937db8d0ee9be"
+    },
+    "EXECUTION_INTENT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "e56e44a42e4f759fcfdfaf21b1304fab28732ab6ed9d5ebaa92967a996d3cefa"
+    },
+    "FINAL_DECISION_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "ada548e99c4e688b1310a05f81ae841ee5f58aa1b76315e3c209ca9ec6cb1d82"
+    },
+    "INVALIDATION_CONDITION_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "36dae7e030aa13984407fe76173b47c5d5471427ee5df50d47e58a88dd3fb7e4"
+    },
+    "INVESTMENT_MANDATE_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "5aa9daba660d218cbc4ee841fd822e1266c48cf39b09d107785bc47ade45ef1f"
+    },
+    "JOURNAL_EVENT_ENVELOPE_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "1eaa020043265ab5da81ca45f0dd0c0339643da2a32da61b78c674c23108e437"
+    },
+    "MATERIAL_CLAIM_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "5d16ec74d58c187badab0a2ad98bc89593642c35271457f02e7aaa626b4478b5"
+    },
+    "MODEL_RUN_RECEIPT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "60387c2458861676c913912c540ba9377b3f743059d7489710ac6217330cba65"
+    },
+    "MONITOR_SOURCE_EVENT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "523c4a284b992e789a54e29092cb7b4ffaf04a771f07fe8fb57526c0303be4d5"
+    },
+    "MONITOR_SUBSCRIPTION_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "b5d38b1f2195f125ae9b8759f24210511bb0aa2ad8b7726c19a42b82fa95c391"
+    },
+    "MONITOR_TRIGGER_MATCH_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "6f480e2e297bed78a27f305b327bf3908d2aea351a0a5afea1e96f6cdf275a54"
+    },
+    "MUTATION_RESULT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "745b212e8a45f95f11ff3b36f195ffc122be9eb98b16f88f082beb68ad7b93fa"
+    },
+    "NEXT_REVIEW_TRIGGER_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "189d7cc4c934dbd4c7f1fc7b4b1a947e08215c75ca5f4eea8a9aae9e8fc8daee"
+    },
+    "OWNER_ACCOUNT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "d482b76bd53da6fb4b2e57f8e971ce8f7a381999cef8a636a182e45f91c1c75c"
+    },
+    "OWNER_SESSION_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "37acad2e6e7c1e0d9ba42972bff8edc7df7ea783a9646b19caf66e5f28d9b17b"
+    },
+    "POLICY_REFERENCE_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "8afc329f8444c4c3c96caa292377ff404cb15c24d080d0f2e3d6759e54977208"
+    },
+    "POLICY_VALUE_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "328a9dccb24143e4fd50d2c19841f8846cced1797ac9bdd1fab04a231c555f75"
+    },
+    "PORTFOLIO_IMPACT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "0f26321b8248ead1ac0256d8920615d00b8df4432793666df6723d04efee4a56"
+    },
+    "PROPOSAL_CANDIDATE_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "64d391d7688071f680b957817ed161e0d89c3b761e0f177f7ac8a56aea6e9931"
+    },
+    "PROVIDER_READ_RECEIPT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "35030764cea58f8ba60bfc06e41daacc3697a0292ffff7f6c6e17aef9cf2b52a"
+    },
+    "RAW_NUMERIC_VALUE_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "264435486afd120a35be183832533e4ed288299be1203326412f4f00e2a2f2db"
+    },
+    "RECONCILIATION_RESULT_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "687a760858f99381a6c687b818d8d663514f6bc7d2f5634d4ef4ff0f930d607a"
+    },
+    "RESEARCH_REOPEN_REQUEST_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "6f8da2ba3c4e73505f0bee9a9a8c67742c81f181875ef9dc543bcdb4cd3ec976"
+    },
+    "REVIEW_WORK_ITEM_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "e8c1571f0f0c4eaf70e2c10563852d7b2117b4b645046ac1c6468c413d78415a"
+    },
+    "RISK_CHECK_RESULT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "e28e19b593b3c135157d1cdddbab9ca58fcc3ba639fe9e415679ca38bef45f8a"
+    },
+    "RISK_POLICY_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "cf960777b8ec33ffdebf48daaf4e9fd08b82be597e4eac4a8969a910dad266c7"
+    },
+    "RUN_ENVELOPE_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "e9798cb98e5616fcde07b3463f622665ac3362404be232288134268f85bb0604"
+    },
+    "SCHEMA_REGISTRY_ENTRY_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "c9cf963f94b780d3afc345934769e3aa4da95caf20e25f9f713e06ba840709dc"
+    },
+    "SECURITY_TYPE_PROOF_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "0844766a6bbf068e1af8d034ca716bca7678b7b896036e1415e3d2f9d4682b9a"
+    },
+    "SIZING_COMPUTATION_V1": {
+      "reuse_for_v0_4": false,
+      "v0_3_independent_result": "FAIL",
+      "v0_3_resource_sha256": "c8877e4f2c11f87b387f19f16c89c2a4dcfdedaef9b3d2d69edc9ff962f75d1c"
+    },
+    "SIZING_POLICY_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "20a845fc49d91f8b25ae3f24c79efed6bb9037ad5fbbe64ef83fa8c2bccd4d6f"
+    },
+    "THESIS_EVENT_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "494a9ed49f2b1519f99bf9ba7ac665b5d29ea76938bf636778cd0c225d5f1475"
+    },
+    "TRADE_PROPOSAL_V1": {
+      "reuse_for_v0_4": true,
+      "v0_3_independent_result": "PASS",
+      "v0_3_resource_sha256": "8722ce160984ef9f6c48141ecc985a6fcfce9e26fb28f77494f4676c73936765"
+    }
+  },
+  "semantic_certification_ledger_v0_4": {
+    "ACCEPTED_PROPOSAL_CANDIDATE_V1": "PASS",
+    "AGGREGATE_HEAD_V1": "PASS",
+    "APPROVAL_ACTION_NONCE_V1": "PASS",
+    "APPROVAL_ENVELOPE_V1": "PASS",
+    "B2_DATA_SNAPSHOT_V1": "PASS",
+    "B3_RESEARCH_SNAPSHOT_V1": "PASS",
+    "B5_RISK_INPUT_SNAPSHOT_V1": "FAIL",
+    "B5_RISK_RESULT_V1": "PASS",
+    "B6_COMMIT_RISK_RESULT_V1": "PASS",
+    "B6_COMMIT_STATE_SNAPSHOT_V1": "PASS",
+    "B6_PREPARE_RISK_RESULT_V1": "PASS",
+    "B6_PRE_SUBMIT_SNAPSHOT_V1": "PASS",
+    "BROKER_SUBMIT_RECEIPT_V1": "PASS",
+    "CANDIDATE_PACKET_V1": "PASS",
+    "COMPUTED_VALUE_V1": "PASS",
+    "CONFLICT_RECORD_V1": "PASS",
+    "COUNCIL_OPINION_V1": "PASS",
+    "DECISION_CHANGE_CONDITION_V1": "PASS",
+    "DECISION_LIFECYCLE_POLICY_V1": "PASS",
+    "DECISION_TTL_V1": "PASS",
+    "DEEP_COMPARISON_RESULT_V1": "PASS",
+    "EVAL_CASE_RESULT_V1": "PASS",
+    "EVAL_RUN_V1": "PASS",
+    "EVIDENCE_ITEM_V1": "PASS",
+    "EVIDENCE_POLICY_V1": "PASS",
+    "EXECUTION_EVENT_V1": "PASS",
+    "EXECUTION_GATE_EVALUATION_V1": "PASS",
+    "EXECUTION_INTENT_V1": "PASS",
+    "FINAL_DECISION_V1": "PASS",
+    "INVALIDATION_CONDITION_V1": "PASS",
+    "INVESTMENT_MANDATE_V1": "PASS",
+    "JOURNAL_EVENT_ENVELOPE_V1": "PASS",
+    "MATERIAL_CLAIM_V1": "PASS",
+    "MODEL_RUN_RECEIPT_V1": "PASS",
+    "MONITOR_SOURCE_EVENT_V1": "PASS",
+    "MONITOR_SUBSCRIPTION_V1": "PASS",
+    "MONITOR_TRIGGER_MATCH_V1": "PASS",
+    "MUTATION_RESULT_V1": "PASS",
+    "NEXT_REVIEW_TRIGGER_V1": "PASS",
+    "OWNER_ACCOUNT_V1": "PASS",
+    "OWNER_SESSION_V1": "PASS",
+    "POLICY_REFERENCE_V1": "PASS",
+    "POLICY_VALUE_V1": "PASS",
+    "PORTFOLIO_IMPACT_V1": "PASS",
+    "PROPOSAL_CANDIDATE_V1": "PASS",
+    "PROVIDER_READ_RECEIPT_V1": "PASS",
+    "RAW_NUMERIC_VALUE_V1": "PASS",
+    "RECONCILIATION_RESULT_V1": "PASS",
+    "RESEARCH_REOPEN_REQUEST_V1": "PASS",
+    "REVIEW_WORK_ITEM_V1": "PASS",
+    "RISK_CHECK_RESULT_V1": "PASS",
+    "RISK_POLICY_V1": "PASS",
+    "RUN_ENVELOPE_V1": "PASS",
+    "SCHEMA_REGISTRY_ENTRY_V1": "PASS",
+    "SECURITY_TYPE_PROOF_V1": "PASS",
+    "SIZING_COMPUTATION_V1": "PASS",
+    "SIZING_POLICY_V1": "PASS",
+    "THESIS_EVENT_V1": "PASS",
+    "TRADE_PROPOSAL_V1": "PASS"
+  },
+  "semantic_reuse_policy": {
+    "candidate_plan_delta_is_separate_authority": true,
+    "changed_fail_resource_count": 1,
+    "changed_fail_resources": [
+      "B5_RISK_INPUT_SNAPSHOT_V1"
+    ],
+    "first_fully_accepted_baseline_rule": "v0.5.2 may become the first accepted B1.2 registry baseline only after independent PASS of the single repaired canonical schema, changed/new B5 closed-projection helpers, and M071 v0.3 plan-level mapping authority delta.",
+    "reusable_pass_resource_count": 58,
+    "reusable_pass_resources": [
+      "INVESTMENT_MANDATE_V1",
+      "EVIDENCE_POLICY_V1",
+      "EVIDENCE_ITEM_V1",
+      "RAW_NUMERIC_VALUE_V1",
+      "COMPUTED_VALUE_V1",
+      "PROVIDER_READ_RECEIPT_V1",
+      "CONFLICT_RECORD_V1",
+      "SECURITY_TYPE_PROOF_V1",
+      "B2_DATA_SNAPSHOT_V1",
+      "DEEP_COMPARISON_RESULT_V1",
+      "B3_RESEARCH_SNAPSHOT_V1",
+      "MATERIAL_CLAIM_V1",
+      "CANDIDATE_PACKET_V1",
+      "MODEL_RUN_RECEIPT_V1",
+      "COUNCIL_OPINION_V1",
+      "FINAL_DECISION_V1",
+      "INVALIDATION_CONDITION_V1",
+      "DECISION_CHANGE_CONDITION_V1",
+      "RESEARCH_REOPEN_REQUEST_V1",
+      "SIZING_POLICY_V1",
+      "RISK_POLICY_V1",
+      "SIZING_COMPUTATION_V1",
+      "PROPOSAL_CANDIDATE_V1",
+      "RISK_CHECK_RESULT_V1",
+      "B5_RISK_RESULT_V1",
+      "PORTFOLIO_IMPACT_V1",
+      "ACCEPTED_PROPOSAL_CANDIDATE_V1",
+      "TRADE_PROPOSAL_V1",
+      "APPROVAL_ENVELOPE_V1",
+      "OWNER_ACCOUNT_V1",
+      "OWNER_SESSION_V1",
+      "APPROVAL_ACTION_NONCE_V1",
+      "B6_PRE_SUBMIT_SNAPSHOT_V1",
+      "B6_PREPARE_RISK_RESULT_V1",
+      "EXECUTION_GATE_EVALUATION_V1",
+      "EXECUTION_INTENT_V1",
+      "B6_COMMIT_STATE_SNAPSHOT_V1",
+      "B6_COMMIT_RISK_RESULT_V1",
+      "BROKER_SUBMIT_RECEIPT_V1",
+      "EXECUTION_EVENT_V1",
+      "RECONCILIATION_RESULT_V1",
+      "MONITOR_SUBSCRIPTION_V1",
+      "MONITOR_SOURCE_EVENT_V1",
+      "MONITOR_TRIGGER_MATCH_V1",
+      "THESIS_EVENT_V1",
+      "REVIEW_WORK_ITEM_V1",
+      "JOURNAL_EVENT_ENVELOPE_V1",
+      "AGGREGATE_HEAD_V1",
+      "SCHEMA_REGISTRY_ENTRY_V1",
+      "RUN_ENVELOPE_V1",
+      "POLICY_REFERENCE_V1",
+      "EVAL_RUN_V1",
+      "EVAL_CASE_RESULT_V1",
+      "MUTATION_RESULT_V1",
+      "POLICY_VALUE_V1",
+      "DECISION_LIFECYCLE_POLICY_V1",
+      "DECISION_TTL_V1",
+      "NEXT_REVIEW_TRIGGER_V1"
+    ],
+    "reuse_requires_current_source_no_drift": true,
+    "reuse_requires_exact_resource_hash": true
+  },
+  "source_aliases": {
+    "B1_IMPLEMENTATION_PLAN_v0.1": {
+      "content_hash": "eaec3552afdd037b8a2d9d93e340bcfebdf7f49c76b84778f4da70c15eabe449",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1mEOyDhzy4r2KyzBsvx1JAjKf3B5coVZm",
+      "title": "AI_INVESTMENT_COUNCIL_B1_IMPLEMENTATION_PLAN_v0.1_2026-08-14.docx",
+      "version": "v0.1"
+    },
+    "B1_SCHEMA_COMPAT_V0_5": {
+      "content_hash": "374caefc7fd176f28d644485e9bdbd2523bba80a561a6ac9e093184cee9ee251",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1zzFUeNxgzpKqDgn6miXOgDdDkhRg4qZaYtCvRljAAQ4",
+      "title": "B1_SCHEMA_AND_TRANSITION_COMPATIBILITY_AMENDMENT — v0.5 — 2026-08-14",
+      "version": "v0.5"
+    },
+    "CANONICAL_MANIFEST_V0_5": {
+      "content_hash": "b8c155d45e807c24e47618c9cc0d58043717ad2601638330be49804d38476306",
+      "content_hash_representation": "text/plain export 2026-08-15",
+      "drive_file_id": "17dMr1DeJkFUACGkH4FWAihewYUahNkkbcoWMSLhZNVM",
+      "title": "CANONICAL_SCHEMA_COMPATIBILITY_AND_PROMOTION_MANIFEST — v0.5 — 2026-08-14"
+    },
+    "DECISION_LIFECYCLE_POLICY_OWNER_INPUT_V0_1": {
+      "content_hash": "78fc44f1d0095210dda69f53d60c8cde0accc1b2afd2205879a895249a264291",
+      "content_hash_representation": "text/plain export 2026-08-15",
+      "drive_file_id": "1-iaPmoLaPkmahaCVY7Je8tQr1YUnCe1T_YOxD3xRCnk",
+      "title": "DECISION_LIFECYCLE_POLICY_OWNER_INPUT — TEMPLATE — v0.1 — 2026-08-14"
+    },
+    "PB2_V0_1": {
+      "content_hash": "56072d32c7a5f626415c93d48619526925bc5c1d875404b9499d9b53e63b6837",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "15EYvLwPuQi93y6D4IM4EMlzQsfvfDwngP4mQCt4Wnc4",
+      "title": "P-B2_IMPLEMENTATION_PACKET — DATA_EVIDENCE_SCREENER_ANALYTICS — v0.1 — 2026-08-14",
+      "version": "v0.1"
+    },
+    "PB3_V0_1": {
+      "content_hash": "2c75c0e13f911839ebb2243f698e5f55960e1c225faaf65f240482ea4c8a6ef4",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "11j-M5JfYHXeorDiOu2dmC-xFnZUL64gXh2G9uyO8_nQ",
+      "title": "P-B3_IMPLEMENTATION_PACKET — RESEARCH_ORCHESTRATOR — v0.1 — 2026-08-14",
+      "version": "v0.1"
+    },
+    "PB4_PROMOTION_V0_5": {
+      "content_hash": "c5a0a5164132a177ac36d27e4489e740d50e9b753a926e5fb8cdc4e095c71c9d",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1v-SJwkna5CHj_-mCexkLHhl_BH0w_ttcEB6JIxtiPvs",
+      "title": "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT — v0.5 — 2026-08-14",
+      "version": "v0.5"
+    },
+    "PB4_PROMPT_V0_2": {
+      "content_hash": "a8022eb14b9b390df5e9d9416e5ed9ca7dc5e6b8051c8c22e347a90dfea135cf",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1fvjxOnyjYT6ZZ5XY8d7bve58mkCkB11jgkxx_kaXQ3o",
+      "title": "P-B4_PROMPT_AND_SCHEMA_CONTRACT — v0.2 — 2026-08-14",
+      "version": "v0.2"
+    },
+    "PB56_HANDOFF_V0_5": {
+      "content_hash": "46c4e55dc1a4fb362ece95ee91c58ee5d45f7328ecb2950f44f2263c2174a9d0",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1g7sZbOPIWQpBTIYv9Al_CCVcFHQPzqIPwmOjna3NPHM",
+      "title": "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT — v0.5 — 2026-08-14",
+      "version": "v0.5"
+    },
+    "PB5_BASE_V0_1": {
+      "content_hash": "681c35f6c4ed72ece6e0a64b4c5003c40b1cdc28532bf16ce9be57311f8520f0",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1J0L175n1Oh_JOyZxrZhH5V0B4Au0JWotojwoUtWO5iY",
+      "title": "P-B5_IMPLEMENTATION_PACKET — DETERMINISTIC_PORTFOLIO_RISK — v0.1 — 2026-08-14",
+      "version": "v0.1"
+    },
+    "PB5_POLICY_V0_2": {
+      "content_hash": "1cef20eb784206f195b42d9768643d5b38a1bbf982d7d97291d5833e1638cb17",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1LFyp4CcwBbolGwrKoSkF9JFHmcj6OLZ68C_1kA3f1ps",
+      "title": "P-B5_RISK_AND_SIZING_POLICY_CONTRACT — v0.2 — 2026-08-14",
+      "version": "v0.2"
+    },
+    "PB6_AUTH_V0_2": {
+      "content_hash": "dba3c7cc78ccac38c2b4b1d9615498116b23dcbe745ae6e26344cc7979048943",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1CQjffYBH8fS8azOPd7izlddkFeAIRKTLVErxvejdnDo",
+      "title": "P-B6_OWNER_AUTH_AND_SESSION_CONTRACT — v0.2 — 2026-08-14",
+      "version": "v0.2"
+    },
+    "PB6_BASE_V0_1": {
+      "content_hash": "32cb3ee7a7f56a1d48b808064b8c0467289fbb8239fcb4da35017a3272999c1b",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1FGY4IJplFBOKv6b2pS-XvLAjrOWyYZRqPdbcJQaFLns",
+      "title": "P-B6_IMPLEMENTATION_PACKET — APPROVAL_AND_DETERMINISTIC_PAPER_EXECUTION — v0.1 — 2026-08-14",
+      "version": "v0.1"
+    },
+    "PB6_EXEC_V0_2": {
+      "content_hash": "0dc87724c38fcfa0a09e33c372514c6ded74b1e1abd039138044322a2d3193ce",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1e8Bcdg9D5B_vNKzqKlKynyGf5jajmKbZMweCHF1gZ80",
+      "title": "P-B6_EXECUTION_COMMIT_AND_RECONCILIATION_CONTRACT — v0.2 — 2026-08-14",
+      "version": "v0.2"
+    },
+    "PB6_POLICY_LINEAGE_V0_5": {
+      "content_hash": "de53ab85e8c5b971d501c500fde01a6ca323109f026934ad588dd7a19dd9aeaf",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1XK7kkn41sLK1ba7YsphM8AU2PDOrN6TaXTuJKK99BWQ",
+      "title": "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT — v0.5 — 2026-08-14",
+      "version": "v0.5"
+    },
+    "PB7_MONITOR_V0_2": {
+      "content_hash": "65d62c75179a23f5ca6c768c77f2fdfb19f8429cd677daa18931250607d5f9cf",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "19_fBVLnGn-QhlZMZS3ROgNyKrosyojWL3jMG-ML_2xg",
+      "title": "P-B7_THESIS_MONITOR_AND_REEVALUATION_CONTRACT — v0.2 — 2026-08-14",
+      "version": "v0.2"
+    },
+    "PB7_WORKFLOW_V0_5": {
+      "content_hash": "1253093f825809aaa6622afc9e9e7391d90b3bb7e780f196a9193e300c23c194",
+      "content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+      "drive_file_id": "1FoKA2c69ID_wJoydiyXkq7x2I14uRyg1oIMq5aI17-Y",
+      "title": "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT — v0.5 — 2026-08-14",
+      "version": "v0.5"
+    },
+    "PB8_EVAL_V0_4": {
+      "content_hash": "ac022ff4ef74c6816d06d6cd5422d69c1a10cc6769ef32192453a3394d25f229",
+      "content_hash_representation": "text/plain export 2026-08-15",
+      "drive_file_id": "1Rjc3-EfC9hGrUiUzX0siAlEF0yg844mKJc0pY5YwYHg",
+      "title": "P-B8_EVAL_HARNESS_AND_MUTATION_CONTRACT — v0.4 — 2026-08-14"
+    },
+    "R0_ROOT_V0_5": {
+      "content_hash": "1b4939bb79b793d8ad477b748382316a88d413fefe6c34b13138e60893c1732c",
+      "content_hash_representation": "text/plain export 2026-08-15",
+      "drive_file_id": "1JCDhbt1IJDO6XmGjDLLmgtdptjUGYiMELLXKhKHHXS8",
+      "title": "AIC_R0_BOUNDED_PLAN_REPAIR_AND_CROSS_PACKET_COMPATIBILITY — v0.5 — 2026-08-14"
+    },
+    "SPEC_V0_5": {
+      "content_hash": "2c13bd8f55698eedcdf3155dd4bd3b57b757ee3347d395a4a877bb126901703c",
+      "content_hash_representation": "raw DOCX",
+      "drive_file_id": "1EOmGLu9sHOSs8ceK6bSf1_pE-Gje5kNb",
+      "title": "AI_INVESTMENT_COUNCIL_ENGINEERING_SPEC_v0.5_2026-08-14.docx"
+    }
+  },
+  "source_universe": {
+    "candidate_plan_delta_is_not_yet_current_source": true,
+    "closed_world_contract_count": 20,
+    "source_manifest_entries": [
+      {
+        "explicit_required_id_count": 38,
+        "explicit_required_id_set_hash": "781e62136193a5c4e5f22058d56013b63ccc4955ac5bd0ffd6646ec9b7c8a858",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "AI_INVESTMENT_COUNCIL_B1_IMPLEMENTATION_PLAN_v0.1_2026-08-14.docx",
+        "source_content_hash": "eaec3552afdd037b8a2d9d93e340bcfebdf7f49c76b84778f4da70c15eabe449",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1mEOyDhzy4r2KyzBsvx1JAjKf3B5coVZm",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 27,
+        "explicit_required_id_set_hash": "8aa2188ae4bcab5277a9c39b1962dcd65443679ec5b35b3670db501ca4be8241",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "B1_SCHEMA_AND_TRANSITION_COMPATIBILITY_AMENDMENT — v0.5 — 2026-08-14",
+        "source_content_hash": "374caefc7fd176f28d644485e9bdbd2523bba80a561a6ac9e093184cee9ee251",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1zzFUeNxgzpKqDgn6miXOgDdDkhRg4qZaYtCvRljAAQ4",
+        "source_version": "v0.5"
+      },
+      {
+        "explicit_required_id_count": 40,
+        "explicit_required_id_set_hash": "e3902149f8400370051d0f1b5f158af8cd84a5e7fc82db8aa30b883498d31e60",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B2_IMPLEMENTATION_PACKET — DATA_EVIDENCE_SCREENER_ANALYTICS — v0.1 — 2026-08-14",
+        "source_content_hash": "56072d32c7a5f626415c93d48619526925bc5c1d875404b9499d9b53e63b6837",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "15EYvLwPuQi93y6D4IM4EMlzQsfvfDwngP4mQCt4Wnc4",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 48,
+        "explicit_required_id_set_hash": "1dbe30d78ce1c74f56be1eae84f5d9dfb97e16e2698ce3155f1375a6e7d6e8bb",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B3_IMPLEMENTATION_PACKET — RESEARCH_ORCHESTRATOR — v0.1 — 2026-08-14",
+        "source_content_hash": "2c75c0e13f911839ebb2243f698e5f55960e1c225faaf65f240482ea4c8a6ef4",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "11j-M5JfYHXeorDiOu2dmC-xFnZUL64gXh2G9uyO8_nQ",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 0,
+        "explicit_required_id_set_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "parser_disposition": "PARSED_ZERO_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B3_PROMPT_AND_SCHEMA_CONTRACT — v0.1 — 2026-08-14",
+        "source_content_hash": "8cc6e1fa713aa12a90cf877891c5ef8075d2dc5ecd7b4e16d63f57778114f29f",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1DtqUCxC3HymHhZJNlJi0wuaP9wBToyKrGX_xh0b98SA",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 22,
+        "explicit_required_id_set_hash": "fa8445b5b244621ab49c7bff48441857d6ceb4e3d0eb1833ed78af72b40a0302",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT — v0.5 — 2026-08-14",
+        "source_content_hash": "c5a0a5164132a177ac36d27e4489e740d50e9b753a926e5fb8cdc4e095c71c9d",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1v-SJwkna5CHj_-mCexkLHhl_BH0w_ttcEB6JIxtiPvs",
+        "source_version": "v0.5"
+      },
+      {
+        "explicit_required_id_count": 72,
+        "explicit_required_id_set_hash": "401beba4d309eb747df229114920fd86f5cc11beaa24e23bbdfa2cde53f8d011",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B4_IMPLEMENTATION_PACKET — BOUNDED_COUNCIL_AND_JUDGE — v0.1 — 2026-08-14",
+        "source_content_hash": "e5520029432ae6fadaf422e2b64ed55cde5a529a10317522ee7b8cc677fab4c3",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1XLtnxrQEivv7KYeEdseE7mVobT_wOLySMKItdKTq6gk",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 7,
+        "explicit_required_id_set_hash": "c12796aca210983da12cd714ff5b90cd947422008b939578b08b23533f3e68cc",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B4_PROMPT_AND_SCHEMA_CONTRACT — v0.2 — 2026-08-14",
+        "source_content_hash": "a8022eb14b9b390df5e9d9416e5ed9ca7dc5e6b8051c8c22e347a90dfea135cf",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1fvjxOnyjYT6ZZ5XY8d7bve58mkCkB11jgkxx_kaXQ3o",
+        "source_version": "v0.2"
+      },
+      {
+        "explicit_required_id_count": 24,
+        "explicit_required_id_set_hash": "00fdfa5749de0129a9f607d0d975999b9c17eba0c6a8d779ba044eadb3b7d617",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT — v0.5 — 2026-08-14",
+        "source_content_hash": "46c4e55dc1a4fb362ece95ee91c58ee5d45f7328ecb2950f44f2263c2174a9d0",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1g7sZbOPIWQpBTIYv9Al_CCVcFHQPzqIPwmOjna3NPHM",
+        "source_version": "v0.5"
+      },
+      {
+        "explicit_required_id_count": 72,
+        "explicit_required_id_set_hash": "8d3a3112f6154dfa3e54a8bdfcc0d90543eaf13cd74a26e5f301be5df1ca2d1f",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B5_IMPLEMENTATION_PACKET — DETERMINISTIC_PORTFOLIO_RISK — v0.1 — 2026-08-14",
+        "source_content_hash": "681c35f6c4ed72ece6e0a64b4c5003c40b1cdc28532bf16ce9be57311f8520f0",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1J0L175n1Oh_JOyZxrZhH5V0B4Au0JWotojwoUtWO5iY",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 7,
+        "explicit_required_id_set_hash": "9121d22dad1c27ea16aee2278b7814c53d382c21b72ebf977e76214a9f4bfb47",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B5_RISK_AND_SIZING_POLICY_CONTRACT — v0.2 — 2026-08-14",
+        "source_content_hash": "1cef20eb784206f195b42d9768643d5b38a1bbf982d7d97291d5833e1638cb17",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1LFyp4CcwBbolGwrKoSkF9JFHmcj6OLZ68C_1kA3f1ps",
+        "source_version": "v0.2"
+      },
+      {
+        "explicit_required_id_count": 24,
+        "explicit_required_id_set_hash": "e5e74bc2a02b505825ce641d19222216abfab912c1571a93fe9b220c9557ea61",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B6_APPROVAL_UI_AND_ENVELOPE_CONTRACT — v0.1 — 2026-08-14",
+        "source_content_hash": "ce6e481d7db0ef801b6fb2f7b32e1feb6dde6940270860a6530c94073f585629",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1TbOJRp6kwOXo4GOZYuO0E1GW1syqQ5MPSefENugoFfg",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 1,
+        "explicit_required_id_set_hash": "17554cd14db7a3fd98a792cd1dbbcca3870f3263e8f804b85eb3848922eb462e",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B6_EXECUTION_COMMIT_AND_RECONCILIATION_CONTRACT — v0.2 — 2026-08-14",
+        "source_content_hash": "0dc87724c38fcfa0a09e33c372514c6ded74b1e1abd039138044322a2d3193ce",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1e8Bcdg9D5B_vNKzqKlKynyGf5jajmKbZMweCHF1gZ80",
+        "source_version": "v0.2"
+      },
+      {
+        "explicit_required_id_count": 96,
+        "explicit_required_id_set_hash": "51a0f442abe52f4f438f65b3b98fbac05f8fbce5d2f96e8957bcbdf1f66cac8e",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B6_IMPLEMENTATION_PACKET — APPROVAL_AND_DETERMINISTIC_PAPER_EXECUTION — v0.1 — 2026-08-14",
+        "source_content_hash": "32cb3ee7a7f56a1d48b808064b8c0467289fbb8239fcb4da35017a3272999c1b",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1FGY4IJplFBOKv6b2pS-XvLAjrOWyYZRqPdbcJQaFLns",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 36,
+        "explicit_required_id_set_hash": "89ef9c05dc13ebf5814a034dfa67c212021b432bf60f2e9bf3daaff6dae0e94b",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B6_OWNER_AUTH_AND_SESSION_CONTRACT — v0.2 — 2026-08-14",
+        "source_content_hash": "dba3c7cc78ccac38c2b4b1d9615498116b23dcbe745ae6e26344cc7979048943",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1CQjffYBH8fS8azOPd7izlddkFeAIRKTLVErxvejdnDo",
+        "source_version": "v0.2"
+      },
+      {
+        "explicit_required_id_count": 17,
+        "explicit_required_id_set_hash": "88aa90fcb1aa74efb7d1a76da55d7d5eaa3490afcc32e410872d99be22184aa7",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT — v0.5 — 2026-08-14",
+        "source_content_hash": "de53ab85e8c5b971d501c500fde01a6ca323109f026934ad588dd7a19dd9aeaf",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1XK7kkn41sLK1ba7YsphM8AU2PDOrN6TaXTuJKK99BWQ",
+        "source_version": "v0.5"
+      },
+      {
+        "explicit_required_id_count": 1,
+        "explicit_required_id_set_hash": "56de64ea3b9a602675c42868f8d4d8c9a376d9c915f71ffc7b38f5fd3fcb1ee8",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B7_COCKPIT_UI_AND_NAVIGATION_CONTRACT — v0.2 — 2026-08-14",
+        "source_content_hash": "887153dee27b43a9984b336a6d819bdb5ff029fc86887b0d00fb785c8a945b3d",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "10olFU_HpmgRBYSfJul3mmBVAVOweewweu2eWe1jApr0",
+        "source_version": "v0.2"
+      },
+      {
+        "explicit_required_id_count": 80,
+        "explicit_required_id_set_hash": "f1ebcc127601ea94719051f04ef0d756a2dcaf02848adf859d656b68086c4906",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B7_IMPLEMENTATION_PACKET — COCKPIT_AND_THESIS_MONITOR — v0.1 — 2026-08-14",
+        "source_content_hash": "d652a1d160a1d87cdc8b858d8e5b6a65ba906dd3dc1176184b4e3fcb122a693e",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1fiWI7LKuKIXqMiKaodTQtiG2nH2It8slTorfHEpuEsU",
+        "source_version": "v0.1"
+      },
+      {
+        "explicit_required_id_count": 1,
+        "explicit_required_id_set_hash": "7f65168c681abcf5e2c3800cb276f0689cdcea213478afc083cae43e47344475",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B7_THESIS_MONITOR_AND_REEVALUATION_CONTRACT — v0.2 — 2026-08-14",
+        "source_content_hash": "65d62c75179a23f5ca6c768c77f2fdfb19f8429cd677daa18931250607d5f9cf",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "19_fBVLnGn-QhlZMZS3ROgNyKrosyojWL3jMG-ML_2xg",
+        "source_version": "v0.2"
+      },
+      {
+        "explicit_required_id_count": 26,
+        "explicit_required_id_set_hash": "ce05dcf3c90624a328f66b85eaeb2bd1574cbfe8d2c51068af9dbe15c4bc0b12",
+        "parser_disposition": "PARSED_EXPLICIT_REQUIRED_IDS",
+        "source_artifact": "P-B7_WORKFLOW_AND_MONITOR_RECONCILIATION_AMENDMENT — v0.5 — 2026-08-14",
+        "source_content_hash": "1253093f825809aaa6622afc9e9e7391d90b3bb7e780f196a9193e300c23c194",
+        "source_content_hash_representation": "NFC_UTF8_LF_NORMALIZED_PLAINTEXT",
+        "source_file_id": "1FoKA2c69ID_wJoydiyXkq7x2I14uRyg1oIMq5aI17-Y",
+        "source_version": "v0.5"
+      }
+    ],
+    "source_manifest_hash": "a800ebb5461c30ad2a292803bfaa603882e363ce28b947181422adfc602e0e95",
+    "source_manifest_hash_algorithm": "SHA256(canonical JSON of the exact 20 SOURCE_MANIFEST_JSON entries; sort_keys=true, separators=(',',':'), ensure_ascii=false)",
+    "source_manifest_origin": {
+      "file_id": "1c6pE_1VemAeLAGh5ixHrf4a66a_S33xbPHo0aNLTDHU",
+      "representation": "text/plain export 2026-08-15",
+      "text_export_sha256": "98b11ef4fd27a9ca41ae73c1aaf517cd90da220ab4727c683f69874a0c2098f4",
+      "title": "P-B8_ACCEPTANCE_INVENTORY_NORMALIZED_ROWS — v0.3 — 2026-08-14"
+    }
+  },
+  "status": "BUILDER_REPAIR_CANDIDATE_READY_FOR_INDEPENDENT_REVIEW_NOT_ACTIVATED",
+  "verification_oracle": {
+    "all_normative_resources_pinned": true,
+    "candidate_self_declared_hashes_are_pass_evidence": false,
+    "future_change_rule": "After accepted activation, compare future candidate resources to the last accepted external registry and apply bounded semantic/transitive compatibility review.",
+    "mutant_rule": "Bare numeric strings/numbers, extra fields in closed B5 risk records, raw JsonValue restoration, missing M071, use of M065/M066/M067, or mapping-kind/persistence drift must fail.",
+    "same_resource_id_different_hash": "FAIL",
+    "same_schema_name_version_different_hash": "FAIL",
+    "v0_5_2_acceptance_rule": "Hold registry fixed; reuse 58 exact v0.4 canonical PASS resources only after current source no-drift. Deep-review B5_RISK_INPUT_SNAPSHOT_V1, B5RiskPositions, B5RiskOpenOrders, B5PortfolioPositionRecord, B5OpenOrderExposureRecord, and M071 v0.3."
+  },
+  "version": "0.5.2"
+}

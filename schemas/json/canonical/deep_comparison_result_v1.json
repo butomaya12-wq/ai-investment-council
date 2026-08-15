@@ -1,0 +1,128 @@
+{
+  "$id": "urn:aic:b1.2:schema:DEEP_COMPARISON_RESULT_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "all_candidates_instrument_type": {
+      "const": "OPERATING_COMPANY_COMMON_STOCK",
+      "type": "string"
+    },
+    "all_candidates_us_listed": {
+      "const": true,
+      "type": "boolean"
+    },
+    "candidate_symbols": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "comparison_completeness": {
+      "enum": [
+        "COMPLETE",
+        "DEGRADED",
+        "INCOMPLETE",
+        "CONFLICTED"
+      ],
+      "type": "string"
+    },
+    "comparison_dimension_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "comparison_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "cross_candidate_tradeoffs": {
+      "items": {
+        "$ref": "urn:aic:b1.2:schema:DeepComparisonTradeoff:v0.2"
+      },
+      "type": "array"
+    },
+    "deep_comparison_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "eligibility_proof_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "mandate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "material_gaps": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "ranking_result_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "side_by_side_dimensions": {
+      "items": {
+        "$ref": "urn:aic:b1.2:schema:DeepComparisonDimension:v0.2"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "deep_comparison_id",
+    "snapshot_id",
+    "mandate_version",
+    "comparison_dimension_version",
+    "candidate_symbols",
+    "eligibility_proof_ids",
+    "all_candidates_us_listed",
+    "all_candidates_instrument_type",
+    "side_by_side_dimensions",
+    "cross_candidate_tradeoffs",
+    "ranking_result_ref",
+    "comparison_completeness",
+    "material_gaps",
+    "comparison_hash"
+  ],
+  "title": "DEEP_COMPARISON_RESULT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "comparison_hash",
+  "x-aic-canonical-id-field": "deep_comparison_id",
+  "x-aic-canonical-name": "DEEP_COMPARISON_RESULT_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.deep_comparison_result.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "comparison_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "DC-V01",
+      "rule": "each side_by_side_dimensions[].candidate_slots symbols equal top-level candidate_symbols set exactly"
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B2_IMPLEMENTATION_PACKET_v0.1:§19",
+    "CANONICAL_MANIFEST_v0.5:M010"
+  ]
+}

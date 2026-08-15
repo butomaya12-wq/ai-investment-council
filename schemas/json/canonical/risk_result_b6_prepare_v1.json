@@ -1,0 +1,111 @@
+{
+  "$id": "urn:aic:b1.2:schema:B6_PREPARE_RISK_RESULT_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "approval_authority": {
+      "const": false,
+      "type": "boolean"
+    },
+    "calculated_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "canonical_payload_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "check_result_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "decision_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "execution_authority": {
+      "const": false,
+      "type": "boolean"
+    },
+    "final_decision_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_lineage_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_refs": {
+      "$ref": "urn:aic:b1.2:schema:PolicyRefs10:v0.2"
+    },
+    "pre_submit_snapshot_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "pre_submit_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proposal_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "risk_result_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "risk_result_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "MODIFY",
+        "BLOCK",
+        "INCOMPLETE_DATA"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "risk_result_id",
+    "proposal_id",
+    "canonical_payload_hash",
+    "pre_submit_snapshot_id",
+    "pre_submit_snapshot_hash",
+    "decision_id",
+    "final_decision_hash",
+    "policy_refs",
+    "policy_lineage_hash",
+    "status",
+    "check_result_ids",
+    "calculated_at",
+    "risk_result_hash",
+    "execution_authority",
+    "approval_authority"
+  ],
+  "title": "B6_PREPARE_RISK_RESULT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "risk_result_hash",
+  "x-aic-canonical-id-field": "risk_result_id",
+  "x-aic-canonical-name": "B6_PREPARE_RISK_RESULT_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.risk_result.b6_prepare.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "risk_result_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B6_POLICY_REFERENCE_EXECUTION_LINEAGE_AMENDMENT_v0.5:§4",
+    "CANONICAL_MANIFEST_v0.5:M040"
+  ]
+}

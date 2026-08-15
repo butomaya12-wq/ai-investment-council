@@ -1,0 +1,121 @@
+{
+  "$id": "urn:aic:b1.2:schema:RECONCILIATION_RESULT_V1:v0.4",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attempt_count": {
+      "maximum": 5,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "broker_order_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "client_order_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "ended_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "intent_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "BROKER_ORDER_BOUND",
+        "NO_ORDER_PROVEN",
+        "BROKER_OUTCOME_UNKNOWN"
+      ],
+      "type": "string"
+    },
+    "post_retry_prohibited": {
+      "const": true,
+      "type": "boolean"
+    },
+    "provider_status": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "read_receipt_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "reconciliation_result_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "result_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    }
+  },
+  "required": [
+    "reconciliation_result_id",
+    "intent_id",
+    "client_order_id",
+    "started_at",
+    "ended_at",
+    "attempt_count",
+    "read_receipt_ids",
+    "broker_order_id",
+    "provider_status",
+    "outcome",
+    "post_retry_prohibited",
+    "result_hash"
+  ],
+  "title": "RECONCILIATION_RESULT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "result_hash",
+  "x-aic-canonical-id-field": "reconciliation_result_id",
+  "x-aic-canonical-name": "RECONCILIATION_RESULT_V1",
+  "x-aic-contract-version": "0.4",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_4",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "aic.reconciliation_result.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-R5-RECON-001"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "result_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "RECON4-V01",
+      "rule": "Represents bounded read-only reconciliation evidence/outcome for one intent/client_order_id; post_retry_prohibited=true and no field authorizes another POST."
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B6_EXECUTION_COMMIT_AND_RECONCILIATION_CONTRACT_v0.2:§9-§10",
+    "CANONICAL_MANIFEST_v0.5:M048"
+  ]
+}

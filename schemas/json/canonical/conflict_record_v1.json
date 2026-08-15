@@ -1,0 +1,108 @@
+{
+  "$id": "urn:aic:b1.2:schema:CONFLICT_RECORD_V1:v0.4",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authoritative_evidence_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "conflict_class": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "conflict_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "conflict_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "entity_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 2,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "field_or_claim": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "material": {
+      "type": "boolean"
+    },
+    "resolution_rule_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "enum": [
+        "UNRESOLVED",
+        "RESOLVED"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "conflict_id",
+    "entity_id",
+    "field_or_claim",
+    "evidence_ids",
+    "conflict_class",
+    "material",
+    "status",
+    "authoritative_evidence_id",
+    "resolution_rule_ref",
+    "conflict_hash"
+  ],
+  "title": "CONFLICT_RECORD_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "conflict_hash",
+  "x-aic-canonical-id-field": "conflict_id",
+  "x-aic-canonical-name": "CONFLICT_RECORD_V1",
+  "x-aic-contract-version": "0.4",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_4",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic/runtime bindings MUST conform to this exact accepted schema resource; prose/candidate self-hashes cannot override the external accepted registry baseline.",
+  "x-aic-journal-payload-schema": "aic.conflict_record.v1",
+  "x-aic-normalization-decision-ids": [
+    "ND-R5-CONFLICT-001"
+  ],
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; NULLABILITY_ONLY_WHERE_EXPLICITLY_SOURCE_BACKED_OR_REVIEWED_NORMALIZATION",
+  "x-aic-registry-baseline-required": true,
+  "x-aic-self-hash-field": "conflict_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "CR4-V01",
+      "rule": "Fields materialize only existing conflict axes: object/field, competing evidence, materiality, resolution authority/status, canonical id/hash."
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B2_IMPLEMENTATION_PACKET_v0.1:§8 conflict rule",
+    "CANONICAL_MANIFEST_v0.5:M007"
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "$id": "urn:aic:b1.2:schema:MATERIAL_CLAIM_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assumptions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "category": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "claim_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "claim_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "claim_kind": {
+      "enum": [
+        "FACT",
+        "INFERENCE"
+      ],
+      "type": "string"
+    },
+    "claim_text": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "computed_value_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "conflict_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "evidence_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "materiality": {
+      "enum": [
+        "MATERIAL",
+        "SUPPORTING"
+      ],
+      "type": "string"
+    },
+    "support_status": {
+      "enum": [
+        "SUPPORTED",
+        "CONFLICTED",
+        "INSUFFICIENT"
+      ],
+      "type": "string"
+    },
+    "uncertainty_note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "claim_id",
+    "candidate_id",
+    "category",
+    "claim_text",
+    "claim_kind",
+    "materiality",
+    "evidence_ids",
+    "computed_value_ids",
+    "conflict_ids",
+    "assumptions",
+    "support_status",
+    "uncertainty_note",
+    "claim_hash"
+  ],
+  "title": "MATERIAL_CLAIM_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "claim_hash",
+  "x-aic-canonical-id-field": "claim_id",
+  "x-aic-canonical-name": "MATERIAL_CLAIM_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.material_claim.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "claim_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B3_IMPLEMENTATION_PACKET_v0.1:§13",
+    "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§1-2",
+    "CANONICAL_MANIFEST_v0.5:M014"
+  ]
+}

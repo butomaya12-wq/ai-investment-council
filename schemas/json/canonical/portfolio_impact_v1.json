@@ -1,0 +1,153 @@
+{
+  "$id": "urn:aic:b1.2:schema:PORTFOLIO_IMPACT_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "account_equity_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "computed_value_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "correlation_cluster_refs": {
+      "anyOf": [
+        {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "current_buying_power_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "current_candidate_exposure_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "current_gross_long_exposure_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "impact_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "internal_buying_power_buffer_after_proposal_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "liquidity_participation_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pending_candidate_buy_exposure_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_reserve_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "portfolio_impact_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "post_candidate_gross_exposure_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "post_candidate_weight_of_equity_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "post_gross_long_exposure_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proposal_candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "proposed_notional_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "risk_input_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "sector_theme_impact_refs": {
+      "anyOf": [
+        {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "portfolio_impact_id",
+    "risk_input_snapshot_id",
+    "proposal_candidate_id",
+    "account_equity_ref",
+    "current_candidate_exposure_ref",
+    "pending_candidate_buy_exposure_ref",
+    "proposed_notional_ref",
+    "post_candidate_gross_exposure_ref",
+    "post_candidate_weight_of_equity_ref",
+    "current_gross_long_exposure_ref",
+    "post_gross_long_exposure_ref",
+    "current_buying_power_ref",
+    "policy_reserve_ref",
+    "internal_buying_power_buffer_after_proposal_ref",
+    "liquidity_participation_ref",
+    "sector_theme_impact_refs",
+    "correlation_cluster_refs",
+    "computed_value_ids",
+    "impact_hash"
+  ],
+  "title": "PORTFOLIO_IMPACT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "impact_hash",
+  "x-aic-canonical-id-field": "portfolio_impact_id",
+  "x-aic-canonical-name": "PORTFOLIO_IMPACT_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.portfolio_impact.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "impact_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B5_IMPLEMENTATION_PACKET_v0.1:§15",
+    "CANONICAL_MANIFEST_v0.5:M033"
+  ]
+}

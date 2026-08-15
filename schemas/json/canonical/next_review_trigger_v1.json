@@ -1,0 +1,60 @@
+{
+  "$id": "urn:aic:b1.2:schema:NEXT_REVIEW_TRIGGER_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "decision_ttl_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "lifecycle_anchor_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "trigger_at_utc": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "trigger_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "trigger_type": {
+      "const": "TTL_EXPIRY",
+      "type": "string"
+    }
+  },
+  "required": [
+    "trigger_type",
+    "lifecycle_anchor_at",
+    "decision_ttl_hash",
+    "trigger_at_utc",
+    "trigger_hash"
+  ],
+  "title": "NEXT_REVIEW_TRIGGER_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "trigger_hash",
+  "x-aic-canonical-id-field": null,
+  "x-aic-canonical-name": "NEXT_REVIEW_TRIGGER_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "NONE_EMBEDDED_IN_DECISION",
+  "x-aic-persistence-class": "EMBEDDED_ONLY",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "trigger_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "NRT-V01",
+      "rule": "trigger_at_utc == lifecycle_anchor_at + bound DECISION_TTL_V1.duration_seconds; lifecycle_anchor_at equals draft/final created_at; no promotion recomputation"
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B4_CLAIM_AND_FINAL_DECISION_PROMOTION_AMENDMENT_v0.5:§14",
+    "CANONICAL_MANIFEST_v0.5:M070"
+  ]
+}

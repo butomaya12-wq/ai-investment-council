@@ -1,0 +1,164 @@
+{
+  "$id": "urn:aic:b1.2:schema:ACCEPTED_PROPOSAL_CANDIDATE_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "accepted_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "accepted_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "accepted_proposal_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "asset": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "b5_risk_input_snapshot_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "b5_risk_input_snapshot_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "decision_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "environment": {
+      "const": "PAPER",
+      "type": "string"
+    },
+    "extended_hours": {
+      "const": false,
+      "type": "boolean"
+    },
+    "final_decision_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "final_proposal_candidate_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "final_proposal_candidate_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "mandate_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "notional_usd": {
+      "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$",
+      "type": "string",
+      "x-aic-no-exponent": true,
+      "x-aic-python-type": "decimal.Decimal"
+    },
+    "order_type": {
+      "const": "MARKET",
+      "type": "string"
+    },
+    "paper_account_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "pass_risk_result_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "pass_risk_result_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_lineage_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "policy_refs": {
+      "$ref": "urn:aic:b1.2:schema:PolicyRefs10:v0.2"
+    },
+    "portfolio_impact_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "portfolio_impact_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "side": {
+      "const": "BUY",
+      "type": "string"
+    },
+    "sizing_computation_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "time_in_force": {
+      "const": "DAY",
+      "type": "string"
+    }
+  },
+  "required": [
+    "accepted_proposal_id",
+    "final_proposal_candidate_id",
+    "final_proposal_candidate_hash",
+    "asset",
+    "side",
+    "notional_usd",
+    "order_type",
+    "time_in_force",
+    "extended_hours",
+    "environment",
+    "pass_risk_result_id",
+    "pass_risk_result_hash",
+    "portfolio_impact_id",
+    "portfolio_impact_hash",
+    "b5_risk_input_snapshot_id",
+    "b5_risk_input_snapshot_hash",
+    "paper_account_id",
+    "decision_id",
+    "final_decision_hash",
+    "mandate_version",
+    "policy_refs",
+    "policy_lineage_hash",
+    "sizing_computation_id",
+    "accepted_at",
+    "accepted_hash"
+  ],
+  "title": "ACCEPTED_PROPOSAL_CANDIDATE_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "accepted_hash",
+  "x-aic-canonical-id-field": "accepted_proposal_id",
+  "x-aic-canonical-name": "ACCEPTED_PROPOSAL_CANDIDATE_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.accepted_proposal_candidate.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "accepted_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "APC-V01",
+      "rule": "policy_refs has exact 10-key set including decision_lifecycle_policy,risk_policy,sizing_policy"
+    },
+    {
+      "id": "APC-V02",
+      "rule": "pass RiskResult, PortfolioImpact, snapshot, FinalDecision and ProposalCandidate IDs/hashes form one exact lineage"
+    }
+  ],
+  "x-aic-source-refs": [
+    "P-B5_B6_ACCEPTED_PROPOSAL_HANDOFF_AMENDMENT_v0.5:§3,§11",
+    "CANONICAL_MANIFEST_v0.5:M034"
+  ]
+}

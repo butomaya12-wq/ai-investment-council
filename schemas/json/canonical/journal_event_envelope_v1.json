@@ -1,0 +1,149 @@
+{
+  "$id": "urn:aic:b1.2:schema:JOURNAL_EVENT_ENVELOPE_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actor_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "actor_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "aggregate_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "aggregate_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "aggregate_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "causation_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "correlation_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "event_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "event_id": {
+      "format": "uuid",
+      "type": "string"
+    },
+    "event_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "inserted_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "payload": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "payload_schema": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload_schema_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "prev_event_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "run_id": {
+      "format": "uuid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "aggregate_type",
+    "aggregate_id",
+    "aggregate_version",
+    "run_id",
+    "event_type",
+    "payload_schema",
+    "payload_schema_version",
+    "occurred_at",
+    "actor_type",
+    "actor_id",
+    "correlation_id",
+    "causation_id",
+    "payload",
+    "prev_event_hash",
+    "event_hash",
+    "inserted_at"
+  ],
+  "title": "JOURNAL_EVENT_ENVELOPE_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "event_hash",
+  "x-aic-canonical-id-field": "event_id",
+  "x-aic-canonical-name": "JOURNAL_EVENT_ENVELOPE_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "AUTHORITATIVE_EVENT_HISTORY",
+  "x-aic-opaque-substructures": {
+    "paths": [
+      "/payload"
+    ],
+    "rule": "B1 validates container type only. No child-field business semantics may be inferred from this bundle; owning later-stage contract/payload_schema must define any child semantics before use."
+  },
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "event_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-semantic-validators": [
+    {
+      "id": "JE-V01",
+      "rule": "event_hash binds prev_event_hash + canonical event envelope payload according to B1 journal hasher"
+    }
+  ],
+  "x-aic-source-refs": [
+    "B1_IMPLEMENTATION_PLAN_v0.1:§11.2",
+    "CANONICAL_MANIFEST_v0.5:M056"
+  ]
+}

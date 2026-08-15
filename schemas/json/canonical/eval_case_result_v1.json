@@ -1,0 +1,125 @@
+{
+  "$id": "urn:aic:b1.2:schema:EVAL_CASE_RESULT_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "check_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "ended_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "eval_case_result_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "eval_run_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "expectation_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "expected_evidence_class": {
+      "enum": [
+        "TEST_FIXTURE",
+        "REAL_PROVIDER_READ",
+        "REAL_PAPER_WRITE",
+        "REAL_SOURCE_REPLAY",
+        "SYSTEM_RUNTIME_EVENT",
+        "REVIEW_EVIDENCE",
+        "FREEZE_METADATA"
+      ],
+      "type": "string"
+    },
+    "expected_status_on_clean": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "failure_class": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "observed_status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "passed": {
+      "type": "boolean"
+    },
+    "required": {
+      "type": "boolean"
+    },
+    "result_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "source_artifact": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    }
+  },
+  "required": [
+    "eval_case_result_id",
+    "eval_run_id",
+    "check_id",
+    "required",
+    "source_artifact",
+    "source_version",
+    "expectation_hash",
+    "expected_evidence_class",
+    "expected_status_on_clean",
+    "observed_status",
+    "passed",
+    "evidence_refs",
+    "failure_class",
+    "started_at",
+    "ended_at",
+    "result_hash"
+  ],
+  "title": "EVAL_CASE_RESULT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "result_hash",
+  "x-aic-canonical-id-field": "eval_case_result_id",
+  "x-aic-canonical-name": "EVAL_CASE_RESULT_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.eval_case_result.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "result_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B8_EVAL_HARNESS_AND_MUTATION_CONTRACT_v0.4:§4,§16",
+    "CANONICAL_MANIFEST_v0.5:M062"
+  ]
+}

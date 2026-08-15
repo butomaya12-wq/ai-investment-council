@@ -1,0 +1,247 @@
+{
+  "$id": "urn:aic:b1.2:schema:EVAL_RUN_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "acceptance_inventory_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "active_check_id_set_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "authority_manifest_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "b1_to_b7_required_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "b8_cross_layer_required_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "case_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "cases_blocked_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "cases_failed_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "cases_not_run_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "cases_passed_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "cases_required_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "cases_run_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "direct_required_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "ended_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "eval_run_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "eval_run_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "failure_class": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "final_status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "fixture_manifest_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "harness_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "mutants_detected_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "mutants_missed": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "mutants_required_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "mutation_manifest_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "network_policy": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "normalized_rows_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "paper_writes_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "permissions_profile": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "product_git_commit": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "provider_reads_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "secret_scan_result": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "side_effect_counts": {
+      "additionalProperties": {
+        "$ref": "urn:aic:b1.2:schema:JsonValue:v0.2"
+      },
+      "type": "object"
+    },
+    "source_manifest_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "type": "string",
+      "x-aic-require-aware-utc": true
+    },
+    "suite_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "suite_manifest_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "supersession_override_map_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "eval_run_id",
+    "harness_version",
+    "product_git_commit",
+    "suite_manifest_hash",
+    "fixture_manifest_hash",
+    "mutation_manifest_hash",
+    "acceptance_inventory_hash",
+    "normalized_rows_hash",
+    "source_manifest_hash",
+    "supersession_override_map_hash",
+    "authority_manifest_hash",
+    "b1_to_b7_required_count",
+    "b8_cross_layer_required_count",
+    "direct_required_count",
+    "active_check_id_set_hash",
+    "permissions_profile",
+    "network_policy",
+    "suite_ids",
+    "case_ids",
+    "started_at",
+    "ended_at",
+    "cases_required_count",
+    "cases_run_count",
+    "cases_passed_count",
+    "cases_failed_count",
+    "cases_blocked_count",
+    "cases_not_run_count",
+    "mutants_required_count",
+    "mutants_detected_count",
+    "mutants_missed",
+    "secret_scan_result",
+    "side_effect_counts",
+    "provider_reads_count",
+    "paper_writes_count",
+    "failure_class",
+    "final_status",
+    "eval_run_hash"
+  ],
+  "title": "EVAL_RUN_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "eval_run_hash",
+  "x-aic-canonical-id-field": "eval_run_id",
+  "x-aic-canonical-name": "EVAL_RUN_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.eval_run.v1",
+  "x-aic-opaque-substructures": {
+    "paths": [
+      "/side_effect_counts"
+    ],
+    "rule": "B1 validates container type only. No child-field business semantics may be inferred from this bundle; owning later-stage contract/payload_schema must define any child semantics before use."
+  },
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "eval_run_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B8_EVAL_HARNESS_AND_MUTATION_CONTRACT_v0.4:§2,§16",
+    "CANONICAL_MANIFEST_v0.5:M061"
+  ]
+}

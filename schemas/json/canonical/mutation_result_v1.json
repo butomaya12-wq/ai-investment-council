@@ -1,0 +1,106 @@
+{
+  "$id": "urn:aic:b1.2:schema:MUTATION_RESULT_V1:v0.2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "cleanup_rollback_proof_ref": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "detected": {
+      "type": "boolean"
+    },
+    "eval_run_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "expected_check_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "expected_detector_suite": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "expected_status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "forbidden_side_effect_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "mutant_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "mutation_result_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "observed_check_ids": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "observed_status": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "result_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "target_protection": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "mutation_result_id",
+    "eval_run_id",
+    "mutant_id",
+    "target_protection",
+    "expected_detector_suite",
+    "expected_check_ids",
+    "observed_check_ids",
+    "expected_status",
+    "observed_status",
+    "detected",
+    "forbidden_side_effect_count",
+    "cleanup_rollback_proof_ref",
+    "evidence_refs",
+    "result_hash"
+  ],
+  "title": "MUTATION_RESULT_V1",
+  "type": "object",
+  "x-aic-canonical-hash-field": "result_hash",
+  "x-aic-canonical-id-field": "mutation_result_id",
+  "x-aic-canonical-name": "MUTATION_RESULT_V1",
+  "x-aic-contract-version": "0.2",
+  "x-aic-field-authority": "MACHINE_CLOSED_V0_2",
+  "x-aic-fixed-field-presence": true,
+  "x-aic-implementation-rule": "Pydantic implementation MUST conform to this schema; prose is not field authority.",
+  "x-aic-journal-payload-schema": "aic.mutation_result.v1",
+  "x-aic-persistence-class": "DURABLE_CANONICAL",
+  "x-aic-presence-normalization": "ALL_TOP_LEVEL_FIELDS_PRESENT; SOURCE_OPTIONAL_OR_IF_AVAILABLE_VALUES_ARE_EXPLICIT_NULL",
+  "x-aic-self-hash-field": "result_hash",
+  "x-aic-self-hash-rule": "SHA256(B1_CANONICAL_SERIALIZATION(object excluding own self-hash field only))",
+  "x-aic-source-refs": [
+    "P-B8_EVAL_HARNESS_AND_MUTATION_CONTRACT_v0.4:§6",
+    "CANONICAL_MANIFEST_v0.5:M063"
+  ]
+}
