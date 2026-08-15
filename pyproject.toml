@@ -1,0 +1,23 @@
+[project]
+name = "ai-investment-council"
+version = "0.0.0"
+description = "Pre-event B1 structural scaffold for AI Investment Council"
+requires-python = "==3.12.13"
+dependencies = [
+  "pydantic>=2,<3",
+  "sqlalchemy>=2.0,<2.1",
+  "psycopg>=3,<4",
+  "alembic>=1.18,<1.19",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=9.1,<9.2",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
