@@ -5,6 +5,9 @@ description = "Pre-event B1 structural scaffold for AI Investment Council"
 requires-python = "==3.12.13"
 dependencies = [
   "pydantic>=2,<3",
+  "jsonschema>=4.26,<4.27",
+  "referencing>=0.37,<0.38",
+  "rfc3339-validator>=0.1.4,<0.2",
   "sqlalchemy>=2.0,<2.1",
   "psycopg>=3,<4",
   "alembic>=1.18,<1.19",

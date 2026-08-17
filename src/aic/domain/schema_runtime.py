@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import UTC, datetime
+from collections import Counter
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, ClassVar, ForwardRef, Literal, Union, get_args
-from uuid import UUID
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, StrictBool, StrictInt, ValidationInfo, create_model, model_validator
+from jsonschema import Draft202012Validator, FormatChecker
+from pydantic import BaseModel, BeforeValidator, ConfigDict, StrictBool, StrictInt, ValidationInfo, WrapSerializer, create_model, model_validator
+from referencing import Registry
+from referencing.jsonschema import DRAFT202012
 from typing_extensions import Annotated
 
-from .canonical import canonical_data, canonical_sha256
+from .canonical import Rfc3339DateTime, canonical_rfc3339_datetime, canonical_sha256, parse_rfc3339_datetime
 from .errors import ContractValidationError
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -23,92 +26,158 @@ _REGISTRY_PATH = _AUTHORITY_DIR / "canonical_schema_registry_baseline_v0.5.2.jso
 BUNDLE: dict[str, Any] = json.loads(_BUNDLE_PATH.read_text(encoding="utf-8"))
 REGISTRY_BASELINE: dict[str, Any] = json.loads(_REGISTRY_PATH.read_text(encoding="utf-8"))
 RESOURCES: dict[str, dict[str, Any]] = BUNDLE["$defs"]
-ID_TO_NAME = {schema["$id"]: name for name, schema in RESOURCES.items() if "$id" in schema}
+
+_REVIEWED_ACTIVE_FORMATS = frozenset({"date", "date-time", "uuid"})
+EXPECTED_ACTIVATED_RESOURCE_COUNT = 83
+_EXPECTED_ACTIVE_FORMAT_OCCURRENCES = MappingProxyType(
+    {"date-time": 97, "uuid": 11, "date": 1}
+)
+_EXPECTED_ACTIVE_FORMAT_TOTAL = 109
+_STRICT_UUID_PATTERN = re.compile(
+    r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}",
+    re.ASCII,
+)
+
+
+def _build_offline_registry(resources: dict[str, dict[str, Any]]) -> Registry:
+    if len(resources) != EXPECTED_ACTIVATED_RESOURCE_COUNT:
+        raise ContractValidationError(
+            f"activated resource count must equal {EXPECTED_ACTIVATED_RESOURCE_COUNT}"
+        )
+    seen_ids: set[str] = set()
+    registry_resources: list[tuple[str, Any]] = []
+    for name, schema in resources.items():
+        resource_id = schema.get("$id")
+        if not isinstance(resource_id, str) or not resource_id:
+            raise ContractValidationError(f"{name}: non-empty $id is required")
+        if resource_id in seen_ids:
+            raise ContractValidationError(f"duplicate schema $id: {resource_id}")
+        Draft202012Validator.check_schema(schema)
+        seen_ids.add(resource_id)
+        registry_resources.append((resource_id, DRAFT202012.create_resource(schema)))
+    return Registry().with_resources(registry_resources)
+
+
+def _active_format_occurrences(resources: dict[str, dict[str, Any]]) -> Counter[str]:
+    occurrences: Counter[str] = Counter()
+
+    def visit(node: Any) -> None:
+        if isinstance(node, dict):
+            if "format" in node:
+                format_name = node["format"]
+                if not isinstance(format_name, str):
+                    raise ContractValidationError("JSON Schema format must be a string")
+                occurrences[format_name] += 1
+            for value in node.values():
+                visit(value)
+        elif isinstance(node, list):
+            for value in node:
+                visit(value)
+
+    for schema in resources.values():
+        visit(schema)
+    return occurrences
+
+
+def _is_strict_uuid(instance: object) -> bool:
+    if not isinstance(instance, str):
+        return True
+    return _STRICT_UUID_PATTERN.fullmatch(instance) is not None
+
+
+def _parse_authorized_rfc3339_datetime(value: Any) -> datetime | Rfc3339DateTime:
+    parsed = parse_rfc3339_datetime(value)
+    if isinstance(parsed, Rfc3339DateTime) and parsed.is_leap_second:
+        preceding_utc_second = parsed._utc_second
+        is_final_day_of_month = (
+            (preceding_utc_second + timedelta(days=1)).month != preceding_utc_second.month
+        )
+        if not (
+            preceding_utc_second.hour == 23
+            and preceding_utc_second.minute == 59
+            and preceding_utc_second.second == 59
+            and is_final_day_of_month
+        ):
+            raise ValueError("leap second must normalize to the UTC end of a month")
+    return parsed
+
+
+def _is_strict_authorized_rfc3339_datetime(value: object) -> bool:
+    if not isinstance(value, str):
+        return True
+    try:
+        _parse_authorized_rfc3339_datetime(value)
+    except ValueError:
+        return False
+    return True
+
+
+def _build_profile_format_checker(resources: dict[str, dict[str, Any]]) -> FormatChecker:
+    occurrences = _active_format_occurrences(resources)
+    active_formats = frozenset(occurrences)
+    if active_formats != _REVIEWED_ACTIVE_FORMATS:
+        raise ContractValidationError(
+            "unreviewed active JSON Schema format(s): "
+            + ", ".join(sorted(active_formats - _REVIEWED_ACTIVE_FORMATS))
+        )
+    if sum(occurrences.values()) != _EXPECTED_ACTIVE_FORMAT_TOTAL:
+        raise ContractValidationError("active JSON Schema format total occurrence anchor mismatch")
+    if dict(occurrences) != dict(_EXPECTED_ACTIVE_FORMAT_OCCURRENCES):
+        raise ContractValidationError("active JSON Schema format occurrence anchor mismatch")
+    missing_checkers = sorted(active_formats - FormatChecker.checkers.keys())
+    if missing_checkers:
+        raise ContractValidationError(
+            "required JSON Schema format checker(s) unavailable: " + ", ".join(missing_checkers)
+        )
+    checker = FormatChecker(formats=active_formats)
+    checker.checks("date-time")(_is_strict_authorized_rfc3339_datetime)
+    checker.checks("uuid")(_is_strict_uuid)
+    return checker
+
+
+OFFLINE_REGISTRY = _build_offline_registry(RESOURCES)
+ACTIVE_FORMAT_OCCURRENCES = MappingProxyType(dict(_active_format_occurrences(RESOURCES)))
+ACTIVE_FORMATS = frozenset(ACTIVE_FORMAT_OCCURRENCES)
+PROFILE_FORMAT_CHECKER = _build_profile_format_checker(RESOURCES)
+ID_TO_NAME = {schema["$id"]: name for name, schema in RESOURCES.items()}
 CANONICAL_NAMES: tuple[str, ...] = tuple(BUNDLE["x-aic-inventory"])
-
-_ALLOWED_SCHEMA_KEYWORDS = {
-    "$id", "$schema", "$ref", "$comment", "title", "description",
-    "type", "properties", "required", "additionalProperties", "items",
-    "anyOf", "allOf", "not", "if", "then", "contains",
-    "enum", "const", "format", "pattern", "minLength",
-    "minimum", "maximum", "minItems", "maxItems", "uniqueItems",
-}
-
-
-def _collect_unknown_schema_keywords(node: Any, path: str = "$") -> list[str]:
-    unknown: list[str] = []
-    if isinstance(node, dict):
-        for key, value in node.items():
-            if key.startswith("x-aic-"):
-                continue
-            if key not in _ALLOWED_SCHEMA_KEYWORDS and key not in {
-                # property names are traversed as values, not schema keywords
-            }:
-                # Keys under properties are field names; keys under x-aic are ignored above.
-                if path.endswith(".properties"):
-                    pass
-                else:
-                    unknown.append(f"{path}.{key}")
-            if key == "properties" and isinstance(value, dict):
-                for field_name, field_schema in value.items():
-                    unknown.extend(_collect_unknown_schema_keywords(field_schema, f"{path}.properties.{field_name}"))
-            elif key.startswith("x-aic-"):
-                continue
-            else:
-                unknown.extend(_collect_unknown_schema_keywords(value, f"{path}.{key}"))
-    elif isinstance(node, list):
-        for i, item in enumerate(node):
-            unknown.extend(_collect_unknown_schema_keywords(item, f"{path}[{i}]"))
-    return unknown
-
-
-def assert_supported_schema_subset() -> None:
-    unknown: list[str] = []
-    for name, schema in RESOURCES.items():
-        unknown.extend(_collect_unknown_schema_keywords(schema, f"$defs.{name}"))
-    # Filter metadata object keys carried under non-schema extension content.
-    unknown = [u for u in unknown if ".x-aic-" not in u]
-    if unknown:
-        raise ContractValidationError("unsupported JSON Schema keyword(s): " + ", ".join(sorted(set(unknown))[:20]))
 
 
 def _parse_decimal(value: Any) -> Decimal:
-    if isinstance(value, bool) or isinstance(value, (int, float)):
-        raise ValueError("authoritative decimal rejects int/float/bool input")
-    if isinstance(value, Decimal):
-        result = value
-    elif isinstance(value, str):
-        if "e" in value.lower():
-            raise ValueError("decimal exponent notation is forbidden")
-        try:
-            result = Decimal(value)
-        except InvalidOperation as exc:
-            raise ValueError("invalid decimal string") from exc
-    else:
-        raise ValueError("decimal must be Decimal or canonical decimal string")
+    if type(value) is not str:
+        raise ValueError("authoritative decimal requires a canonical decimal string")
+    pattern = RESOURCES["CanonicalDecimal"].get("pattern")
+    if not isinstance(pattern, str):
+        raise ContractValidationError("CanonicalDecimal.pattern must be a string")
+    if re.fullmatch(pattern, value) is None:
+        raise ValueError("invalid canonical decimal string")
+    try:
+        result = Decimal(value)
+    except InvalidOperation as exc:
+        raise ValueError("invalid decimal string") from exc
     if not result.is_finite():
         raise ValueError("NaN/Infinity are forbidden")
     return result
 
 
-def _parse_utc_datetime(value: Any) -> datetime:
-    if isinstance(value, datetime):
-        dt = value
-    elif isinstance(value, str):
-        text = value[:-1] + "+00:00" if value.endswith("Z") else value
-        try:
-            dt = datetime.fromisoformat(text)
-        except ValueError as exc:
-            raise ValueError("invalid ISO-8601 datetime") from exc
-    else:
-        raise ValueError("datetime must be aware datetime or ISO-8601 string")
-    if dt.tzinfo is None or dt.utcoffset() is None:
-        raise ValueError("naive datetime is forbidden")
-    return dt.astimezone(UTC)
+def _parse_utc_datetime(value: Any) -> datetime | Rfc3339DateTime:
+    return _parse_authorized_rfc3339_datetime(value)
+
+
+def _serialize_utc_datetime(value: datetime | Rfc3339DateTime, handler: Any, info: Any) -> Any:
+    if isinstance(value, Rfc3339DateTime):
+        if info.mode == "json":
+            return canonical_rfc3339_datetime(value)
+        return value
+    return handler(value, info)
 
 
 CanonicalDecimalT = Annotated[Decimal, BeforeValidator(_parse_decimal)]
-UtcDateTimeT = Annotated[datetime, BeforeValidator(_parse_utc_datetime)]
+UtcDateTimeT = Annotated[
+    Union[datetime, Rfc3339DateTime],
+    BeforeValidator(_parse_utc_datetime),
+    WrapSerializer(_serialize_utc_datetime),
+]
 
 
 class FrozenDict(dict):
@@ -135,133 +204,16 @@ def _deep_freeze(value: Any) -> Any:
     return value
 
 
-def _resolve_ref(ref: str) -> dict[str, Any]:
-    try:
-        return RESOURCES[ID_TO_NAME[ref]]
-    except KeyError as exc:
-        raise ContractValidationError(f"unresolved schema ref: {ref}") from exc
-
-
-def _json_type_ok(expected: str, value: Any) -> bool:
-    if expected == "null": return value is None
-    if expected == "boolean": return type(value) is bool
-    if expected == "integer": return type(value) is int
-    if expected == "number": return type(value) in {int, float} and type(value) is not bool
-    if expected == "string": return isinstance(value, str)
-    if expected == "array": return isinstance(value, list)
-    if expected == "object": return isinstance(value, dict)
-    return False
-
-
-def _validation_errors(schema: dict[str, Any], value: Any, path: str = "$") -> list[str]:
-    if "$ref" in schema:
-        return _validation_errors(_resolve_ref(schema["$ref"]), value, path)
-
-    if "anyOf" in schema:
-        branch_errors = [_validation_errors(branch, value, path) for branch in schema["anyOf"]]
-        if not any(not errors for errors in branch_errors):
-            return [f"{path}: no anyOf branch matched"]
-
-    if "allOf" in schema:
-        errors: list[str] = []
-        for branch in schema["allOf"]:
-            errors.extend(_validation_errors(branch, value, path))
-        if errors:
-            return errors
-
-    if "not" in schema and not _validation_errors(schema["not"], value, path):
-        return [f"{path}: forbidden by not schema"]
-
-    if "if" in schema and not _validation_errors(schema["if"], value, path):
-        if "then" in schema:
-            errors = _validation_errors(schema["then"], value, path)
-            if errors:
-                return errors
-
-    expected_type = schema.get("type")
-    if expected_type is not None and not _json_type_ok(expected_type, value):
-        return [f"{path}: expected {expected_type}, got {type(value).__name__}"]
-
-    if "const" in schema and value != schema["const"]:
-        return [f"{path}: const mismatch"]
-    if "enum" in schema and value not in schema["enum"]:
-        return [f"{path}: enum mismatch"]
-
-    if isinstance(value, str):
-        if "minLength" in schema and len(value) < schema["minLength"]:
-            return [f"{path}: string shorter than minLength"]
-        if "pattern" in schema and re.search(schema["pattern"], value) is None:
-            return [f"{path}: pattern mismatch"]
-        fmt = schema.get("format")
-        if fmt == "uuid":
-            try:
-                UUID(value)
-            except Exception:
-                return [f"{path}: invalid uuid"]
-        if fmt == "date-time":
-            try:
-                dt = _parse_utc_datetime(value)
-            except ValueError as exc:
-                return [f"{path}: {exc}"]
-            if schema.get("x-aic-require-aware-utc") and dt.tzinfo is None:
-                return [f"{path}: aware UTC datetime required"]
-
-    if type(value) in {int, float} and type(value) is not bool:
-        if "minimum" in schema and value < schema["minimum"]:
-            return [f"{path}: below minimum"]
-        if "maximum" in schema and value > schema["maximum"]:
-            return [f"{path}: above maximum"]
-
-    if isinstance(value, list):
-        if "minItems" in schema and len(value) < schema["minItems"]:
-            return [f"{path}: fewer than minItems"]
-        if "maxItems" in schema and len(value) > schema["maxItems"]:
-            return [f"{path}: more than maxItems"]
-        if schema.get("uniqueItems"):
-            seen: set[str] = set()
-            for item in value:
-                key = json.dumps(item, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
-                if key in seen:
-                    return [f"{path}: duplicate item violates uniqueItems"]
-                seen.add(key)
-        if "items" in schema:
-            errors: list[str] = []
-            for i, item in enumerate(value):
-                errors.extend(_validation_errors(schema["items"], item, f"{path}[{i}]"))
-            if errors:
-                return errors
-        if "contains" in schema:
-            if not any(not _validation_errors(schema["contains"], item, f"{path}[*]") for item in value):
-                return [f"{path}: contains constraint not satisfied"]
-
-    if isinstance(value, dict):
-        required = schema.get("required", [])
-        for field in required:
-            if field not in value:
-                return [f"{path}.{field}: required field missing"]
-        properties = schema.get("properties", {})
-        errors: list[str] = []
-        for field, field_value in value.items():
-            if field in properties:
-                errors.extend(_validation_errors(properties[field], field_value, f"{path}.{field}"))
-            else:
-                additional = schema.get("additionalProperties", True)
-                if additional is False:
-                    errors.append(f"{path}.{field}: additional property forbidden")
-                elif isinstance(additional, dict):
-                    errors.extend(_validation_errors(additional, field_value, f"{path}.{field}"))
-        if errors:
-            return errors
-
-    return []
-
-
 def validate_resource(resource_name: str, value: Any) -> None:
     schema = RESOURCES[resource_name]
-    data = canonical_data(value)
-    errors = _validation_errors(schema, data)
-    if errors:
-        raise ContractValidationError(f"{resource_name}: {errors[0]}")
+    validator = Draft202012Validator(
+        schema,
+        registry=OFFLINE_REGISTRY,
+        format_checker=PROFILE_FORMAT_CHECKER,
+    )
+    error = next(validator.iter_errors(value), None)
+    if error is not None:
+        raise ContractValidationError(f"{resource_name}: {error.json_path}: {error.message}")
 
 
 def _schema_to_annotation(schema: dict[str, Any], models: dict[str, type[BaseModel]]) -> Any:
@@ -314,9 +266,14 @@ class SchemaBoundModel(BaseModel):
     __schema_name__: ClassVar[str]
     __deep_frozen__: ClassVar[bool] = False
 
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_raw_activated_schema(cls, value: Any) -> Any:
+        validate_resource(cls.__schema_name__, value)
+        return value
+
     @model_validator(mode="after")
     def _validate_activated_schema(self, info: ValidationInfo) -> "SchemaBoundModel":
-        validate_resource(self.__schema_name__, self)
         schema = RESOURCES[self.__schema_name__]
         self_hash = schema.get("x-aic-self-hash-field")
         if self_hash and not (info.context or {}).get("skip_self_hash"):
@@ -378,7 +335,6 @@ def _object_dependency_order() -> list[str]:
 
 
 def build_models() -> dict[str, type[BaseModel]]:
-    assert_supported_schema_subset()
     models: dict[str, type[BaseModel]] = {}
     canonical_set = set(CANONICAL_NAMES)
     for name in _object_dependency_order():
