@@ -15,7 +15,7 @@ from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 
 ALPACA_NEWS_ENDPOINT = "https://data.alpaca.markets/v1beta1/news"
-ALPACA_NEWS_NORMALIZATION_VERSION = "B3_ALPACA_NEWS_v0_1"
+ALPACA_NEWS_NORMALIZATION_VERSION = "B3_ALPACA_NEWS_v0_2"
 
 
 class AlpacaNewsReadError(RuntimeError):
@@ -53,6 +53,15 @@ def _require_string(value: object, *, field: str, allow_empty: bool = False) -> 
     if not allow_empty and not value:
         raise AlpacaNewsReadError(f"{field} must be non-empty")
     return value
+
+
+def _normalize_text_string(value: object, *, field: str, allow_empty: bool = False) -> str:
+    if type(value) is not str:
+        raise AlpacaNewsReadError(f"{field} must be a JSON string")
+    normalized = value.strip()
+    if not allow_empty and not normalized:
+        raise AlpacaNewsReadError(f"{field} must be non-empty after normalization")
+    return normalized
 
 
 class AlpacaNewsArticle(AlpacaNewsProviderModel):
@@ -222,12 +231,12 @@ def _normalize_article(raw: object) -> AlpacaNewsArticle:
     if len(set(symbols)) != len(symbols):
         raise AlpacaNewsReadError("news symbols must be unique")
 
-    headline = _require_string(raw.get("headline"), field="news.headline")
-    summary = _require_string(raw.get("summary", ""), field="news.summary", allow_empty=True)
-    content = _require_string(raw.get("content", ""), field="news.content", allow_empty=True)
-    author = _require_string(raw.get("author", ""), field="news.author", allow_empty=True)
-    source = _require_string(raw.get("source"), field="news.source")
-    url = _require_string(raw.get("url"), field="news.url")
+    headline = _normalize_text_string(raw.get("headline"), field="news.headline")
+    summary = _normalize_text_string(raw.get("summary", ""), field="news.summary", allow_empty=True)
+    content = _normalize_text_string(raw.get("content", ""), field="news.content", allow_empty=True)
+    author = _normalize_text_string(raw.get("author", ""), field="news.author", allow_empty=True)
+    source = _normalize_text_string(raw.get("source"), field="news.source")
+    url = _normalize_text_string(raw.get("url"), field="news.url")
     created_at = _parse_timestamp(raw.get("created_at"), field="news.created_at")
     updated_at = _parse_timestamp(raw.get("updated_at"), field="news.updated_at")
     canonical_content = json.dumps(
