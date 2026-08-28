@@ -20,11 +20,23 @@ from .models import (
     ResearchNeedType,
     ResearchQuestion,
 )
-from .policy import (
-    RESEARCH_POLICY_VERSION,
-    ResearchPolicy,
-    ResearchPolicyError,
-    validate_research_plan,
+from .planner import (
+    PLANNER_REQUEST_VERSION,
+    PLANNER_SCHEMA_NAME,
+    PlannerContextItem,
+    PlannerInputEnvelope,
+    PlannerRequestEnvelope,
+    build_planner_request,
+    parse_planner_output,
+)
+from .policy import RESEARCH_POLICY_VERSION, ResearchPolicy, ResearchPolicyError, validate_research_plan
+from .prompts import PLANNER_INSTRUCTIONS, PLANNER_PROMPT_VERSION, planner_prompt_hash
+from .retrieve import (
+    RETRIEVAL_DISPATCH_VERSION,
+    RetrievalAction,
+    RetrievalProvider,
+    RetrievalRequest,
+    compile_retrieval_requests,
 )
 
 __all__ = [
@@ -38,7 +50,15 @@ __all__ = [
     "ModelRunReceipt",
     "ModelSelectionResult",
     "ModelSelectionStatus",
+    "PLANNER_INSTRUCTIONS",
+    "PLANNER_PROMPT_VERSION",
+    "PLANNER_REQUEST_VERSION",
+    "PLANNER_SCHEMA_NAME",
+    "PlannerContextItem",
+    "PlannerInputEnvelope",
+    "PlannerRequestEnvelope",
     "RESEARCH_POLICY_VERSION",
+    "RETRIEVAL_DISPATCH_VERSION",
     "ResearchBatchManifest",
     "ResearchEvidenceBundle",
     "ResearchEvidenceStatus",
@@ -48,6 +68,13 @@ __all__ = [
     "ResearchPolicy",
     "ResearchPolicyError",
     "ResearchQuestion",
+    "RetrievalAction",
+    "RetrievalProvider",
+    "RetrievalRequest",
+    "build_planner_request",
+    "compile_retrieval_requests",
+    "parse_planner_output",
+    "planner_prompt_hash",
     "select_model_from_eval",
     "validate_research_plan",
 ]
