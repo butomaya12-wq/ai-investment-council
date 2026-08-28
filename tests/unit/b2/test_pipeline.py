@@ -1,16 +1,17 @@
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from aic.b2.config_loader import APPROVED_DIMENSIONS, APPROVED_SYMBOLS, load_screening_policy
 from aic.b2.eligibility import EligibilityProof
 from aic.b2.models import AssetRecord, InstrumentType, ProofStatus, SecurityTypeProof, SnapshotManifest, SnapshotStatus
-from aic.b2.pipeline import B2RunStatus, run_b2_gate
+from aic.b2.pipeline import B2RunStatus, run_b2_gate, run_event_b2_gate
 from aic.b2.screening import CandidateScreenInput, MetricDirection, ScreeningPolicy
 
 
 CUTOFF = datetime(2026, 8, 28, 15, 0, tzinfo=UTC)
 
 
-def _snapshot(*, policy_version="screen-v1", status=SnapshotStatus.COMPLETE, market_as_of=CUTOFF):
+def _snapshot(*, policy_version="screen-v1", status=SnapshotStatus.COMPLETE, market_as_of=CUTOFF, dimensions_version="dimensions-v1"):
     return SnapshotManifest.build(
         snapshot_id="snapshot-1",
         created_at=datetime(2026, 8, 28, 15, 1, tzinfo=UTC),
@@ -18,7 +19,7 @@ def _snapshot(*, policy_version="screen-v1", status=SnapshotStatus.COMPLETE, mar
         mandate_version="mandate-v1",
         screening_policy_version=policy_version,
         evidence_policy_version="evidence-v1",
-        comparison_dimension_version="dimensions-v1",
+        comparison_dimension_version=dimensions_version,
         provider_receipt_ids=("receipt-1",),
         evidence_ids=("evidence-1",),
         computed_value_ids=("computed-1",),
@@ -72,24 +73,10 @@ def _sec_proof(symbol: str, *, status=ProofStatus.PROVEN):
     )
 
 
-def _eligibility_proof(
-    proof_id: str,
-    symbol: str,
-    *,
-    asset_status: str = "active",
-    tradable: bool = True,
-    exchange: str = "NASDAQ",
-    allowed_exchanges=("NASDAQ",),
-):
+def _eligibility_proof(proof_id: str, symbol: str, *, asset_status="active", tradable=True, exchange="NASDAQ", allowed_exchanges=("NASDAQ",)):
     return EligibilityProof.build(
         eligibility_proof_id=proof_id,
-        asset=AssetRecord(
-            symbol=symbol,
-            asset_class="us_equity",
-            status=asset_status,
-            tradable=tradable,
-            exchange=exchange,
-        ),
+        asset=AssetRecord(symbol=symbol, asset_class="us_equity", status=asset_status, tradable=tradable, exchange=exchange),
         security_type_proof=_sec_proof(symbol),
         allowed_exchanges=allowed_exchanges,
         evidence_complete=True,
@@ -98,11 +85,7 @@ def _eligibility_proof(
 
 
 def _proofs():
-    return (
-        _eligibility_proof("p1", "AAA"),
-        _eligibility_proof("p2", "BBB"),
-        _eligibility_proof("p3", "CCC"),
-    )
+    return (_eligibility_proof("p1", "AAA"), _eligibility_proof("p2", "BBB"), _eligibility_proof("p3", "CCC"))
 
 
 def _run(snapshot=None, policy=None, proofs=None):
@@ -133,20 +116,17 @@ def test_mismatched_eligibility_proof_blocks_before_screening() -> None:
 
 def test_inactive_candidate_cannot_reach_b3() -> None:
     proofs = (_eligibility_proof("p1", "AAA"), _eligibility_proof("p2", "BBB", asset_status="inactive"), _eligibility_proof("p3", "CCC"))
-    result = _run(proofs=proofs)
-    assert result.status is B2RunStatus.BLOCKED_ELIGIBILITY_PROOF
+    assert _run(proofs=proofs).status is B2RunStatus.BLOCKED_ELIGIBILITY_PROOF
 
 
 def test_non_tradable_candidate_cannot_reach_b3() -> None:
     proofs = (_eligibility_proof("p1", "AAA"), _eligibility_proof("p2", "BBB", tradable=False), _eligibility_proof("p3", "CCC"))
-    result = _run(proofs=proofs)
-    assert result.status is B2RunStatus.BLOCKED_ELIGIBILITY_PROOF
+    assert _run(proofs=proofs).status is B2RunStatus.BLOCKED_ELIGIBILITY_PROOF
 
 
 def test_exchange_outside_allowed_policy_cannot_reach_b3() -> None:
     proofs = (_eligibility_proof("p1", "AAA"), _eligibility_proof("p2", "BBB", exchange="NYSE", allowed_exchanges=("NASDAQ",)), _eligibility_proof("p3", "CCC"))
-    result = _run(proofs=proofs)
-    assert result.status is B2RunStatus.BLOCKED_ELIGIBILITY_PROOF
+    assert _run(proofs=proofs).status is B2RunStatus.BLOCKED_ELIGIBILITY_PROOF
 
 
 def test_future_market_snapshot_blocks_run() -> None:
@@ -171,3 +151,52 @@ def test_same_inputs_produce_same_input_hash_and_result() -> None:
     second = _run()
     assert first == second
     assert first.input_hash == second.input_hash
+
+
+def _event_inputs(symbols=APPROVED_SYMBOLS):
+    candidates = tuple(
+        CandidateScreenInput(
+            symbol=symbol,
+            eligibility_proof_id=f"elig-{symbol}",
+            dimensions={dimension: Decimal(index + 1) for dimension in APPROVED_DIMENSIONS},
+        )
+        for index, symbol in enumerate(symbols)
+    )
+    proofs = tuple(_eligibility_proof(f"elig-{symbol}", symbol) for symbol in symbols)
+    return candidates, proofs
+
+
+def _run_event(policy=None, symbols=APPROVED_SYMBOLS):
+    approved_policy = load_screening_policy("config/b2/screening_policy_v1.json") if policy is None else policy
+    candidates, proofs = _event_inputs(symbols)
+    return run_event_b2_gate(
+        snapshot=_snapshot(policy_version="SCREENING_POLICY_V1", dimensions_version="DIMENSIONS_EVENT_V1"),
+        policy=approved_policy,
+        candidates=candidates,
+        eligibility_proofs=proofs,
+        comparison_id="comparison-event",
+        mandate_version="mandate-v1",
+        comparison_dimension_version="DIMENSIONS_EVENT_V1",
+        dimension_ids=APPROVED_DIMENSIONS,
+    )
+
+
+def test_event_gate_accepts_exact_owner_policy_and_universe() -> None:
+    assert _run_event().status is B2RunStatus.READY_FOR_B3
+
+
+def test_event_gate_rejects_same_version_with_changed_weights() -> None:
+    approved = load_screening_policy("config/b2/screening_policy_v1.json")
+    changed = approved.model_copy(
+        update={"weights": {**approved.weights, "return_20s": Decimal("0.30"), "max_drawdown_20s": Decimal("0.10")}}
+    )
+    result = _run_event(policy=changed)
+    assert result.status is B2RunStatus.BLOCKED_EVENT_POLICY
+    assert result.reason_codes == ("OWNER_APPROVED_SCREENING_POLICY_MISMATCH",)
+
+
+def test_event_gate_rejects_nonapproved_universe() -> None:
+    symbols = (*APPROVED_SYMBOLS[:-1], "TSLA")
+    result = _run_event(symbols=symbols)
+    assert result.status is B2RunStatus.BLOCKED_EVENT_POLICY
+    assert result.reason_codes == ("OWNER_APPROVED_UNIVERSE_MISMATCH",)

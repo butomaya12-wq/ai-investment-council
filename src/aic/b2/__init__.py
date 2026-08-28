@@ -3,7 +3,7 @@ from .config_loader import B2ConfigError, load_demo_universe, load_screening_pol
 from .decimal_math import DECIMAL_CONTEXT_ID
 from .eligibility import EligibilityDecision, EligibilityProof, EligibilityReason, evaluate_asset_eligibility
 from .fundamentals import FundamentalCompatibilityError, period_growth, same_period_ratio
-from .pipeline import B2RunResult, B2RunStatus, run_b2_gate
+from .pipeline import B2RunResult, B2RunStatus, run_b2_gate, run_event_b2_gate
 from .point_in_time import PointInTimeEvidenceSet, assert_snapshot_point_in_time, partition_evidence_at_cutoff
 from .screening import (
     CandidateScreenInput,
@@ -62,6 +62,7 @@ __all__ = [
     "period_growth",
     "require_identical_sessions",
     "run_b2_gate",
+    "run_event_b2_gate",
     "same_period_ratio",
     "trailing_return",
     "CandidateScreenInput",

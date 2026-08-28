@@ -13,21 +13,23 @@ from aic.b2.providers.sec import (
 )
 
 
-def test_normalize_submissions_and_select_latest_at_cutoff() -> None:
-    records = normalize_submissions_recent(
-        {
-            "filings": {
-                "recent": {
-                    "accessionNumber": ["0001", "0002"],
-                    "form": ["10-K", "10-Q"],
-                    "acceptanceDateTime": ["20251031060126", "2026-07-30T20:00:00Z"],
-                    "filingDate": ["2025-10-31", "2026-07-30"],
-                    "reportDate": ["2025-09-27", "2026-06-27"],
-                    "primaryDocument": ["annual.htm", "quarterly.htm"],
-                }
+def _submissions_payload():
+    return {
+        "filings": {
+            "recent": {
+                "accessionNumber": ["0001", "0002"],
+                "form": ["10-K", "10-Q"],
+                "acceptanceDateTime": ["20251031060126", "2026-07-30T20:00:00Z"],
+                "filingDate": ["2025-10-31", "2026-07-30"],
+                "reportDate": ["2025-09-27", "2026-06-27"],
+                "primaryDocument": ["annual.htm", "quarterly.htm"],
             }
         }
-    )
+    }
+
+
+def test_normalize_submissions_and_select_latest_at_cutoff() -> None:
+    records = normalize_submissions_recent(_submissions_payload())
     selected = select_latest_operating_filing_at_cutoff(
         records,
         decision_cutoff=datetime(2026, 8, 28, 15, 0, tzinfo=UTC),
@@ -38,21 +40,17 @@ def test_normalize_submissions_and_select_latest_at_cutoff() -> None:
 
 
 def test_submissions_parallel_array_mismatch_fails_closed() -> None:
+    payload = _submissions_payload()
+    payload["filings"]["recent"]["form"].append("8-K")
     with pytest.raises(SecNormalizationError, match="different lengths"):
-        normalize_submissions_recent(
-            {
-                "filings": {
-                    "recent": {
-                        "accessionNumber": ["0001"],
-                        "form": ["10-K", "10-Q"],
-                        "acceptanceDateTime": ["20251031060126"],
-                        "filingDate": ["2025-10-31"],
-                        "reportDate": ["2025-09-27"],
-                        "primaryDocument": ["annual.htm"],
-                    }
-                }
-            }
-        )
+        normalize_submissions_recent(payload)
+
+
+def test_submissions_rejects_non_string_accession_provider_drift() -> None:
+    payload = _submissions_payload()
+    payload["filings"]["recent"]["accessionNumber"][0] = 1
+    with pytest.raises(SecNormalizationError, match="JSON string"):
+        normalize_submissions_recent(payload)
 
 
 @pytest.mark.parametrize(
@@ -63,10 +61,7 @@ def test_submissions_parallel_array_mismatch_fails_closed() -> None:
         ("NVDA", "Common Stock, $0.001 par value per share"),
     ],
 )
-def test_official_sec_registered_common_stock_shape_is_proven(
-    symbol: str,
-    security_title: str,
-) -> None:
+def test_official_sec_registered_common_stock_shape_is_proven(symbol: str, security_title: str) -> None:
     row = normalize_registered_security(
         {
             "symbol": symbol,
@@ -152,5 +147,22 @@ def test_sec_shell_status_rejects_string_boolean_drift() -> None:
                 "accepted_at": "2026-08-01T12:00:00Z",
                 "source_uri": "https://www.sec.gov/test",
                 "entity_shell_company": "false",
+            }
+        )
+
+
+@pytest.mark.parametrize("bad_symbol", [123, None, " aapl ", "aapl"])
+def test_registered_security_rejects_noncanonical_symbol_drift(bad_symbol) -> None:
+    with pytest.raises(SecNormalizationError):
+        normalize_registered_security(
+            {
+                "symbol": bad_symbol,
+                "security_title": "Common Stock",
+                "exchange_name": "NASDAQ",
+                "accession_number": "test",
+                "form": "10-K",
+                "accepted_at": "2026-08-01T12:00:00Z",
+                "source_uri": "https://www.sec.gov/test",
+                "entity_shell_company": False,
             }
         )

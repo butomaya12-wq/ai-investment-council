@@ -60,6 +60,30 @@ def load_demo_universe(path: str | Path) -> tuple[str, ...]:
     return tuple(normalized)
 
 
+def assert_owner_approved_screening_policy(policy: ScreeningPolicy) -> None:
+    expected_directions = {
+        dimension: MetricDirection.HIGHER_IS_BETTER for dimension in APPROVED_DIMENSIONS
+    }
+    if policy.policy_version != APPROVED_POLICY_VERSION:
+        raise B2ConfigError("unexpected screening policy version")
+    if policy.universe_ref != APPROVED_UNIVERSE_ID:
+        raise B2ConfigError("screening policy must bind DEMO_UNIVERSE_V1")
+    if policy.required_dimensions != APPROVED_DIMENSIONS:
+        raise B2ConfigError("screening dimensions differ from owner-approved policy")
+    if dict(policy.metric_directions) != expected_directions:
+        raise B2ConfigError("screening directions differ from owner-approved policy")
+    if policy.weights is None or set(policy.weights) != set(APPROVED_DIMENSIONS):
+        raise B2ConfigError("screening weights do not cover approved dimensions")
+    if any(policy.weights[dimension] != APPROVED_WEIGHT for dimension in APPROVED_DIMENSIONS):
+        raise B2ConfigError("screening weights differ from owner-approved 0.20 each")
+    if decimal_sum(policy.weights.values()) != Decimal("1.00"):
+        raise B2ConfigError("SCREENING_POLICY_V1 weights must sum exactly to 1.00")
+    if policy.normalization_method != "MIN_MAX_V1" or policy.missing_value_rule != "DATA_INCOMPLETE":
+        raise B2ConfigError("screening method/missing-value rule differs from owner approval")
+    if policy.shortlist_size != 5 or policy.final_candidate_count != 3:
+        raise B2ConfigError("screening shortlist/final counts differ from owner approval")
+
+
 def load_screening_policy(path: str | Path) -> ScreeningPolicy:
     payload = _read_json_object(path)
     expected_fields = {
@@ -93,24 +117,5 @@ def load_screening_policy(path: str | Path) -> ScreeningPolicy:
         policy = ScreeningPolicy.model_validate(normalized)
     except Exception as exc:
         raise B2ConfigError("invalid screening policy") from exc
-
-    expected_directions = {
-        dimension: MetricDirection.HIGHER_IS_BETTER for dimension in APPROVED_DIMENSIONS
-    }
-    if policy.policy_version != APPROVED_POLICY_VERSION:
-        raise B2ConfigError("unexpected screening policy version")
-    if policy.universe_ref != APPROVED_UNIVERSE_ID:
-        raise B2ConfigError("screening policy must bind DEMO_UNIVERSE_V1")
-    if policy.required_dimensions != APPROVED_DIMENSIONS:
-        raise B2ConfigError("screening dimensions differ from owner-approved policy")
-    if dict(policy.metric_directions) != expected_directions:
-        raise B2ConfigError("screening directions differ from owner-approved policy")
-    if policy.weights is None or set(policy.weights) != set(APPROVED_DIMENSIONS):
-        raise B2ConfigError("screening weights do not cover approved dimensions")
-    if any(policy.weights[dimension] != APPROVED_WEIGHT for dimension in APPROVED_DIMENSIONS):
-        raise B2ConfigError("screening weights differ from owner-approved 0.20 each")
-    if decimal_sum(policy.weights.values()) != Decimal("1.00"):
-        raise B2ConfigError("SCREENING_POLICY_V1 weights must sum exactly to 1.00")
-    if policy.shortlist_size != 5 or policy.final_candidate_count != 3:
-        raise B2ConfigError("screening shortlist/final counts differ from owner approval")
+    assert_owner_approved_screening_policy(policy)
     return policy

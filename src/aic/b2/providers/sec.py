@@ -69,6 +69,16 @@ _COMMON_STOCK_RE = re.compile(r"\bcommon\s+stock\b", re.IGNORECASE)
 _OPERATING_COMPANY_FORMS = frozenset({"10-K", "10-Q"})
 
 
+def _require_sec_string(value: Any, *, field: str, uppercase: bool = False) -> str:
+    if type(value) is not str:
+        raise SecNormalizationError(f"{field} must be a JSON string")
+    if not value or value != value.strip():
+        raise SecNormalizationError(f"{field} must be a non-empty trimmed string")
+    if uppercase and value != value.upper():
+        raise SecNormalizationError(f"{field} must be canonical uppercase")
+    return value
+
+
 def _parse_sec_datetime(value: Any, *, field: str) -> datetime:
     if isinstance(value, datetime):
         parsed = value
@@ -133,21 +143,20 @@ def normalize_submissions_recent(payload: Mapping[str, Any]) -> tuple[SecFilingR
     records: list[SecFilingRecord] = []
     for index in range(count):
         report_date = arrays["reportDate"][index]
+        accepted_raw = _require_sec_string(arrays["acceptanceDateTime"][index], field="acceptanceDateTime")
+        filing_date_raw = _require_sec_string(arrays["filingDate"][index], field="filingDate")
         records.append(
             SecFilingRecord(
-                accession_number=str(arrays["accessionNumber"][index]).strip(),
-                form=str(arrays["form"][index]).strip(),
-                accepted_at=_parse_sec_datetime(
-                    arrays["acceptanceDateTime"][index],
-                    field="acceptanceDateTime",
-                ),
-                filing_date=_parse_sec_date(arrays["filingDate"][index], field="filingDate"),
+                accession_number=_require_sec_string(arrays["accessionNumber"][index], field="accessionNumber"),
+                form=_require_sec_string(arrays["form"][index], field="form"),
+                accepted_at=_parse_sec_datetime(accepted_raw, field="acceptanceDateTime"),
+                filing_date=_parse_sec_date(filing_date_raw, field="filingDate"),
                 report_date=(
                     None
                     if report_date in (None, "")
-                    else _parse_sec_date(report_date, field="reportDate")
+                    else _parse_sec_date(_require_sec_string(report_date, field="reportDate"), field="reportDate")
                 ),
-                primary_document=str(arrays["primaryDocument"][index]).strip(),
+                primary_document=_require_sec_string(arrays["primaryDocument"][index], field="primaryDocument"),
             )
         )
     return tuple(records)
@@ -184,21 +193,23 @@ def normalize_registered_security(payload: Mapping[str, Any]) -> SecRegisteredSe
     shell_status = payload.get("entity_shell_company")
     if shell_status is not None and type(shell_status) is not bool:
         raise SecNormalizationError("entity_shell_company must be a JSON boolean or null")
+    source_record_ref = payload.get(
+        "source_record_ref",
+        "dei:Security12bTitle|dei:TradingSymbol|dei:SecurityExchangeName",
+    )
 
     return SecRegisteredSecurity(
-        symbol=str(payload["symbol"]).strip(),
-        security_title=str(payload["security_title"]).strip(),
-        exchange_name=str(payload["exchange_name"]).strip(),
-        accession_number=str(payload["accession_number"]).strip(),
-        form=str(payload["form"]).strip(),
-        accepted_at=_parse_sec_datetime(payload["accepted_at"], field="accepted_at"),
-        source_uri=str(payload["source_uri"]).strip(),
-        source_record_ref=str(
-            payload.get(
-                "source_record_ref",
-                "dei:Security12bTitle|dei:TradingSymbol|dei:SecurityExchangeName",
-            )
+        symbol=_require_sec_string(payload["symbol"], field="symbol", uppercase=True),
+        security_title=_require_sec_string(payload["security_title"], field="security_title"),
+        exchange_name=_require_sec_string(payload["exchange_name"], field="exchange_name"),
+        accession_number=_require_sec_string(payload["accession_number"], field="accession_number"),
+        form=_require_sec_string(payload["form"], field="form"),
+        accepted_at=_parse_sec_datetime(
+            _require_sec_string(payload["accepted_at"], field="accepted_at"),
+            field="accepted_at",
         ),
+        source_uri=_require_sec_string(payload["source_uri"], field="source_uri"),
+        source_record_ref=_require_sec_string(source_record_ref, field="source_record_ref"),
         entity_shell_company=shell_status,
     )
 
@@ -213,7 +224,7 @@ def resolve_sec_registered_security(
 ) -> SecSecurityTypeResolution:
     cutoff = _parse_sec_datetime(decision_cutoff, field="decision_cutoff")
     retrieved = _parse_sec_datetime(retrieved_at, field="retrieved_at")
-    expected = expected_symbol.strip().upper()
+    expected = _require_sec_string(expected_symbol, field="expected_symbol", uppercase=True)
     reasons: list[SecSecurityTypeReason] = []
 
     if row.accepted_at > cutoff:
@@ -222,11 +233,11 @@ def resolve_sec_registered_security(
         reasons.append(SecSecurityTypeReason.FORM_NOT_OPERATING_COMPANY)
     if row.entity_shell_company is not False:
         reasons.append(SecSecurityTypeReason.SHELL_STATUS_NOT_FALSE)
-    if row.symbol.strip().upper() != expected:
+    if row.symbol != expected:
         reasons.append(SecSecurityTypeReason.TRADING_SYMBOL_MISMATCH)
     if _COMMON_STOCK_RE.search(row.security_title) is None:
         reasons.append(SecSecurityTypeReason.SECURITY_TITLE_NOT_COMMON_STOCK)
-    if not row.exchange_name.strip():
+    if not row.exchange_name:
         reasons.append(SecSecurityTypeReason.EXCHANGE_MISSING)
 
     proven = not reasons

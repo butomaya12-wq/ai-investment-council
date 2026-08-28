@@ -78,6 +78,28 @@ class SecFactSelectionResult(B2Model):
     reason_codes: tuple[str, ...] = ()
 
 
+def _require_fact_string(value: Any, *, field: str) -> str:
+    if type(value) is not str:
+        raise SecNormalizationError(f"{field} must be a JSON string")
+    if not value or value != value.strip():
+        raise SecNormalizationError(f"{field} must be a non-empty trimmed string")
+    return value
+
+
+def _optional_fact_string(value: Any, *, field: str) -> str | None:
+    if value is None:
+        return None
+    return _require_fact_string(value, field=field)
+
+
+def _optional_fiscal_year(value: Any) -> int | None:
+    if value is None:
+        return None
+    if type(value) is not int:
+        raise SecNormalizationError("fy must be a JSON integer or null")
+    return value
+
+
 def _decimal_from_sec(value: Any, *, field: str) -> Decimal:
     if isinstance(value, bool) or value is None:
         raise SecNormalizationError(f"{field} must be numeric")
@@ -125,8 +147,8 @@ def normalize_companyfacts(
 
     normalized: list[SecCompanyFact] = []
     for qualified in concept_refs:
-        if ":" not in qualified:
-            raise SecNormalizationError("concept_refs entries must be taxonomy:concept")
+        if type(qualified) is not str or ":" not in qualified:
+            raise SecNormalizationError("concept_refs entries must be taxonomy:concept strings")
         taxonomy, concept = qualified.split(":", 1)
         taxonomy_node = facts_root.get(taxonomy)
         if taxonomy_node is None:
@@ -143,8 +165,7 @@ def normalize_companyfacts(
             raise SecNormalizationError(f"facts.{taxonomy}.{concept}.units must be an object")
 
         for unit, rows in units.items():
-            if not isinstance(unit, str):
-                raise SecNormalizationError("companyfacts unit key must be a string")
+            unit_name = _require_fact_string(unit, field="companyfacts unit")
             if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
                 raise SecNormalizationError("companyfacts unit records must be an array")
             for raw in rows:
@@ -157,40 +178,45 @@ def normalize_companyfacts(
 
                 start_raw = raw.get("start")
                 period_start = (
-                    None if start_raw in (None, "") else _parse_date(start_raw, field="start")
+                    None if start_raw in (None, "") else _parse_date(_require_fact_string(start_raw, field="start"), field="start")
                 )
-                period_end = _parse_date(raw["end"], field="end")
-                filed_at = _parse_date(raw["filed"], field="filed")
+                period_end = _parse_date(_require_fact_string(raw["end"], field="end"), field="end")
+                filed_at = _parse_date(_require_fact_string(raw["filed"], field="filed"), field="filed")
                 value = _decimal_from_sec(raw["val"], field="val")
+                accession_no = _require_fact_string(raw["accn"], field="accn")
+                form = _require_fact_string(raw["form"], field="form")
+                fiscal_year = _optional_fiscal_year(raw.get("fy"))
+                fiscal_period = _optional_fact_string(raw.get("fp"), field="fp")
+                frame = _optional_fact_string(raw.get("frame"), field="frame")
                 fact_identity = {
                     "taxonomy": taxonomy,
                     "concept": concept,
-                    "unit": unit,
+                    "unit": unit_name,
                     "value": str(value),
                     "period_start": None if period_start is None else period_start.isoformat(),
                     "period_end": period_end.isoformat(),
                     "filed_at": filed_at.isoformat(),
-                    "accession_no": str(raw["accn"]),
-                    "form": str(raw["form"]),
-                    "fiscal_year": raw.get("fy"),
-                    "fiscal_period": raw.get("fp"),
-                    "frame": raw.get("frame"),
+                    "accession_no": accession_no,
+                    "form": form,
+                    "fiscal_year": fiscal_year,
+                    "fiscal_period": fiscal_period,
+                    "frame": frame,
                 }
                 normalized.append(
                     SecCompanyFact(
                         fact_id=canonical_sha256(fact_identity),
                         taxonomy=taxonomy,
                         concept=concept,
-                        unit=unit,
+                        unit=unit_name,
                         value=value,
                         period_start=period_start,
                         period_end=period_end,
                         filed_at=filed_at,
-                        accession_no=str(raw["accn"]).strip(),
-                        form=str(raw["form"]).strip(),
-                        fiscal_year=None if raw.get("fy") is None else int(raw["fy"]),
-                        fiscal_period=None if raw.get("fp") is None else str(raw["fp"]),
-                        frame=None if raw.get("frame") is None else str(raw["frame"]),
+                        accession_no=accession_no,
+                        form=form,
+                        fiscal_year=fiscal_year,
+                        fiscal_period=fiscal_period,
+                        frame=frame,
                     )
                 )
     return tuple(normalized)

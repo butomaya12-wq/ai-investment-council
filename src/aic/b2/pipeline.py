@@ -7,6 +7,7 @@ from pydantic import model_validator
 
 from aic.domain.canonical import canonical_sha256
 
+from .config_loader import APPROVED_SYMBOLS, B2ConfigError, assert_owner_approved_screening_policy
 from .eligibility import EligibilityProof
 from .models import B2Model, DeepComparisonResult, SnapshotManifest, SnapshotStatus
 from .point_in_time import assert_snapshot_point_in_time
@@ -26,6 +27,7 @@ class B2RunStatus(StrEnum):
     DATA_INCOMPLETE = "DATA_INCOMPLETE"
     INSUFFICIENT_ELIGIBLE = "INSUFFICIENT_ELIGIBLE"
     BLOCKED_ELIGIBILITY_PROOF = "BLOCKED_ELIGIBILITY_PROOF"
+    BLOCKED_EVENT_POLICY = "BLOCKED_EVENT_POLICY"
     BLOCKED_LINEAGE = "BLOCKED_LINEAGE"
     BLOCKED_SNAPSHOT = "BLOCKED_SNAPSHOT"
 
@@ -208,4 +210,55 @@ def run_b2_gate(
         input_hash=input_hash,
         shortlist=shortlist,
         deep_comparison=deep_comparison,
+    )
+
+
+def run_event_b2_gate(
+    *,
+    snapshot: SnapshotManifest,
+    policy: ScreeningPolicy,
+    candidates: tuple[CandidateScreenInput, ...],
+    eligibility_proofs: tuple[EligibilityProof, ...],
+    comparison_id: str,
+    mandate_version: str,
+    comparison_dimension_version: str,
+    dimension_ids: tuple[str, ...],
+) -> B2RunResult:
+    input_hash = _input_hash(
+        snapshot=snapshot,
+        policy=policy,
+        candidates=candidates,
+        eligibility_proofs=eligibility_proofs,
+        dimension_ids=dimension_ids,
+    )
+    try:
+        assert_owner_approved_screening_policy(policy)
+    except B2ConfigError:
+        return B2RunResult(
+            status=B2RunStatus.BLOCKED_EVENT_POLICY,
+            snapshot_id=snapshot.snapshot_id,
+            screening_policy_version=policy.policy_version,
+            input_hash=input_hash,
+            reason_codes=("OWNER_APPROVED_SCREENING_POLICY_MISMATCH",),
+        )
+
+    candidate_symbols = tuple(candidate.symbol for candidate in candidates)
+    if candidate_symbols != APPROVED_SYMBOLS:
+        return B2RunResult(
+            status=B2RunStatus.BLOCKED_EVENT_POLICY,
+            snapshot_id=snapshot.snapshot_id,
+            screening_policy_version=policy.policy_version,
+            input_hash=input_hash,
+            reason_codes=("OWNER_APPROVED_UNIVERSE_MISMATCH",),
+        )
+
+    return run_b2_gate(
+        snapshot=snapshot,
+        policy=policy,
+        candidates=candidates,
+        eligibility_proofs=eligibility_proofs,
+        comparison_id=comparison_id,
+        mandate_version=mandate_version,
+        comparison_dimension_version=comparison_dimension_version,
+        dimension_ids=dimension_ids,
     )

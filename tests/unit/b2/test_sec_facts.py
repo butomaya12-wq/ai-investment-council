@@ -142,6 +142,20 @@ def test_boolean_numeric_value_fails_closed() -> None:
         normalize_companyfacts(_payload(primary_value=True), concept_refs=(PRIMARY,))
 
 
+def test_companyfacts_rejects_non_string_accession_drift() -> None:
+    payload = _payload()
+    payload["facts"]["us-gaap"]["RevenueFromContractWithCustomerExcludingAssessedTax"]["units"]["USD"][0]["accn"] = 1
+    with pytest.raises(SecNormalizationError, match="JSON string"):
+        normalize_companyfacts(payload, concept_refs=(PRIMARY,))
+
+
+def test_companyfacts_rejects_string_fiscal_year_drift() -> None:
+    payload = _payload()
+    payload["facts"]["us-gaap"]["RevenueFromContractWithCustomerExcludingAssessedTax"]["units"]["USD"][0]["fy"] = "2025"
+    with pytest.raises(SecNormalizationError, match="JSON integer"):
+        normalize_companyfacts(payload, concept_refs=(PRIMARY,))
+
+
 def test_policy_requires_explicit_qualified_concept_precedence() -> None:
     with pytest.raises(ValueError, match="taxonomy:concept"):
         SecFactSelectionPolicy(
