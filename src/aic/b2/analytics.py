@@ -8,6 +8,7 @@ from pydantic import field_validator
 
 from aic.domain.canonical import canonical_sha256
 
+from .decimal_math import decimal_divide, decimal_multiply, decimal_subtract, decimal_sum
 from .models import B2Model, ComputedValue
 
 
@@ -56,7 +57,7 @@ def trailing_return(prices: Sequence[Decimal]) -> Decimal:
         raise ValueError("initial price must be positive")
     if any(v <= 0 for v in normalized):
         raise ValueError("prices must be positive")
-    return (normalized[-1] / normalized[0]) - Decimal("1")
+    return decimal_subtract(decimal_divide(normalized[-1], normalized[0]), Decimal("1"))
 
 
 def max_drawdown(prices: Sequence[Decimal]) -> Decimal:
@@ -71,7 +72,7 @@ def max_drawdown(prices: Sequence[Decimal]) -> Decimal:
     for price in normalized:
         if price > peak:
             peak = price
-        drawdown = (price / peak) - Decimal("1")
+        drawdown = decimal_subtract(decimal_divide(price, peak), Decimal("1"))
         if drawdown < worst:
             worst = drawdown
     return worst
@@ -83,8 +84,8 @@ def average_daily_dollar_volume(bars: Sequence[DailyBar]) -> Decimal:
     dates = [bar.session_date for bar in bars]
     if len(set(dates)) != len(dates):
         raise ValueError("duplicate session dates are forbidden")
-    total = sum((bar.close * bar.volume for bar in bars), start=Decimal("0"))
-    return total / Decimal(len(bars))
+    total = decimal_sum(decimal_multiply(bar.close, bar.volume) for bar in bars)
+    return decimal_divide(total, Decimal(len(bars)))
 
 
 def require_identical_sessions(series: Sequence[Sequence[DailyBar]]) -> tuple[date, ...]:

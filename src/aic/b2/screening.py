@@ -6,6 +6,7 @@ from typing import Any, Mapping, Self
 
 from pydantic import field_validator, model_validator
 
+from .decimal_math import decimal_divide, decimal_multiply, decimal_subtract, decimal_sum
 from .models import (
     B2Model,
     ComparisonStatus,
@@ -77,7 +78,7 @@ class ScreeningPolicy(B2Model):
                     raise TypeError(f"weight {dimension} must be Decimal")
                 if not weight.is_finite() or weight < 0:
                     raise ValueError("weights must be finite and non-negative")
-                total += weight
+                total = decimal_sum((total, weight))
             if total <= 0:
                 raise ValueError("at least one screening weight must be positive")
         return self
@@ -130,10 +131,16 @@ def _normalize_dimension(
     high = max(values.values())
     if high == low:
         return {symbol: Decimal("0") for symbol in values}
-    span = high - low
+    span = decimal_subtract(high, low)
     if direction is MetricDirection.HIGHER_IS_BETTER:
-        return {symbol: (value - low) / span for symbol, value in values.items()}
-    return {symbol: (high - value) / span for symbol, value in values.items()}
+        return {
+            symbol: decimal_divide(decimal_subtract(value, low), span)
+            for symbol, value in values.items()
+        }
+    return {
+        symbol: decimal_divide(decimal_subtract(high, value), span)
+        for symbol, value in values.items()
+    }
 
 
 def screen_candidates(
@@ -184,12 +191,9 @@ def screen_candidates(
             dimension: normalized_by_dimension[dimension][candidate.symbol]
             for dimension in policy.required_dimensions
         }
-        score = sum(
-            (
-                normalized[dimension] * policy.weights[dimension]
-                for dimension in policy.required_dimensions
-            ),
-            start=Decimal("0"),
+        score = decimal_sum(
+            decimal_multiply(normalized[dimension], policy.weights[dimension])
+            for dimension in policy.required_dimensions
         )
         ranked.append(
             RankedCandidate(
