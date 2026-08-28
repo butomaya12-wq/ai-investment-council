@@ -86,6 +86,17 @@ class ResearchPolicy(B3Model):
         return self
 
 
+def _required_source_tier(need_type: ResearchNeedType) -> str:
+    return {
+        ResearchNeedType.NEED_B2_EVIDENCE_DETAIL: "B2",
+        ResearchNeedType.NEED_B2_COMPUTED_VALUE_DETAIL: "B2",
+        ResearchNeedType.NEED_SEC_FILING_SECTION: "SEC",
+        ResearchNeedType.NEED_ALPACA_NEWS_WINDOW: "ALPACA_NEWS",
+        ResearchNeedType.NEED_CORPORATE_ACTION_DETAIL: "ALPACA_CORPORATE_ACTIONS",
+        ResearchNeedType.NEED_COMPANY_IR_DOCUMENT: "IR_REGISTRY",
+    }[need_type]
+
+
 def validate_research_plan(plan: ResearchGapPlan, policy: ResearchPolicy) -> None:
     if plan.research_policy_version != policy.policy_version:
         raise ResearchPolicyError("ResearchGapPlan research_policy_version mismatch")
@@ -93,9 +104,15 @@ def validate_research_plan(plan: ResearchGapPlan, policy: ResearchPolicy) -> Non
         raise ResearchPolicyError("ResearchGapPlan exceeds max_needs_per_candidate")
 
     total_requested_items = 0
+    allowed_tiers = set(policy.allowed_source_tiers)
     for need in plan.requested_needs:
         if need.need_type not in policy.allowed_need_types:
             raise ResearchPolicyError(f"need type not allowed: {need.need_type.value}")
+        required_tier = _required_source_tier(need.need_type)
+        if required_tier not in allowed_tiers:
+            raise ResearchPolicyError(
+                f"need source tier not allowed by research policy: {required_tier}"
+            )
         if need.max_items > policy.max_items_per_need:
             raise ResearchPolicyError("ResearchNeed exceeds max_items_per_need")
         total_requested_items += need.max_items
