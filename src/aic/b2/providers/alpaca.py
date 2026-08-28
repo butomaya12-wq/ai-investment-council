@@ -35,6 +35,12 @@ def _decimal_from_provider(value: Any, *, field: str) -> Decimal:
     return decimal_value
 
 
+def _require_provider_bool(value: Any, *, field: str) -> bool:
+    if type(value) is not bool:
+        raise AlpacaNormalizationError(f"{field} must be a JSON boolean")
+    return value
+
+
 def _parse_provider_datetime(value: Any, *, field: str) -> datetime:
     if not isinstance(value, str) or not value.strip():
         raise AlpacaNormalizationError(f"{field} must be an ISO timestamp")
@@ -53,14 +59,19 @@ def normalize_asset(payload: Mapping[str, Any]) -> AssetRecord:
     missing = tuple(name for name in required if name not in payload)
     if missing:
         raise AlpacaNormalizationError(f"asset payload missing fields: {missing}")
+    fractionable = payload.get("fractionable")
     return AssetRecord(
         symbol=str(payload["symbol"]),
         asset_class=str(payload["asset_class"]),
         status=str(payload["status"]),
-        tradable=bool(payload["tradable"]),
+        tradable=_require_provider_bool(payload["tradable"], field="tradable"),
         exchange=str(payload["exchange"]),
         name=None if payload.get("name") is None else str(payload["name"]),
-        fractionable=None if payload.get("fractionable") is None else bool(payload["fractionable"]),
+        fractionable=(
+            None
+            if fractionable is None
+            else _require_provider_bool(fractionable, field="fractionable")
+        ),
     )
 
 

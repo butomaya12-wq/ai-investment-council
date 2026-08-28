@@ -29,6 +29,20 @@ def test_normalize_real_shape_asset_fixture() -> None:
     assert asset.exchange == "NASDAQ"
 
 
+def test_normalize_asset_rejects_string_boolean_provider_drift() -> None:
+    with pytest.raises(AlpacaNormalizationError, match="JSON boolean"):
+        normalize_asset(
+            {
+                "symbol": "AAPL",
+                "asset_class": "us_equity",
+                "exchange": "NASDAQ",
+                "status": "active",
+                "tradable": "false",
+                "fractionable": True,
+            }
+        )
+
+
 def test_normalize_stock_bars_converts_provider_float_to_decimal_boundary() -> None:
     normalized = normalize_stock_bars(
         {
