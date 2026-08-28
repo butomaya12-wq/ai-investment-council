@@ -6,8 +6,13 @@ import sys
 from pathlib import Path
 
 from aic.data.providers import (
+    AlpacaNewsReadError,
     load_alpaca_market_data_credentials,
     load_sec_user_agent,
+)
+from aic.data.providers.alpaca_cli_news import (
+    CLI_PROFILE_CREDENTIAL_PLACEHOLDER,
+    AlpacaCliNewsTransport,
 )
 from aic.domain.canonical import canonical_sha256
 from aic.research.evidence_bundle import freeze_research_evidence_bundle
@@ -28,6 +33,7 @@ from aic.research.retrieve import (
 DEFAULT_HANDOFF = Path("config/event/b2_real_event_handoff_v0_1.json")
 DEFAULT_PLANS = Path(".aic-runtime/b3_planner_batch.json")
 DEFAULT_OUTPUT = Path(".aic-runtime/b3_retrieval_batch.json")
+DEFAULT_ALPACA_PROFILE = "paper"
 
 
 def _args() -> argparse.Namespace:
@@ -37,7 +43,35 @@ def _args() -> argparse.Namespace:
     parser.add_argument("--handoff", type=Path, default=DEFAULT_HANDOFF)
     parser.add_argument("--plans", type=Path, default=DEFAULT_PLANS)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--alpaca-profile",
+        default=DEFAULT_ALPACA_PROFILE,
+        help="Paper Alpaca CLI profile used only when env API-key credentials are absent.",
+    )
     return parser.parse_args()
+
+
+def _build_alpaca_news_adapter(*, profile: str) -> tuple[AlpacaNewsRetrievalAdapter, str]:
+    try:
+        alpaca_key_id, alpaca_secret = load_alpaca_market_data_credentials()
+    except AlpacaNewsReadError as exc:
+        if "missing from runtime environment" not in str(exc):
+            raise
+        return (
+            AlpacaNewsRetrievalAdapter(
+                api_key_id=CLI_PROFILE_CREDENTIAL_PLACEHOLDER,
+                api_secret_key=CLI_PROFILE_CREDENTIAL_PLACEHOLDER,
+                transport=AlpacaCliNewsTransport(profile=profile),
+            ),
+            f"CLI_PROFILE:{profile}",
+        )
+    return (
+        AlpacaNewsRetrievalAdapter(
+            api_key_id=alpaca_key_id,
+            api_secret_key=alpaca_secret,
+        ),
+        "ENV_API_KEYS",
+    )
 
 
 def main() -> int:
@@ -50,16 +84,15 @@ def main() -> int:
 
     policy = build_event_research_policy()
     sec_user_agent = load_sec_user_agent()
-    alpaca_key_id, alpaca_secret = load_alpaca_market_data_credentials()
+    alpaca_adapter, alpaca_auth_mode = _build_alpaca_news_adapter(
+        profile=args.alpaca_profile
+    )
     adapters = {
         RetrievalProvider.SEC: SecFilingRetrievalAdapter(
             handoff=handoff,
             user_agent=sec_user_agent,
         ),
-        RetrievalProvider.ALPACA: AlpacaNewsRetrievalAdapter(
-            api_key_id=alpaca_key_id,
-            api_secret_key=alpaca_secret,
-        ),
+        RetrievalProvider.ALPACA: alpaca_adapter,
     }
 
     candidate_results: list[dict[str, object]] = []
@@ -119,6 +152,7 @@ def main() -> int:
         "handoff_hash": handoff.handoff_hash,
         "planner_artifact_hash": plans.artifact_hash,
         "research_policy_version": policy.policy_version,
+        "alpaca_auth_mode": alpaca_auth_mode,
         "candidates": candidate_results,
         "broker_writes": 0,
         "alpaca_orders": 0,
