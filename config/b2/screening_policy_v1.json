@@ -1,0 +1,11 @@
+{
+  "policy_version": "SCREENING_POLICY_V1",
+  "universe_ref": "DEMO_UNIVERSE_V1",
+  "required_dimensions": ["return_20s", "max_drawdown_20s", "adv_20s", "annual_revenue_growth", "annual_operating_margin"],
+  "metric_directions": {"return_20s": "HIGHER_IS_BETTER", "max_drawdown_20s": "HIGHER_IS_BETTER", "adv_20s": "HIGHER_IS_BETTER", "annual_revenue_growth": "HIGHER_IS_BETTER", "annual_operating_margin": "HIGHER_IS_BETTER"},
+  "normalization_method": "MIN_MAX_V1",
+  "weights": {"return_20s": "0.20", "max_drawdown_20s": "0.20", "adv_20s": "0.20", "annual_revenue_growth": "0.20", "annual_operating_margin": "0.20"},
+  "missing_value_rule": "DATA_INCOMPLETE",
+  "shortlist_size": 5,
+  "final_candidate_count": 3
+}
