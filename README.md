@@ -4,30 +4,26 @@ Evidence-grounded decision-integrity architecture for an AI-assisted
 investment workflow.
 
 ## Current status
-Pre-event deterministic foundation.
+Alpaca AI Trading Agents Hackathon event-window build is active on `hackathon/alpaca-2026`.
 
 B1 foundation: FROZEN
 G02 validation: 1408/1408 PASS
 Pre-event freeze commit: 6337068...
 
-## What exists today
-- strict data contracts
-- canonical serialization and hashes
-- JSON Schema / offline registry
-- deterministic validation boundary
-- date / date-time / UUID conformance
-- test and evidence foundation
+## Event-window progress
+- B2 deterministic evidence/screening core implemented
+- owner-approved `DEMO_UNIVERSE_V1` frozen in `config/event/demo_universe_v1.json`
+- owner-approved `SCREENING_POLICY_V1` frozen in `config/b2/screening_policy_v1.json`
+- market/evidence reads remain read-only
+- no Alpaca paper order has been submitted by this build
 
-## Planned during Alpaca Hackathon
-- market/evidence pipeline
+## Planned next
+- exact B2 real-runtime shortlist/deep comparison
 - research orchestrator
 - Bull / Bear / Red-Team Council
-- deterministic portfolio risk
-- Alpaca PAPER execution
+- deterministic options risk
+- explicit human-approved Alpaca PAPER execution
 - cockpit / thesis monitor
-
-## Important
-Core AI/trading functionality has not been implemented pre-event.
 
 ## Safety
 Paper only.
