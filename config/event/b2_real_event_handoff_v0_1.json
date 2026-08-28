@@ -1,0 +1,131 @@
+{
+  "handoff_version": "B2_REAL_EVENT_HANDOFF_v0_1",
+  "source_run_id": "AIC-ALPACA-B2-20260828-011",
+  "source_evidence_index": "00_BUILD_EVIDENCE_INDEX — ALPACA 2026",
+  "b2_decision_cutoff": "2026-08-27T20:00:00Z",
+  "research_cutoff": "2026-08-28T17:34:00Z",
+  "b2_snapshot_ref": "EVENT_HANDOFF_B2_20260828_011",
+  "deep_comparison_ref": "EVENT_HANDOFF_DEEP_COMPARISON_20260828_011",
+  "top3": [
+    "NVDA",
+    "MSFT",
+    "META"
+  ],
+  "candidates": [
+    {
+      "symbol": "NVDA",
+      "sec_accession": "0001045810-26-000021",
+      "sec_source_uri": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+      "sec_evidence_id": "B2_SEC_IDENTITY_NVDA_20260827",
+      "metrics": [
+        {
+          "computed_value_id": "B2_NVDA_RETURN_20S_20260827",
+          "metric_id": "return_20s",
+          "value": "0.168888433141919606234618539786710",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_NVDA_MAX_DRAWDOWN_20S_20260827",
+          "metric_id": "max_drawdown_20s",
+          "value": "-0.0746560142032845095428317798490901",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_NVDA_ADV_20S_20260827",
+          "metric_id": "adv_20s",
+          "value": "27358551725.2465",
+          "unit": "USD"
+        },
+        {
+          "computed_value_id": "B2_NVDA_ANNUAL_REVENUE_GROWTH_20260827",
+          "metric_id": "annual_revenue_growth",
+          "value": "0.654735357900947914511444707541170",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_NVDA_ANNUAL_OPERATING_MARGIN_20260827",
+          "metric_id": "annual_operating_margin",
+          "value": "0.6038168363141272031786901795885856",
+          "unit": "RATIO"
+        }
+      ]
+    },
+    {
+      "symbol": "MSFT",
+      "sec_accession": "0001193125-26-323660",
+      "sec_source_uri": "https://www.sec.gov/Archives/edgar/data/789019/000119312526323660/msft-20260630.htm",
+      "sec_evidence_id": "B2_SEC_IDENTITY_MSFT_20260827",
+      "metrics": [
+        {
+          "computed_value_id": "B2_MSFT_RETURN_20S_20260827",
+          "metric_id": "return_20s",
+          "value": "0.119618709820438927067169142097096",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_MSFT_MAX_DRAWDOWN_20S_20260827",
+          "metric_id": "max_drawdown_20s",
+          "value": "-0.0508042524601825870450144251669762",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_MSFT_ADV_20S_20260827",
+          "metric_id": "adv_20s",
+          "value": "14776503746.576",
+          "unit": "USD"
+        },
+        {
+          "computed_value_id": "B2_MSFT_ANNUAL_REVENUE_GROWTH_20260827",
+          "metric_id": "annual_revenue_growth",
+          "value": "0.177886867998466584316565148869106",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_MSFT_ANNUAL_OPERATING_MARGIN_20260827",
+          "metric_id": "annual_operating_margin",
+          "value": "0.4678081840892722073053498835278554",
+          "unit": "RATIO"
+        }
+      ]
+    },
+    {
+      "symbol": "META",
+      "sec_accession": "0001628280-26-003942",
+      "sec_source_uri": "https://www.sec.gov/Archives/edgar/data/1326801/000162828026003942/meta-20251231.htm",
+      "sec_evidence_id": "B2_SEC_IDENTITY_META_20260827",
+      "metrics": [
+        {
+          "computed_value_id": "B2_META_RETURN_20S_20260827",
+          "metric_id": "return_20s",
+          "value": "0.059495760903845797079939892028273",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_META_MAX_DRAWDOWN_20S_20260827",
+          "metric_id": "max_drawdown_20s",
+          "value": "-0.0925524102016290559487247963680064",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_META_ADV_20S_20260827",
+          "metric_id": "adv_20s",
+          "value": "9447620434.8705",
+          "unit": "USD"
+        },
+        {
+          "computed_value_id": "B2_META_ANNUAL_REVENUE_GROWTH_20260827",
+          "metric_id": "annual_revenue_growth",
+          "value": "0.221670384982462112692324058820311",
+          "unit": "RATIO"
+        },
+        {
+          "computed_value_id": "B2_META_ANNUAL_OPERATING_MARGIN_20260827",
+          "metric_id": "annual_operating_margin",
+          "value": "0.4143785515957923230795258899515341",
+          "unit": "RATIO"
+        }
+      ]
+    }
+  ],
+  "handoff_hash": "75df1e47b1f469bdce6d118f7a529b3f7a95061bcd760d756918a0e13e1a04e7"
+}
