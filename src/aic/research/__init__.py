@@ -1,3 +1,8 @@
+from .evidence_bundle import (
+    ResearchEvidenceFreezeError,
+    ResearchEvidenceFreezeResult,
+    freeze_research_evidence_bundle,
+)
 from .handoff import (
     EXPECTED_TOP3,
     HANDOFF_VERSION,
@@ -57,10 +62,16 @@ from .runtime import (
 )
 from .retrieve import (
     RETRIEVAL_DISPATCH_VERSION,
+    RETRIEVAL_EXECUTION_VERSION,
     RetrievalAction,
+    RetrievalAdapter,
+    RetrievalExecutionError,
+    RetrievalExecutionResult,
+    RetrievalExecutionStatus,
     RetrievalProvider,
     RetrievalRequest,
     compile_retrieval_requests,
+    execute_retrieval_plan,
 )
 
 __all__ = [
@@ -90,9 +101,12 @@ __all__ = [
     "PlannerRuntimeResult",
     "RESEARCH_POLICY_VERSION",
     "RETRIEVAL_DISPATCH_VERSION",
+    "RETRIEVAL_EXECUTION_VERSION",
     "RUNTIME_VERSION",
     "ResearchBatchManifest",
     "ResearchEvidenceBundle",
+    "ResearchEvidenceFreezeError",
+    "ResearchEvidenceFreezeResult",
     "ResearchEvidenceStatus",
     "ResearchGapPlan",
     "ResearchNeed",
@@ -106,6 +120,10 @@ __all__ = [
     "ResponsesRuntimeError",
     "ResponsesUsage",
     "RetrievalAction",
+    "RetrievalAdapter",
+    "RetrievalExecutionError",
+    "RetrievalExecutionResult",
+    "RetrievalExecutionStatus",
     "RetrievalProvider",
     "RetrievalRequest",
     "StdlibResponsesTransport",
@@ -113,6 +131,8 @@ __all__ = [
     "build_planner_request",
     "compile_retrieval_requests",
     "execute_planner_runtime",
+    "execute_retrieval_plan",
+    "freeze_research_evidence_bundle",
     "load_openai_api_key",
     "load_real_event_handoff",
     "parse_planner_output",
