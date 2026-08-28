@@ -90,4 +90,11 @@ def test_partial_ladder_eval_is_rejected() -> None:
 
 def test_binary_float_cost_is_rejected() -> None:
     with pytest.raises(TypeError):
-        _result("M1", cost=0.01)
+        ModelEvalResult(
+            candidate_key="M1",
+            all_required_checks_passed=True,
+            critical_safety_failures=0,
+            estimated_cost_usd=0.01,
+            latency_ms=100,
+            total_tokens=1000,
+        )
