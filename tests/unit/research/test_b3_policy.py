@@ -6,6 +6,7 @@ from aic.research.models import (
     AlpacaNewsWindowParameters,
     B2EvidenceDetailParameters,
     CompanyIRDocumentParameters,
+    CorporateActionDetailParameters,
     CurrentEvidenceStatus,
     ResearchGapPlan,
     ResearchNeed,
@@ -153,5 +154,18 @@ def test_ir_need_requires_approved_ir_policy_ref() -> None:
         max_items=1,
         expected_evidence_role="secondary",
     )
-    with pytest.raises(ResearchPolicyError, match="IR policy"):
+    with pytest.raises(ResearchPolicyError, match="source tier|IR policy"):
         validate_research_plan(_plan([need]), _policy(company_ir_policy_ref=None))
+
+
+def test_need_source_tier_must_be_explicitly_authorized() -> None:
+    need = ResearchNeed(
+        need_id="n1",
+        question_id="q1",
+        need_type=ResearchNeedType.NEED_CORPORATE_ACTION_DETAIL,
+        parameters=CorporateActionDetailParameters(action_ids=("ca-1",)),
+        max_items=1,
+        expected_evidence_role="primary",
+    )
+    with pytest.raises(ResearchPolicyError, match="source tier"):
+        validate_research_plan(_plan([need]), _policy())
