@@ -12,6 +12,7 @@ from .model_policy import API_INVARIANTS, MODEL_POLICY_VERSION, ModelCandidate
 from .models import B3Model, ResearchGapPlan
 from .policy import ResearchPolicy, ResearchPolicyError, validate_research_plan
 from .prompts import PLANNER_INSTRUCTIONS, PLANNER_PROMPT_VERSION, planner_prompt_hash
+from .sec_schema import constrain_sec_sections_in_schema
 
 
 PLANNER_SCHEMA_NAME = "b3_research_gap_plan_v1"
@@ -94,7 +95,7 @@ def _planner_output_schema() -> dict[str, Any]:
     schema = ResearchGapPlan.model_json_schema(mode="validation")
     if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
         raise ValueError("ResearchGapPlan root schema must be strict object")
-    return schema
+    return constrain_sec_sections_in_schema(schema)
 
 
 def build_planner_request(
