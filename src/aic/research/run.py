@@ -39,8 +39,10 @@ SYNTHESIS_REPAIR_REQUEST_VERSION = "B3_SYNTHESIS_REPAIR_REQUEST_v0_1"
 class CandidateSynthesisRuntimeResult(B3Model):
     initial_call: ResponsesCallResult
     repair_call: ResponsesCallResult | None
+    initial_draft: CandidateSynthesisDraft
     draft: CandidateSynthesisDraft
     repair_attempts: int
+    repair_request_hash: str | None
     validator_results: tuple[Mapping[str, object], ...]
     initial_validator_error: str | None
 
@@ -49,11 +51,28 @@ class CandidateSynthesisRuntimeResult(B3Model):
         if self.repair_attempts not in (0, 1):
             raise ValueError("B3 synthesis repair_attempts must be 0 or 1")
         if self.repair_attempts == 0:
-            if self.repair_call is not None or self.initial_validator_error is not None:
+            if (
+                self.repair_call is not None
+                or self.repair_request_hash is not None
+                or self.initial_validator_error is not None
+            ):
                 raise ValueError("zero-repair result cannot contain repair state")
+            if canonical_sha256(self.initial_draft) != canonical_sha256(self.draft):
+                raise ValueError("zero-repair result must preserve initial draft as final draft")
         else:
-            if self.repair_call is None or not self.initial_validator_error:
-                raise ValueError("repaired result must record repair call and first validator error")
+            if (
+                self.repair_call is None
+                or not self.repair_request_hash
+                or not self.initial_validator_error
+            ):
+                raise ValueError(
+                    "repaired result must record repair call, request hash and first validator error"
+                )
+            if (
+                len(self.repair_request_hash) != 64
+                or any(ch not in "0123456789abcdef" for ch in self.repair_request_hash)
+            ):
+                raise ValueError("repair_request_hash must be lowercase SHA-256")
         return self
 
 
@@ -198,8 +217,10 @@ def execute_synthesis_runtime(
         return CandidateSynthesisRuntimeResult(
             initial_call=initial_call,
             repair_call=repair_call,
+            initial_draft=initial_draft,
             draft=repaired_draft,
             repair_attempts=1,
+            repair_request_hash=repair_request.request_hash,
             validator_results=repaired_results,
             initial_validator_error=str(first_error),
         )
@@ -207,8 +228,10 @@ def execute_synthesis_runtime(
     return CandidateSynthesisRuntimeResult(
         initial_call=initial_call,
         repair_call=None,
+        initial_draft=initial_draft,
         draft=initial_draft,
         repair_attempts=0,
+        repair_request_hash=None,
         validator_results=validator_results,
         initial_validator_error=None,
     )
