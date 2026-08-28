@@ -19,6 +19,11 @@ from .sec_filings import (
     load_sec_user_agent,
     read_sec_filing_sections,
 )
+from .sec_runtime_repair import apply_sec_heading_boundary_repair
+
+
+apply_sec_heading_boundary_repair()
+
 
 __all__ = [
     "ALPACA_NEWS_ENDPOINT",
@@ -34,6 +39,7 @@ __all__ = [
     "SecHttpTransport",
     "StdlibAlpacaNewsTransport",
     "StdlibSecHttpTransport",
+    "apply_sec_heading_boundary_repair",
     "load_alpaca_market_data_credentials",
     "load_sec_user_agent",
     "read_alpaca_news_window",
