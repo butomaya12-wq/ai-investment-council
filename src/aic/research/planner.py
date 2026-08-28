@@ -22,7 +22,7 @@ from .models import (
 from .policy import ResearchPolicy, ResearchPolicyError, validate_research_plan
 from .prompts import PLANNER_INSTRUCTIONS, PLANNER_PROMPT_VERSION, planner_prompt_hash
 from .schema_constraints import constrain_planner_schema
-from .sec_schema import constrain_sec_sections_in_schema
+from .sec_schema import constrain_sec_sections_in_schema, validate_runtime_sec_sections
 
 
 PLANNER_SCHEMA_NAME = "b3_research_gap_plan_v1"
@@ -193,6 +193,10 @@ def _validate_plan_source_refs(
         elif isinstance(parameters, SecFilingSectionParameters):
             if parameters.filing_accession not in allowed_handles:
                 raise ResearchPolicyError("SEC filing accession requested outside allowed source handles")
+            try:
+                validate_runtime_sec_sections(parameters.sections)
+            except ValueError as exc:
+                raise ResearchPolicyError(str(exc)) from exc
         elif isinstance(parameters, CorporateActionDetailParameters):
             if not set(parameters.action_ids).issubset(allowed_handles):
                 raise ResearchPolicyError("corporate-action id requested outside allowed source handles")
