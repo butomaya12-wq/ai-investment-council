@@ -19,7 +19,8 @@ from .models import (
     ResearchNeedType,
     SecFilingSectionParameters,
 )
-from .policy import ResearchPolicy, validate_research_plan
+from .policy import ResearchPolicy, ResearchPolicyError, validate_research_plan
+from .sec_schema import validate_runtime_sec_sections
 
 
 RETRIEVAL_DISPATCH_VERSION = "B3_RETRIEVAL_DISPATCH_v0_1"
@@ -98,6 +99,10 @@ def _dispatch_need(plan: ResearchGapPlan, need: ResearchNeed) -> RetrievalReques
         parameters = {"computed_value_ids": need.parameters.computed_value_ids}
     elif need.need_type is ResearchNeedType.NEED_SEC_FILING_SECTION:
         assert isinstance(need.parameters, SecFilingSectionParameters)
+        try:
+            validate_runtime_sec_sections(need.parameters.sections)
+        except ValueError as exc:
+            raise ResearchPolicyError(str(exc)) from exc
         provider = RetrievalProvider.SEC
         action = RetrievalAction.GET_FILING_SECTIONS
         parameters = {
