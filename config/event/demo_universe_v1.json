@@ -1,0 +1,13 @@
+{
+  "universe_id": "DEMO_UNIVERSE_V1",
+  "symbols": [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "AMZN",
+    "META",
+    "GOOGL",
+    "AVGO",
+    "AMD"
+  ]
+}
