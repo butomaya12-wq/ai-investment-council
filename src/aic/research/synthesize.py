@@ -13,7 +13,6 @@ from .evidence_bundle import ResearchEvidenceFreezeResult
 from .handoff import B2RealEventHandoff
 from .model_policy import API_INVARIANTS, MODEL_POLICY_VERSION, ModelCandidate
 from .models import B3Model, ResearchEvidenceStatus, ResearchGapPlan
-from .policy import ResearchPolicy
 from .prompts import (
     SYNTHESIS_INSTRUCTIONS,
     SYNTHESIS_PROMPT_VERSION,
@@ -24,6 +23,19 @@ from .prompts import (
 SYNTHESIS_SCHEMA_NAME = "b3_candidate_packet_synthesis_draft_v1"
 SYNTHESIS_REQUEST_VERSION = "B3_SYNTHESIS_REQUEST_v0_1"
 UNTRUSTED_EVIDENCE_MARKER = "UNTRUSTED_EVIDENCE_CONTENT"
+
+ClaimCategory = Literal[
+    "business_model",
+    "growth_quality",
+    "financial_quality",
+    "competitive_position",
+    "valuation_context",
+    "market_context",
+    "capital_allocation",
+    "catalyst",
+    "risk",
+    "portfolio_interaction",
+]
 
 CLAIM_CATEGORIES = (
     "business_model",
@@ -42,7 +54,7 @@ CLAIM_CATEGORIES = (
 class MaterialClaimDraft(B3Model):
     claim_id: str
     candidate_id: str
-    category: str
+    category: ClaimCategory
     claim_text: str
     claim_kind: Literal["FACT", "INFERENCE"]
     materiality: Literal["MATERIAL", "SUPPORTING"]
@@ -322,7 +334,6 @@ def _draft_schema(synthesis_input: SynthesisInputEnvelope) -> dict[str, Any]:
     schema = CandidateSynthesisDraft.model_json_schema(mode="validation")
     if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
         raise ValueError("CandidateSynthesisDraft root schema must be strict object")
-    # Candidate identity is immutable application-owned lineage. Post-validation repeats this check.
     candidate_property = schema.get("properties", {}).get("candidate_id")
     if isinstance(candidate_property, dict):
         candidate_property.clear()
