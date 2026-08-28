@@ -31,6 +31,21 @@ from .planner import (
 )
 from .policy import RESEARCH_POLICY_VERSION, ResearchPolicy, ResearchPolicyError, validate_research_plan
 from .prompts import PLANNER_INSTRUCTIONS, PLANNER_PROMPT_VERSION, planner_prompt_hash
+from .runtime import (
+    OPENAI_RESPONSES_ENDPOINT,
+    RUNTIME_VERSION,
+    PlannerRuntimeResult,
+    ResponsesCallResult,
+    ResponsesCredentialError,
+    ResponsesProtocolError,
+    ResponsesRuntimeError,
+    ResponsesUsage,
+    StdlibResponsesTransport,
+    execute_planner_runtime,
+    load_openai_api_key,
+    parse_responses_payload,
+    validate_openai_api_key,
+)
 from .retrieve import (
     RETRIEVAL_DISPATCH_VERSION,
     RetrievalAction,
@@ -41,6 +56,19 @@ from .retrieve import (
 
 __all__ = [
     "API_INVARIANTS",
+    "OPENAI_RESPONSES_ENDPOINT",
+    "RUNTIME_VERSION",
+    "PlannerRuntimeResult",
+    "ResponsesCallResult",
+    "ResponsesCredentialError",
+    "ResponsesProtocolError",
+    "ResponsesRuntimeError",
+    "ResponsesUsage",
+    "StdlibResponsesTransport",
+    "execute_planner_runtime",
+    "load_openai_api_key",
+    "parse_responses_payload",
+    "validate_openai_api_key",
     "B3ResearchSnapshot",
     "CandidatePacket",
     "MODEL_CANDIDATE_LADDER",
