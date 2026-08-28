@@ -9,9 +9,19 @@ from pydantic import field_validator, model_validator
 from aic.domain.canonical import canonical_sha256
 
 from .model_policy import API_INVARIANTS, MODEL_POLICY_VERSION, ModelCandidate
-from .models import B3Model, ResearchGapPlan
+from .models import (
+    AlpacaNewsWindowParameters,
+    B2ComputedValueDetailParameters,
+    B2EvidenceDetailParameters,
+    B3Model,
+    CompanyIRDocumentParameters,
+    CorporateActionDetailParameters,
+    ResearchGapPlan,
+    SecFilingSectionParameters,
+)
 from .policy import ResearchPolicy, ResearchPolicyError, validate_research_plan
 from .prompts import PLANNER_INSTRUCTIONS, PLANNER_PROMPT_VERSION, planner_prompt_hash
+from .schema_constraints import constrain_planner_schema
 from .sec_schema import constrain_sec_sections_in_schema
 
 
@@ -91,11 +101,32 @@ class PlannerRequestEnvelope(B3Model):
         return self
 
 
-def _planner_output_schema() -> dict[str, Any]:
+def _ordered_context_refs(
+    planner_input: PlannerInputEnvelope,
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    evidence_refs: list[str] = []
+    computed_refs: list[str] = []
+    for item in planner_input.context_items:
+        evidence_refs.extend(item.evidence_refs)
+        computed_refs.extend(item.computed_value_refs)
+    return (
+        tuple(dict.fromkeys(evidence_refs)),
+        tuple(dict.fromkeys(computed_refs)),
+    )
+
+
+def _planner_output_schema(planner_input: PlannerInputEnvelope) -> dict[str, Any]:
     schema = ResearchGapPlan.model_json_schema(mode="validation")
     if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
         raise ValueError("ResearchGapPlan root schema must be strict object")
-    return constrain_sec_sections_in_schema(schema)
+    schema = constrain_sec_sections_in_schema(schema)
+    evidence_refs, computed_refs = _ordered_context_refs(planner_input)
+    return constrain_planner_schema(
+        schema,
+        evidence_refs=evidence_refs,
+        computed_value_refs=computed_refs,
+        allowed_source_handles=planner_input.allowed_source_handles,
+    )
 
 
 def build_planner_request(
@@ -124,7 +155,7 @@ def build_planner_request(
                 "type": "json_schema",
                 "name": PLANNER_SCHEMA_NAME,
                 "strict": True,
-                "schema": _planner_output_schema(),
+                "schema": _planner_output_schema(planner_input),
             }
         },
     }
@@ -140,6 +171,40 @@ def build_planner_request(
         **envelope_payload,
         request_hash=canonical_sha256(envelope_payload),
     )
+
+
+def _validate_plan_source_refs(
+    plan: ResearchGapPlan,
+    planner_input: PlannerInputEnvelope,
+) -> None:
+    evidence_refs, computed_refs = _ordered_context_refs(planner_input)
+    allowed_evidence = set(evidence_refs)
+    allowed_computed = set(computed_refs)
+    allowed_handles = set(planner_input.allowed_source_handles)
+
+    for need in plan.requested_needs:
+        parameters = need.parameters
+        if isinstance(parameters, B2EvidenceDetailParameters):
+            if not set(parameters.evidence_ids).issubset(allowed_evidence):
+                raise ResearchPolicyError("B2 evidence id requested outside planner input refs")
+        elif isinstance(parameters, B2ComputedValueDetailParameters):
+            if not set(parameters.computed_value_ids).issubset(allowed_computed):
+                raise ResearchPolicyError("B2 computed-value id requested outside planner input refs")
+        elif isinstance(parameters, SecFilingSectionParameters):
+            if parameters.filing_accession not in allowed_handles:
+                raise ResearchPolicyError("SEC filing accession requested outside allowed source handles")
+        elif isinstance(parameters, CorporateActionDetailParameters):
+            if not set(parameters.action_ids).issubset(allowed_handles):
+                raise ResearchPolicyError("corporate-action id requested outside allowed source handles")
+        elif isinstance(parameters, CompanyIRDocumentParameters):
+            if not set(parameters.registry_document_ids).issubset(allowed_handles):
+                raise ResearchPolicyError("IR document id requested outside allowed source handles")
+        elif isinstance(parameters, AlpacaNewsWindowParameters):
+            has_news_authority = any(
+                "NEWS_WINDOW" in handle.upper() for handle in planner_input.allowed_source_handles
+            )
+            if not has_news_authority:
+                raise ResearchPolicyError("Alpaca news requested without an allowed news-window handle")
 
 
 def parse_planner_output(
@@ -176,5 +241,6 @@ def parse_planner_output(
         raise ValueError("planner output lineage does not match immutable planner input")
     if research_policy.policy_version != planner_input.research_policy_version:
         raise ResearchPolicyError("planner input research policy version mismatch")
+    _validate_plan_source_refs(plan, planner_input)
     validate_research_plan(plan, research_policy)
     return plan
