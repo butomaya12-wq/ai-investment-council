@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 
 import pytest
 
+from aic.domain.canonical import canonical_sha256
 from aic.research.event_policy import build_event_research_policy
 from aic.research.model_policy import MODEL_CANDIDATE_LADDER, MODEL_POLICY_VERSION
 from aic.research.policy import RESEARCH_POLICY_VERSION
@@ -175,6 +176,9 @@ def test_valid_synthesis_uses_one_call_and_no_repair() -> None:
     )
     assert result.repair_attempts == 0
     assert result.repair_call is None
+    assert result.repair_request_hash is None
+    assert result.initial_validator_error is None
+    assert canonical_sha256(result.initial_draft) == canonical_sha256(result.draft)
     assert len(transport.payloads) == 1
     assert transport.payloads[0]["store"] is False
     assert transport.payloads[0]["tools"] == []
@@ -197,10 +201,17 @@ def test_invalid_initial_draft_gets_exactly_one_same_evidence_repair() -> None:
     )
     assert result.repair_attempts == 1
     assert result.repair_call is not None
+    assert result.repair_request_hash is not None
+    assert len(result.repair_request_hash) == 64
+    assert result.initial_validator_error is not None
+    assert result.initial_draft.packet.research_status == "COMPLETE"
+    assert result.draft.packet.research_status == "DEGRADED"
+    assert canonical_sha256(result.initial_draft) != canonical_sha256(result.draft)
     assert len(transport.payloads) == 2
     repair_input = json.loads(transport.payloads[1]["input"])
     assert repair_input["frozen_synthesis_input"]["evidence_bundle_hash"] == "a" * 64
     assert repair_input["frozen_synthesis_input"]["evidence_items"][0]["evidence_id"] == EVIDENCE_ID
+    assert repair_input["previous_invalid_draft"]["packet"]["research_status"] == "COMPLETE"
     assert "cannot yield COMPLETE" in repair_input["validator_finding"]
     assert transport.payloads[1]["store"] is False
     assert transport.payloads[1]["tools"] == []
