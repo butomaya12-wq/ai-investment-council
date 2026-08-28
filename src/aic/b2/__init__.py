@@ -1,5 +1,17 @@
 from .analytics import DailyBar, average_daily_dollar_volume, build_computed_value, max_drawdown, require_identical_sessions, trailing_return
 from .eligibility import EligibilityDecision, EligibilityReason, evaluate_asset_eligibility
+
+from .screening import (
+    CandidateScreenInput,
+    MetricDirection,
+    RankedCandidate,
+    ScreeningPolicy,
+    ScreeningStatus,
+    ShortlistResult,
+    build_deep_comparison_from_shortlist,
+    screen_candidates,
+)
+
 from .models import (
     AssetRecord,
     ComparisonStatus,
@@ -35,4 +47,12 @@ __all__ = [
     "max_drawdown",
     "require_identical_sessions",
     "trailing_return",
+    "CandidateScreenInput",
+    "MetricDirection",
+    "RankedCandidate",
+    "ScreeningPolicy",
+    "ScreeningStatus",
+    "ShortlistResult",
+    "build_deep_comparison_from_shortlist",
+    "screen_candidates",
 ]
