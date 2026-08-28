@@ -330,6 +330,34 @@ def build_synthesis_input(
     )
 
 
+def _openai_strict_schema(node: Any) -> Any:
+    """Normalize a local Pydantic schema to the strict Structured Outputs subset.
+
+    Local DTO defaults remain application conveniences. The model-facing schema is
+    closed and requires every declared object property to be present. Nullable values
+    stay nullable through their JSON-Schema null branch; arrays must be returned
+    explicitly, including empty arrays. Pydantic-only default/title annotations are
+    removed from the provider schema.
+    """
+    if isinstance(node, list):
+        return [_openai_strict_schema(item) for item in node]
+    if not isinstance(node, dict):
+        return node
+
+    out: dict[str, Any] = {}
+    for key, value in node.items():
+        if key in {"default", "title"}:
+            continue
+        out[key] = _openai_strict_schema(value)
+
+    if out.get("type") == "object":
+        properties = out.get("properties")
+        if isinstance(properties, dict):
+            out["required"] = list(properties.keys())
+            out["additionalProperties"] = False
+    return out
+
+
 def _draft_schema(synthesis_input: SynthesisInputEnvelope) -> dict[str, Any]:
     schema = CandidateSynthesisDraft.model_json_schema(mode="validation")
     if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
@@ -338,7 +366,10 @@ def _draft_schema(synthesis_input: SynthesisInputEnvelope) -> dict[str, Any]:
     if isinstance(candidate_property, dict):
         candidate_property.clear()
         candidate_property.update({"type": "string", "const": synthesis_input.candidate_id})
-    return schema
+    normalized = _openai_strict_schema(schema)
+    if not isinstance(normalized, dict):
+        raise ValueError("normalized synthesis schema must remain an object")
+    return normalized
 
 
 def build_synthesis_request(
