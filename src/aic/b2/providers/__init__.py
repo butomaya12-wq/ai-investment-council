@@ -15,6 +15,15 @@ from .sec import (
     resolve_sec_registered_security,
     select_latest_operating_filing_at_cutoff,
 )
+from .sec_facts import (
+    SecCompanyFact,
+    SecFactPeriodType,
+    SecFactSelectionPolicy,
+    SecFactSelectionResult,
+    SecFactSelectionStatus,
+    normalize_companyfacts,
+    select_company_fact_at_cutoff,
+)
 
 __all__ = [
     "AlpacaNormalizationError",
@@ -30,4 +39,11 @@ __all__ = [
     "normalize_submissions_recent",
     "resolve_sec_registered_security",
     "select_latest_operating_filing_at_cutoff",
+    "SecCompanyFact",
+    "SecFactPeriodType",
+    "SecFactSelectionPolicy",
+    "SecFactSelectionResult",
+    "SecFactSelectionStatus",
+    "normalize_companyfacts",
+    "select_company_fact_at_cutoff",
 ]
