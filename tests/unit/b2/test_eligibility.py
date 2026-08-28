@@ -1,6 +1,9 @@
 from datetime import UTC, datetime
 
-from aic.b2.eligibility import EligibilityReason, evaluate_asset_eligibility
+import pytest
+from pydantic import ValidationError
+
+from aic.b2.eligibility import EligibilityProof, EligibilityReason, evaluate_asset_eligibility
 from aic.b2.models import AssetRecord, InstrumentType, ProofStatus, SecurityTypeProof
 
 
@@ -18,7 +21,7 @@ def _asset(**overrides):
 
 def _proof(**overrides):
     data = dict(
-        proof_id="p1",
+        proof_id="sec-p1",
         symbol="AAPL",
         instrument_type=InstrumentType.OPERATING_COMPANY_COMMON_STOCK,
         source_type="SEC",
@@ -67,3 +70,63 @@ def test_unproven_security_type_fails_closed() -> None:
     )
     assert not result.eligible
     assert EligibilityReason.SECURITY_TYPE_UNPROVEN in result.reason_codes
+
+
+def test_eligibility_proof_binds_asset_sec_proof_and_policy_flags() -> None:
+    proof = EligibilityProof.build(
+        eligibility_proof_id="elig-p1",
+        asset=_asset(),
+        security_type_proof=_proof(),
+        allowed_exchanges={"NYSE", "NASDAQ"},
+        evidence_complete=True,
+        mandate_allowed=True,
+    )
+    assert proof.eligible is True
+    assert proof.reason_codes == ()
+    assert proof.allowed_exchanges == ("NASDAQ", "NYSE")
+    assert len(proof.eligibility_proof_hash) == 64
+
+
+def test_inactive_asset_builds_explicit_ineligible_proof() -> None:
+    proof = EligibilityProof.build(
+        eligibility_proof_id="elig-p1",
+        asset=_asset(status="inactive"),
+        security_type_proof=_proof(),
+        allowed_exchanges={"NASDAQ"},
+        evidence_complete=True,
+        mandate_allowed=True,
+    )
+    assert proof.eligible is False
+    assert EligibilityReason.INACTIVE in proof.reason_codes
+
+
+def test_tampered_eligibility_hash_is_rejected() -> None:
+    proof = EligibilityProof.build(
+        eligibility_proof_id="elig-p1",
+        asset=_asset(),
+        security_type_proof=_proof(),
+        allowed_exchanges={"NASDAQ"},
+        evidence_complete=True,
+        mandate_allowed=True,
+    )
+    payload = proof.model_dump(mode="python")
+    payload["eligibility_proof_hash"] = "0" * 64
+    with pytest.raises(ValidationError, match="eligibility_proof_hash"):
+        EligibilityProof.model_validate(payload)
+
+
+def test_tampered_eligibility_decision_is_rejected() -> None:
+    proof = EligibilityProof.build(
+        eligibility_proof_id="elig-p1",
+        asset=_asset(),
+        security_type_proof=_proof(),
+        allowed_exchanges={"NASDAQ"},
+        evidence_complete=True,
+        mandate_allowed=True,
+    )
+    payload = proof.model_dump(mode="python")
+    payload["eligible"] = False
+    payload["reason_codes"] = (EligibilityReason.INACTIVE,)
+    payload["eligibility_proof_hash"] = "0" * 64
+    with pytest.raises(ValidationError, match="decision"):
+        EligibilityProof.model_validate(payload)

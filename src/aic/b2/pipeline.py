@@ -7,15 +7,8 @@ from pydantic import model_validator
 
 from aic.domain.canonical import canonical_sha256
 
-from .models import (
-    B2Model,
-    DeepComparisonResult,
-    InstrumentType,
-    ProofStatus,
-    SecurityTypeProof,
-    SnapshotManifest,
-    SnapshotStatus,
-)
+from .eligibility import EligibilityProof
+from .models import B2Model, DeepComparisonResult, SnapshotManifest, SnapshotStatus
 from .point_in_time import assert_snapshot_point_in_time
 from .screening import (
     CandidateScreenInput,
@@ -32,7 +25,7 @@ class B2RunStatus(StrEnum):
     POLICY_STOP = "POLICY_STOP"
     DATA_INCOMPLETE = "DATA_INCOMPLETE"
     INSUFFICIENT_ELIGIBLE = "INSUFFICIENT_ELIGIBLE"
-    BLOCKED_SECURITY_PROOF = "BLOCKED_SECURITY_PROOF"
+    BLOCKED_ELIGIBILITY_PROOF = "BLOCKED_ELIGIBILITY_PROOF"
     BLOCKED_LINEAGE = "BLOCKED_LINEAGE"
     BLOCKED_SNAPSHOT = "BLOCKED_SNAPSHOT"
 
@@ -63,7 +56,7 @@ def _input_hash(
     snapshot: SnapshotManifest,
     policy: ScreeningPolicy,
     candidates: Sequence[CandidateScreenInput],
-    security_type_proofs: Sequence[SecurityTypeProof],
+    eligibility_proofs: Sequence[EligibilityProof],
     dimension_ids: tuple[str, ...],
 ) -> str:
     return canonical_sha256(
@@ -71,7 +64,7 @@ def _input_hash(
             "snapshot": snapshot,
             "policy": policy,
             "candidates": tuple(candidates),
-            "security_type_proofs": tuple(security_type_proofs),
+            "eligibility_proofs": tuple(eligibility_proofs),
             "dimension_ids": dimension_ids,
         }
     )
@@ -82,7 +75,7 @@ def run_b2_gate(
     snapshot: SnapshotManifest,
     policy: ScreeningPolicy,
     candidates: tuple[CandidateScreenInput, ...],
-    security_type_proofs: tuple[SecurityTypeProof, ...],
+    eligibility_proofs: tuple[EligibilityProof, ...],
     comparison_id: str,
     mandate_version: str,
     comparison_dimension_version: str,
@@ -92,7 +85,7 @@ def run_b2_gate(
         snapshot=snapshot,
         policy=policy,
         candidates=candidates,
-        security_type_proofs=security_type_proofs,
+        eligibility_proofs=eligibility_proofs,
         dimension_ids=dimension_ids,
     )
 
@@ -129,39 +122,46 @@ def run_b2_gate(
             reason_codes=("SNAPSHOT_POLICY_OR_MANDATE_LINEAGE_MISMATCH",),
         )
 
-    proof_by_id: dict[str, SecurityTypeProof] = {}
-    for proof in security_type_proofs:
-        if proof.proof_id in proof_by_id:
+    proof_by_id: dict[str, EligibilityProof] = {}
+    policy_exchange_sets: set[tuple[str, ...]] = set()
+    for proof in eligibility_proofs:
+        if proof.eligibility_proof_id in proof_by_id:
             return B2RunResult(
-                status=B2RunStatus.BLOCKED_SECURITY_PROOF,
+                status=B2RunStatus.BLOCKED_ELIGIBILITY_PROOF,
                 snapshot_id=snapshot.snapshot_id,
                 screening_policy_version=policy.policy_version,
                 input_hash=input_hash,
-                reason_codes=("DUPLICATE_SECURITY_PROOF_ID",),
+                reason_codes=("DUPLICATE_ELIGIBILITY_PROOF_ID",),
             )
-        proof_by_id[proof.proof_id] = proof
+        proof_by_id[proof.eligibility_proof_id] = proof
+        policy_exchange_sets.add(proof.allowed_exchanges)
+
+    if len(policy_exchange_sets) > 1:
+        return B2RunResult(
+            status=B2RunStatus.BLOCKED_ELIGIBILITY_PROOF,
+            snapshot_id=snapshot.snapshot_id,
+            screening_policy_version=policy.policy_version,
+            input_hash=input_hash,
+            reason_codes=("INCONSISTENT_ALLOWED_EXCHANGES_POLICY",),
+        )
 
     for candidate in candidates:
         proof = proof_by_id.get(candidate.eligibility_proof_id)
         if proof is None:
             return B2RunResult(
-                status=B2RunStatus.BLOCKED_SECURITY_PROOF,
+                status=B2RunStatus.BLOCKED_ELIGIBILITY_PROOF,
                 snapshot_id=snapshot.snapshot_id,
                 screening_policy_version=policy.policy_version,
                 input_hash=input_hash,
-                reason_codes=(f"MISSING_SECURITY_PROOF:{candidate.symbol}",),
+                reason_codes=(f"MISSING_ELIGIBILITY_PROOF:{candidate.symbol}",),
             )
-        if (
-            proof.symbol != candidate.symbol
-            or proof.status is not ProofStatus.PROVEN
-            or proof.instrument_type is not InstrumentType.OPERATING_COMPANY_COMMON_STOCK
-        ):
+        if proof.asset.symbol != candidate.symbol or not proof.eligible or proof.reason_codes:
             return B2RunResult(
-                status=B2RunStatus.BLOCKED_SECURITY_PROOF,
+                status=B2RunStatus.BLOCKED_ELIGIBILITY_PROOF,
                 snapshot_id=snapshot.snapshot_id,
                 screening_policy_version=policy.policy_version,
                 input_hash=input_hash,
-                reason_codes=(f"INVALID_SECURITY_PROOF:{candidate.symbol}",),
+                reason_codes=(f"INVALID_ELIGIBILITY_PROOF:{candidate.symbol}",),
             )
 
     shortlist = screen_candidates(policy=policy, candidates=candidates)

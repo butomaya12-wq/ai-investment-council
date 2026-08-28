@@ -41,6 +41,21 @@ def _require_provider_bool(value: Any, *, field: str) -> bool:
     return value
 
 
+def _require_provider_string(
+    value: Any,
+    *,
+    field: str,
+    uppercase: bool = False,
+) -> str:
+    if type(value) is not str:
+        raise AlpacaNormalizationError(f"{field} must be a JSON string")
+    if not value or value != value.strip():
+        raise AlpacaNormalizationError(f"{field} must be a non-empty trimmed string")
+    if uppercase and value != value.upper():
+        raise AlpacaNormalizationError(f"{field} must be canonical uppercase")
+    return value
+
+
 def _parse_provider_datetime(value: Any, *, field: str) -> datetime:
     if not isinstance(value, str) or not value.strip():
         raise AlpacaNormalizationError(f"{field} must be an ISO timestamp")
@@ -60,13 +75,14 @@ def normalize_asset(payload: Mapping[str, Any]) -> AssetRecord:
     if missing:
         raise AlpacaNormalizationError(f"asset payload missing fields: {missing}")
     fractionable = payload.get("fractionable")
+    name = payload.get("name")
     return AssetRecord(
-        symbol=str(payload["symbol"]),
-        asset_class=str(payload["asset_class"]),
-        status=str(payload["status"]),
+        symbol=_require_provider_string(payload["symbol"], field="symbol", uppercase=True),
+        asset_class=_require_provider_string(payload["asset_class"], field="asset_class"),
+        status=_require_provider_string(payload["status"], field="status"),
         tradable=_require_provider_bool(payload["tradable"], field="tradable"),
-        exchange=str(payload["exchange"]),
-        name=None if payload.get("name") is None else str(payload["name"]),
+        exchange=_require_provider_string(payload["exchange"], field="exchange", uppercase=True),
+        name=(None if name is None else _require_provider_string(name, field="name")),
         fractionable=(
             None
             if fractionable is None
@@ -82,8 +98,9 @@ def normalize_stock_bars(payload: Mapping[str, Any]) -> dict[str, tuple[DailyBar
 
     normalized: dict[str, tuple[DailyBar, ...]] = {}
     for symbol, raw_bars in bars_object.items():
-        if not isinstance(symbol, str) or not isinstance(raw_bars, Sequence):
-            raise AlpacaNormalizationError("invalid bars symbol/records container")
+        canonical_symbol = _require_provider_string(symbol, field="bars symbol", uppercase=True)
+        if not isinstance(raw_bars, Sequence) or isinstance(raw_bars, (str, bytes)):
+            raise AlpacaNormalizationError("invalid bars records container")
 
         symbol_bars: list[DailyBar] = []
         prior_timestamp: datetime | None = None
@@ -102,7 +119,7 @@ def normalize_stock_bars(payload: Mapping[str, Any]) -> dict[str, tuple[DailyBar
                 )
             )
 
-        normalized[symbol] = tuple(symbol_bars)
+        normalized[canonical_symbol] = tuple(symbol_bars)
     return normalized
 
 

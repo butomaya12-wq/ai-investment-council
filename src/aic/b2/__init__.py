@@ -1,6 +1,7 @@
 from .analytics import DailyBar, average_daily_dollar_volume, build_computed_value, max_drawdown, require_identical_sessions, trailing_return
+from .config_loader import B2ConfigError, load_demo_universe, load_screening_policy
 from .decimal_math import DECIMAL_CONTEXT_ID
-from .eligibility import EligibilityDecision, EligibilityReason, evaluate_asset_eligibility
+from .eligibility import EligibilityDecision, EligibilityProof, EligibilityReason, evaluate_asset_eligibility
 from .fundamentals import FundamentalCompatibilityError, period_growth, same_period_ratio
 from .pipeline import B2RunResult, B2RunStatus, run_b2_gate
 from .point_in_time import PointInTimeEvidenceSet, assert_snapshot_point_in_time, partition_evidence_at_cutoff
@@ -30,6 +31,7 @@ from .models import (
 
 __all__ = [
     "AssetRecord",
+    "B2ConfigError",
     "B2RunResult",
     "B2RunStatus",
     "ComparisonStatus",
@@ -38,6 +40,7 @@ __all__ = [
     "DECIMAL_CONTEXT_ID",
     "DeepComparisonResult",
     "EligibilityDecision",
+    "EligibilityProof",
     "EligibilityReason",
     "EvidenceItem",
     "FundamentalCompatibilityError",
@@ -52,6 +55,8 @@ __all__ = [
     "assert_snapshot_point_in_time",
     "build_computed_value",
     "evaluate_asset_eligibility",
+    "load_demo_universe",
+    "load_screening_policy",
     "max_drawdown",
     "partition_evidence_at_cutoff",
     "period_growth",

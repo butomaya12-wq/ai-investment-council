@@ -43,6 +43,35 @@ def test_normalize_asset_rejects_string_boolean_provider_drift() -> None:
         )
 
 
+@pytest.mark.parametrize("bad_symbol", [123, None, " aapl ", "aapl"])
+def test_normalize_asset_rejects_noncanonical_symbol_provider_drift(bad_symbol) -> None:
+    with pytest.raises(AlpacaNormalizationError):
+        normalize_asset(
+            {
+                "symbol": bad_symbol,
+                "asset_class": "us_equity",
+                "exchange": "NASDAQ",
+                "status": "active",
+                "tradable": True,
+                "fractionable": True,
+            }
+        )
+
+
+def test_normalize_asset_rejects_non_string_exchange_provider_drift() -> None:
+    with pytest.raises(AlpacaNormalizationError, match="JSON string"):
+        normalize_asset(
+            {
+                "symbol": "AAPL",
+                "asset_class": "us_equity",
+                "exchange": 123,
+                "status": "active",
+                "tradable": True,
+                "fractionable": True,
+            }
+        )
+
+
 def test_normalize_stock_bars_converts_provider_float_to_decimal_boundary() -> None:
     normalized = normalize_stock_bars(
         {
