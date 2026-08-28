@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+import importlib.util
+from pathlib import Path
+
 from aic.domain.canonical import canonical_sha256
 from aic.research.run import CandidateSynthesisRuntimeResult
 from aic.research.runtime import RUNTIME_VERSION, ResponsesCallResult, ResponsesUsage
 from aic.research.synthesize import CandidatePacketDraft, CandidateSynthesisDraft, MaterialClaimDraft
-from scripts.b3_real_synthesis import _public_summary, _validated_candidate_record
 
+
+_SCRIPT_PATH = Path(__file__).resolve().parents[3] / "scripts" / "b3_real_synthesis.py"
+_SPEC = importlib.util.spec_from_file_location("aic_b3_real_synthesis_test_target", _SCRIPT_PATH)
+assert _SPEC is not None and _SPEC.loader is not None
+_MODULE = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(_MODULE)
+_public_summary = _MODULE._public_summary
+_validated_candidate_record = _MODULE._validated_candidate_record
 
 EVIDENCE_ID = "B3_SEC_NVDA_N1_1"
 SOURCE_GAP = "ALPACA_NEWS_PAGINATION_INCOMPLETE"
