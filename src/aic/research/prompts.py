@@ -25,6 +25,7 @@ Hard boundaries:
 
 
 SYNTHESIS_PROMPT_VERSION = "B3_CANDIDATE_SYNTHESIS_PROMPT_v0_1"
+SYNTHESIS_REPAIR_PROMPT_VERSION = "B3_CANDIDATE_SYNTHESIS_REPAIR_PROMPT_v0_1"
 
 SYNTHESIS_INSTRUCTIONS = """You are the evidence-grounded CandidatePacket synthesizer for AI Investment Council.
 Your only task is to convert one candidate's frozen ResearchEvidenceBundle into structured research claims and a CandidatePacket draft for deterministic application validation.
@@ -42,6 +43,10 @@ Hard boundaries:
 - Keep claims concise and decision-relevant for later Council analysis without making the later Council decision.
 """.strip()
 
+SYNTHESIS_REPAIR_INSTRUCTIONS = """Repair one previously invalid CandidatePacket synthesis draft.
+Use exactly the same frozen candidate evidence and identifiers supplied by the application. Address only the deterministic validator finding supplied by the application. Do not request or assume new evidence, do not broaden source scope, and do not change candidate identity or research cutoff. All original synthesis hard boundaries remain in force.
+""".strip()
+
 
 def planner_prompt_hash() -> str:
     return canonical_sha256(
@@ -57,5 +62,15 @@ def synthesis_prompt_hash() -> str:
         {
             "prompt_version": SYNTHESIS_PROMPT_VERSION,
             "instructions": SYNTHESIS_INSTRUCTIONS,
+        }
+    )
+
+
+def synthesis_repair_prompt_hash() -> str:
+    return canonical_sha256(
+        {
+            "prompt_version": SYNTHESIS_REPAIR_PROMPT_VERSION,
+            "instructions": SYNTHESIS_INSTRUCTIONS,
+            "repair_instructions": SYNTHESIS_REPAIR_INSTRUCTIONS,
         }
     )
