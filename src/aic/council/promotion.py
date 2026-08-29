@@ -8,7 +8,10 @@ from typing import Mapping
 from aic.domain.canonical import canonical_datetime, canonical_sha256
 from aic.domain.contracts import COUNCIL_OPINION_V1, MATERIAL_CLAIM_V1
 
-from .claim_promotion_authority import load_claim_promotion_normalization
+from .claim_promotion_authority import (
+    NORMALIZATION_VERSION as CLAIM_PROMOTION_NORMALIZATION_VERSION,
+    load_claim_promotion_normalization,
+)
 from .models import (
     CouncilClaimKind,
     CouncilClaimType,
