@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 import pytest
 
@@ -22,12 +21,10 @@ def test_selected_model_authority_freezes_eval_selected_m2() -> None:
     assert set(authority.full_ladder_pass_summary) == {"M1", "M2", "M3"}
 
 
-def test_selected_model_authority_recomputes_selection_rule_after_tamper(tmp_path: Path) -> None:
+def test_selected_model_authority_recomputes_selection_rule_after_tamper() -> None:
     raw = json.loads(DEFAULT_SELECTED_MODEL_AUTHORITY_PATH.read_text(encoding="utf-8"))
     raw["full_ladder_pass_summary"]["M1"]["estimated_cost_usd"] = "0.001"
     raw["selection_hash"] = canonical_sha256(raw, exclude_fields=("selection_hash",))
-    path = tmp_path / "tampered.json"
-    path.write_text(json.dumps(raw), encoding="utf-8")
 
     with pytest.raises(ValueError, match="candidate disagrees with frozen selection rule"):
         SelectedModelAuthority.model_validate(raw)
@@ -35,6 +32,6 @@ def test_selected_model_authority_recomputes_selection_rule_after_tamper(tmp_pat
 
 def test_selected_model_authority_hash_fails_closed_on_payload_drift() -> None:
     raw = json.loads(DEFAULT_SELECTED_MODEL_AUTHORITY_PATH.read_text(encoding="utf-8"))
-    raw["selected_eval_metrics"]["latency_ms"] += 1
+    raw["model_eval_artifact_hash"] = "0" + raw["model_eval_artifact_hash"][1:]
     with pytest.raises(ValueError, match="selection_hash"):
         SelectedModelAuthority.model_validate(raw)
