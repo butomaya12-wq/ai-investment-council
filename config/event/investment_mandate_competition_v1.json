@@ -1,0 +1,51 @@
+{
+  "allowed_universe": [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "AMZN",
+    "META",
+    "GOOGL",
+    "AVGO",
+    "AMD"
+  ],
+  "concentration_policy_ref": "ALPACA_COMPETITION_OPTIONS_POLICY:ALPACA_2026_COMPETITION_OPTIONS_POLICY:ALPACA_COMPETITION_V1_2026_08_29:a4e5f95746cf1e928069454e23bd0bf76e92afe38208c4d8cc0c9cb7a16f00a6#max_aggregate_open_long_option_premium_at_risk",
+  "execution_mode": "PAPER_APPROVAL_REQUIRED",
+  "exclusions": [
+    "LIVE_TRADING",
+    "PUT_OPTIONS",
+    "SHORT_OR_UNCOVERED_OPTIONS",
+    "MULTI_LEG_OPTIONS",
+    "OPTION_DTE_LT_21",
+    "OPTION_DTE_GT_49",
+    "NON_STANDARD_OPTION_CONTRACT",
+    "UNDERLYING_OUTSIDE_DEMO_UNIVERSE_V1",
+    "MODEL_AUTHORED_CONTRACT_QTY_PRICE_OR_ORDER_FIELDS",
+    "STRATEGY_FALLBACK_WHEN_NO_ELIGIBLE_CALL"
+  ],
+  "frozen_at": "2026-08-29T07:42:00.000000Z",
+  "horizon": "UNDERLYING_THESIS_6_TO_18_MONTHS",
+  "liquidity_constraints": {
+    "commit_quote_max_age_seconds": 15,
+    "delta_max": "0.60",
+    "delta_min": "0.45",
+    "delta_target": "0.50",
+    "dte_max_calendar_days": 49,
+    "dte_min_calendar_days": 21,
+    "dte_target_calendar_days": 35,
+    "greeks_required": true,
+    "max_relative_spread": "0.10",
+    "min_open_interest": 100,
+    "option_strategy_allowlist": "SINGLE_LEG_LONG_CALL_ONLY",
+    "selection_quote_max_age_seconds": 60,
+    "standard_contract_size": 100
+  },
+  "live_execution": false,
+  "mandate_hash": "9b8f55c8eedc3e6b5202a42cf9c8e47b3eba7b08607e15ac259b16c235ad5dce",
+  "mandate_id": "ALPACA_2026_COMPETITION_MANDATE",
+  "max_single_name_policy_ref": "ALPACA_COMPETITION_OPTIONS_POLICY:ALPACA_2026_COMPETITION_OPTIONS_POLICY:ALPACA_COMPETITION_V1_2026_08_29:a4e5f95746cf1e928069454e23bd0bf76e92afe38208c4d8cc0c9cb7a16f00a6#max_same_underlying_premium_at_risk",
+  "objective": "Improve decision integrity for medium-risk capital-appreciation decisions by requiring evidence, adversarial Council review, deterministic option selection/risk, and exact human approval; the system does not promise profit or alpha.",
+  "owner_id": "MAYA",
+  "risk_budget_policy_ref": "ALPACA_COMPETITION_OPTIONS_POLICY:ALPACA_2026_COMPETITION_OPTIONS_POLICY:ALPACA_COMPETITION_V1_2026_08_29:a4e5f95746cf1e928069454e23bd0bf76e92afe38208c4d8cc0c9cb7a16f00a6#max_new_position_premium_at_risk",
+  "version": "ALPACA_COMPETITION_V1_2026_08_29"
+}
