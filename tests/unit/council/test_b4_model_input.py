@@ -14,6 +14,8 @@ from aic.research.handoff import B2RealEventHandoff, EXPECTED_METRICS, EXPECTED_
 from aic.research.policy_refs import build_model_policy_reference, build_research_policy_reference
 
 
+pytestmark = pytest.mark.filterwarnings("ignore:Pydantic serializer warnings:UserWarning")
+
 MANDATE = "TEST_MANDATE_V1"
 
 
