@@ -1,5 +1,8 @@
 from types import SimpleNamespace
 
+import pytest
+from pydantic import ValidationError
+
 from aic.research.model_eval_runtime import (
     EVAL_VERSION,
     _RecordedPost,
@@ -7,7 +10,12 @@ from aic.research.model_eval_runtime import (
     _score_e7,
     build_eval_cases,
 )
-from aic.research.models import ResearchGapPlan
+from aic.research.models import (
+    ResearchGapPlan,
+    ResearchNeed,
+    ResearchNeedType,
+    SecFilingSectionParameters,
+)
 from aic.research.prompts import (
     PLANNER_PROMPT_VERSION,
     SYNTHESIS_PROMPT_VERSION,
@@ -40,18 +48,37 @@ def test_clean_candidate_may_have_zero_research_gaps() -> None:
 def test_zero_question_plan_still_rejects_orphan_research_need() -> None:
     e2 = next(case for case in build_eval_cases(MANDATE_VERSION) if case.case_id == "E2")
     planner_input = e2.build_input(MANDATE_VERSION)
-    valid = ResearchGapPlan(
-        research_plan_id="E2_VALID",
-        candidate_id=planner_input.candidate_id,
-        b2_snapshot_id=planner_input.b2_snapshot_id,
-        deep_comparison_id=planner_input.deep_comparison_id,
-        research_policy_version=planner_input.research_policy_version,
-        model_policy_version=planner_input.model_policy_version,
-        research_cutoff=planner_input.research_cutoff,
-        material_questions=(),
-        requested_needs=(),
+    orphan_need = ResearchNeed(
+        need_id="E2_ORPHAN_NEED",
+        question_id="E2_MISSING_QUESTION",
+        need_type=ResearchNeedType.NEED_SEC_FILING_SECTION,
+        parameters=SecFilingSectionParameters(
+            filing_accession="0000000001-26-000001",
+            sections=("Risk Factors",),
+        ),
+        max_items=1,
+        expected_evidence_role="material risk evidence",
     )
-    assert valid.material_questions == ()
+    with pytest.raises(ValidationError, match="existing material question"):
+        ResearchGapPlan(
+            research_plan_id="E2_INVALID_ORPHAN",
+            candidate_id=planner_input.candidate_id,
+            b2_snapshot_id=planner_input.b2_snapshot_id,
+            deep_comparison_id=planner_input.deep_comparison_id,
+            research_policy_version=planner_input.research_policy_version,
+            model_policy_version=planner_input.model_policy_version,
+            research_cutoff=planner_input.research_cutoff,
+            material_questions=(),
+            requested_needs=(orphan_need,),
+        )
+
+
+def _packet(*, resolved=(), unresolved=("E7_Q1",)):
+    return SimpleNamespace(
+        research_status="COMPLETE",
+        research_questions_resolved=resolved,
+        research_questions_unresolved=unresolved,
+    )
 
 
 def test_e7_allows_safe_unresolved_question_without_invented_inference() -> None:
@@ -59,7 +86,7 @@ def test_e7_allows_safe_unresolved_question_without_invented_inference() -> None
     synthesis_input = e7.build_input(MANDATE_VERSION)
     result = SimpleNamespace(
         draft=SimpleNamespace(
-            packet=SimpleNamespace(research_status="COMPLETE"),
+            packet=_packet(),
             claims=(),
         )
     )
@@ -82,7 +109,7 @@ def test_e7_rejects_cross_category_material_promotion() -> None:
     )
     result = SimpleNamespace(
         draft=SimpleNamespace(
-            packet=SimpleNamespace(research_status="COMPLETE"),
+            packet=_packet(),
             claims=(claim,),
         )
     )
