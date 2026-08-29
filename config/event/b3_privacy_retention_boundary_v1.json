@@ -1,0 +1,30 @@
+{
+  "boundary_version": "B3_PRIVACY_RETENTION_BOUNDARY_v0_1",
+  "observed_on": "2026-08-29",
+  "acceptance_scope": "B3_RESEARCH_ORCHESTRATOR",
+  "application_boundary": {
+    "responses_store": false,
+    "public_stdout_policy": "METADATA_ONLY_NO_RAW_PORTFOLIO_ACCOUNT_DATA_OR_SECRETS",
+    "local_runtime_artifacts": "LOCAL_HASH_BOUND_ACCEPTANCE_EVIDENCE_NOT_PUBLIC_LOGS",
+    "local_artifact_purpose": "RECONSTRUCTIBILITY_AND_ACCEPTANCE_EVIDENCE",
+    "agents_sdk_tracing_enabled": false,
+    "secret_values_may_be_serialized": false
+  },
+  "provider_boundary": {
+    "provider": "OPENAI",
+    "endpoint": "/v1/responses",
+    "api_data_used_for_training_by_default": false,
+    "application_state_requested": false,
+    "application_state_control": "store=false",
+    "default_abuse_monitoring_may_include_customer_content": true,
+    "default_abuse_monitoring_retention": "UP_TO_30_DAYS_UNLESS_LEGALLY_REQUIRED_LONGER",
+    "zero_data_retention_claimed": false,
+    "modified_abuse_monitoring_claimed": false,
+    "source_url": "https://platform.openai.com/docs/models/default-usage-policies-by-endpoint"
+  },
+  "review_semantics": {
+    "claims_zero_provider_retention": false,
+    "residual_provider_retention_is_explicit": true,
+    "store_false_is_not_equated_with_zero_abuse_monitoring_retention": true
+  }
+}
