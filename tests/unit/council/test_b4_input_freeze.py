@@ -78,8 +78,12 @@ def _reconciliation():
                 "candidate": candidate,
                 "status": "CANONICAL_RECONCILED",
                 "bundle_hash": str(index) * 64,
-                "material_claims": [claim.model_dump(mode="json", exclude_none=False)],
-                "candidate_packet": packet.model_dump(mode="json", exclude_none=False),
+                "material_claims": [
+                    claim.model_dump(mode="json", exclude_none=False, warnings=False)
+                ],
+                "candidate_packet": packet.model_dump(
+                    mode="json", exclude_none=False, warnings=False
+                ),
                 "reconstructibility_status": "PASS",
             }
         )
