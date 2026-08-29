@@ -391,5 +391,6 @@ def build_static_safety_manifest(repo_root: Path) -> dict[str, Any]:
             for name, item in files.items()
         },
         "checks": checks,
+        "privacy_retention_boundary": build_privacy_retention_boundary(repo_root),
         "all_checks_pass": all(checks.values()),
     }
