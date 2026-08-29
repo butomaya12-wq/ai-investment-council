@@ -55,6 +55,8 @@ _INJECTION_RE = re.compile(
     r"curl\s+https?://|wget\s+https?://)"
 )
 _NUMERIC_RE = re.compile(r"(?<![A-Za-z0-9_])[-+]?\d+(?:\.\d+)?%?")
+_METRIC_ID_NUMERIC_RE = re.compile(r"\d+(?:\.\d+)?")
+_METRIC_WINDOW_SUFFIX_RE = re.compile(r"(?i)(?:(?:-\s*|\s+)sessions?\b|s\b)")
 
 
 def _result(check_id: str, status: str, detail: str) -> Mapping[str, object]:
@@ -209,6 +211,35 @@ def _validate_forbidden_text(draft: CandidateSynthesisDraft) -> None:
             )
 
 
+def _metric_descriptor_numbers(
+    claim: MaterialClaimDraft,
+    computed_by_id: Mapping[str, object],
+) -> set[str]:
+    numbers: set[str] = set()
+    for ref in claim.computed_value_ids:
+        item = computed_by_id.get(ref)
+        if item is None:
+            continue
+        metric_id = getattr(item, "metric_id", "")
+        if isinstance(metric_id, str):
+            numbers.update(_METRIC_ID_NUMERIC_RE.findall(metric_id))
+    return numbers
+
+
+def _is_bound_metric_window_descriptor(
+    *,
+    claim_text: str,
+    match: re.Match[str],
+    metric_descriptor_numbers: set[str],
+) -> bool:
+    token = match.group(0)
+    if token.endswith("%"):
+        return False
+    if token not in metric_descriptor_numbers:
+        return False
+    return _METRIC_WINDOW_SUFFIX_RE.match(claim_text[match.end() :]) is not None
+
+
 def _validate_numeric_provenance(
     draft: CandidateSynthesisDraft,
     synthesis_input: SynthesisInputEnvelope,
@@ -218,8 +249,8 @@ def _validate_numeric_provenance(
     }
     evidence_by_id = {item.evidence_id: item for item in synthesis_input.evidence_items}
     for claim in draft.claims:
-        tokens = tuple(match.group(0) for match in _NUMERIC_RE.finditer(claim.claim_text))
-        if not tokens:
+        matches = tuple(_NUMERIC_RE.finditer(claim.claim_text))
+        if not matches:
             continue
         if not (claim.computed_value_ids or claim.evidence_ids):
             raise CandidatePacketValidationError(
@@ -235,11 +266,19 @@ def _validate_numeric_provenance(
             for ref in claim.computed_value_ids
             if ref in computed_by_id
         }
-        for token in tokens:
+        metric_descriptor_numbers = _metric_descriptor_numbers(claim, computed_by_id)
+        for match in matches:
+            token = match.group(0)
             canonical_token = token[:-1] if token.endswith("%") else token
             if canonical_token in allowed_numeric_strings:
                 continue
             if canonical_token and canonical_token in support_text:
+                continue
+            if _is_bound_metric_window_descriptor(
+                claim_text=claim.claim_text,
+                match=match,
+                metric_descriptor_numbers=metric_descriptor_numbers,
+            ):
                 continue
             raise CandidatePacketValidationError(
                 f"numeric token is not bound to supplied evidence/computed value: {token}"
