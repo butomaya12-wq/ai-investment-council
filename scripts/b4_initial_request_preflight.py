@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from aic.council.claim_promotion_authority import load_claim_promotion_normalization
 from aic.council.model_input import build_initial_model_inputs
@@ -24,6 +25,8 @@ DEFAULT_HANDOFF = Path("config/event/b2_real_event_handoff_v0_1.json")
 DEFAULT_OUTPUT = Path(".aic-runtime/b4_initial_request_preflight.json")
 ARTIFACT_VERSION = "B4_INITIAL_REQUEST_PREFLIGHT_ARTIFACT_v0_1"
 RUN_CLASS = "B4_LOCAL_ZERO_CALL_REAL_INITIAL_REQUEST_PREFLIGHT"
+SEMANTIC_SCHEMA_NORMALIZATION_VERSION = "B4_INITIAL_SCHEMA_SEMANTIC_NORMALIZATION_v0_1"
+_MODEL_RUN_REF_SENTINEL = "__APPLICATION_MODEL_RUN_REF__"
 
 _STAGE_LANE = (
     (CouncilRequestStage.BULL_INITIAL, CouncilLane.BULL),
@@ -50,6 +53,49 @@ def _request_bytes(payload: Any) -> int:
     )
 
 
+def _semantic_schema_hash(schema: Mapping[str, Any]) -> str:
+    """Hash initial-output semantics while normalizing only per-run lineage.
+
+    ``model_run_ref`` is application-owned and must be unique for each model
+    candidate evaluated for the same logical Council call. Its const therefore
+    legitimately differs across L1..L4. No other schema difference is ignored.
+    """
+
+    normalized = deepcopy(dict(schema))
+    matches = 0
+
+    def visit(node: Any) -> None:
+        nonlocal matches
+        if isinstance(node, dict):
+            properties = node.get("properties")
+            if isinstance(properties, dict) and "model_run_ref" in properties:
+                prop = properties["model_run_ref"]
+                if not isinstance(prop, dict):
+                    raise ValueError("model_run_ref schema property must be an object")
+                if prop.get("type") != "string":
+                    raise ValueError("model_run_ref schema property must remain a string")
+                const = prop.get("const")
+                if not isinstance(const, str) or not const:
+                    raise ValueError("model_run_ref schema property must have application const binding")
+                prop["const"] = _MODEL_RUN_REF_SENTINEL
+                matches += 1
+            for child in node.values():
+                visit(child)
+        elif isinstance(node, list):
+            for child in node:
+                visit(child)
+
+    visit(normalized)
+    if matches != 1:
+        raise ValueError("initial schema must contain exactly one model_run_ref const binding")
+    return canonical_sha256(
+        {
+            "normalization_version": SEMANTIC_SCHEMA_NORMALIZATION_VERSION,
+            "schema": normalized,
+        }
+    )
+
+
 def main() -> int:
     try:
         freeze_raw = _read_json(DEFAULT_FREEZE)
@@ -67,6 +113,7 @@ def main() -> int:
                 logical_key = f"{model_input.candidate_id}:{lane.value}"
                 logical_hashes: list[str] = []
                 schema_hashes: list[str] = []
+                semantic_schema_hashes: list[str] = []
                 for model_candidate in INITIAL_MODEL_LADDER:
                     model_run_ref = (
                         f"B4_INITIAL_{model_input.candidate_id}_{lane.value}_"
@@ -84,6 +131,7 @@ def main() -> int:
                     request_payload = request.request_payload
                     schema = request_payload["text"]["format"]["schema"]
                     schema_hash = canonical_sha256(schema)
+                    semantic_schema_hash = _semantic_schema_hash(schema)
                     request_variants.append(
                         {
                             "logical_call": logical_key,
@@ -97,6 +145,7 @@ def main() -> int:
                             "model_input_hash": model_input.model_input_hash,
                             "request_hash": request.request_hash,
                             "schema_hash": schema_hash,
+                            "semantic_schema_hash": semantic_schema_hash,
                             "request_body_utf8_bytes": _request_bytes(request_payload),
                             "store": request_payload["store"],
                             "tools": request_payload["tools"],
@@ -107,6 +156,7 @@ def main() -> int:
                     )
                     logical_hashes.append(request.request_hash)
                     schema_hashes.append(schema_hash)
+                    semantic_schema_hashes.append(semantic_schema_hash)
                 logical_calls.append(
                     {
                         "logical_call": logical_key,
@@ -116,6 +166,8 @@ def main() -> int:
                         "request_variant_count": len(INITIAL_MODEL_LADDER),
                         "request_hashes": logical_hashes,
                         "schema_hashes": list(dict.fromkeys(schema_hashes)),
+                        "semantic_schema_hashes": list(dict.fromkeys(semantic_schema_hashes)),
+                        "allowed_schema_variation": "model_run_ref.const only",
                     }
                 )
 
@@ -123,8 +175,10 @@ def main() -> int:
             raise ValueError("B4 initial preflight requires exactly 9 logical calls")
         if len(request_variants) != 9 * len(INITIAL_MODEL_LADDER):
             raise ValueError("B4 initial preflight request-variant count mismatch")
-        if any(len(item["schema_hashes"]) != 1 for item in logical_calls):
-            raise ValueError("B4 logical-call schema must not vary by model ladder candidate")
+        if any(len(item["semantic_schema_hashes"]) != 1 for item in logical_calls):
+            raise ValueError(
+                "B4 logical-call semantic schema varies beyond application-owned model_run_ref"
+            )
 
         artifact: dict[str, Any] = {
             "artifact_version": ARTIFACT_VERSION,
@@ -136,6 +190,8 @@ def main() -> int:
             "mandate_version": freeze.mandate_version,
             "claim_promotion_normalization_version": normalization.normalization_version,
             "claim_promotion_normalization_hash": normalization.normalization_hash,
+            "semantic_schema_normalization_version": SEMANTIC_SCHEMA_NORMALIZATION_VERSION,
+            "semantic_schema_allowed_variation": "model_run_ref.const only",
             "candidate_order": list(freeze.candidate_order),
             "model_inputs": [
                 {
