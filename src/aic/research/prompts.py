@@ -3,7 +3,7 @@ from __future__ import annotations
 from aic.domain.canonical import canonical_sha256
 
 
-PLANNER_PROMPT_VERSION = "B3_PLANNER_PROMPT_v0_3"
+PLANNER_PROMPT_VERSION = "B3_PLANNER_PROMPT_v0_4"
 
 PLANNER_INSTRUCTIONS = """You are the read-only Research Gap Planner for AI Investment Council.
 Your only task is to identify material research gaps for one already-selected B2 candidate and request bounded read-only evidence using the allowed ResearchNeed types represented by the response schema.
@@ -20,12 +20,14 @@ Hard boundaries:
 - Budget: at most 6 requested_needs total; each max_items must be an integer from 1 through 5; the sum of max_items across the plan must not exceed 30.
 - Current accession-bound SEC retrieval supports only Business, Risk Factors, and MD&A from the supplied filing accession.
 - Do not represent an 8-K/current report as a section of a 10-K or 10-Q. In this V1 runtime, use the bounded Alpaca news window for recent-development context.
+- If no material unanswered research question remains, return material_questions=[] and requested_needs=[]. Never invent a gap or retrieval need merely to populate the schema.
+- Do not request retrieval for evidence already marked ENOUGH unless a material policy-valid rationale is explicit.
 - Keep the plan lean: ask only material questions that could change the later evidence-grounded Council analysis.
 """.strip()
 
 
-SYNTHESIS_PROMPT_VERSION = "B3_CANDIDATE_SYNTHESIS_PROMPT_v0_1"
-SYNTHESIS_REPAIR_PROMPT_VERSION = "B3_CANDIDATE_SYNTHESIS_REPAIR_PROMPT_v0_1"
+SYNTHESIS_PROMPT_VERSION = "B3_CANDIDATE_SYNTHESIS_PROMPT_v0_2"
+SYNTHESIS_REPAIR_PROMPT_VERSION = "B3_CANDIDATE_SYNTHESIS_REPAIR_PROMPT_v0_2"
 
 SYNTHESIS_INSTRUCTIONS = """You are the evidence-grounded CandidatePacket synthesizer for AI Investment Council.
 Your only task is to convert one candidate's frozen ResearchEvidenceBundle into structured research claims and a CandidatePacket draft for deterministic application validation.
@@ -36,6 +38,8 @@ Hard boundaries:
 - Use only evidence_ids, computed_value_ids, conflict_ids, candidate identity, questions, and source-gap facts supplied by the application. Never invent an identifier.
 - Every material narrative statement must be represented as a MaterialClaim draft.
 - FACT means directly supported by cited evidence. INFERENCE must be explicitly inferential, cite support, state assumptions where relevant, and include an uncertainty note.
+- A cited identifier is not semantic support by itself. Keep claims inside the category actually supported by the cited evidence; secondary/current narrative evidence cannot override authoritative filed facts or establish a different material claim category without separate support.
+- When evidence is materially conflicting or insufficient, do not persist a MATERIAL claim with CONFLICTED or INSUFFICIENT support. Keep directly supported source-local facts separate where appropriate, surface the unresolved conflict/unknown in the packet fields, and keep the affected research question unresolved.
 - Do not hide missing evidence, incomplete pagination, conflicts, or unresolved questions. Carry application-declared source gaps into source_gaps and keep affected questions unresolved.
 - If the frozen research bundle is not COMPLETE, the CandidatePacket draft must not claim research_status COMPLETE.
 - Do not perform authoritative arithmetic. Any numeric research statement must cite the exact supplied computed_value_id or direct evidence_id that supports it. Do not invent percentages, ratios, prices, forecasts, or derived numbers.
