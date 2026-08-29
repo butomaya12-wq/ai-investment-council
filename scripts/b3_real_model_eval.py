@@ -13,20 +13,25 @@ from aic.research.mandate import (
     load_competition_investment_mandate,
 )
 from aic.research.model_eval import (
-    EVAL_VERSION,
     EXPECTED_CASE_IDS,
     aggregate_candidate,
-    build_eval_cases,
     load_pricing_authority,
-    run_case,
     select_from_candidate_runs,
 )
-from aic.research.model_eval_runtime import adapt_case_for_runtime_scoring
+from aic.research.model_eval_runtime import EVAL_VERSION, build_eval_cases, run_case
 from aic.research.model_policy import MODEL_CANDIDATE_LADDER, MODEL_POLICY_VERSION
+from aic.research.prompts import (
+    PLANNER_PROMPT_VERSION,
+    SYNTHESIS_PROMPT_VERSION,
+    SYNTHESIS_REPAIR_PROMPT_VERSION,
+    planner_prompt_hash,
+    synthesis_prompt_hash,
+    synthesis_repair_prompt_hash,
+)
 from aic.research.runtime import load_openai_api_key
 
 
-ARTIFACT_VERSION = "B3_MODEL_EVAL_ARTIFACT_v0_1"
+ARTIFACT_VERSION = "B3_MODEL_EVAL_ARTIFACT_v0_2"
 DEFAULT_OUTPUT = Path(".aic-runtime/b3_model_eval.json")
 
 
@@ -106,6 +111,7 @@ def _public_summary(artifact: dict[str, Any], output: Path) -> dict[str, Any]:
         "pricing_version": artifact["pricing_version"],
         "pricing_hash": artifact["pricing_hash"],
         "mandate_version": artifact["mandate_version"],
+        "prompt_manifest": artifact["prompt_manifest"],
         "candidates": candidates,
         "selection": artifact["selection"],
         "broker_writes": artifact["broker_writes"],
@@ -121,10 +127,7 @@ def main() -> int:
     api_key = load_openai_api_key()
     mandate = load_competition_investment_mandate()
     pricing = load_pricing_authority()
-    cases = tuple(
-        adapt_case_for_runtime_scoring(case)
-        for case in build_eval_cases(mandate.version)
-    )
+    cases = build_eval_cases(mandate.version)
     if tuple(case.case_id for case in cases) != EXPECTED_CASE_IDS:
         print("B3 eval fixture set is not exact E1-E12", file=sys.stderr)
         return 2
@@ -204,6 +207,14 @@ def main() -> int:
         "mandate_version": mandate.version,
         "mandate_hash": COMPETITION_MANDATE_HASH,
         "options_policy_hash": COMPETITION_OPTIONS_POLICY_HASH,
+        "prompt_manifest": {
+            "planner_prompt_version": PLANNER_PROMPT_VERSION,
+            "planner_prompt_hash": planner_prompt_hash(),
+            "synthesis_prompt_version": SYNTHESIS_PROMPT_VERSION,
+            "synthesis_prompt_hash": synthesis_prompt_hash(),
+            "synthesis_repair_prompt_version": SYNTHESIS_REPAIR_PROMPT_VERSION,
+            "synthesis_repair_prompt_hash": synthesis_repair_prompt_hash(),
+        },
         "pricing_version": pricing.pricing_version,
         "pricing_hash": pricing.pricing_hash,
         "pricing_observed_at": pricing.observed_at,
