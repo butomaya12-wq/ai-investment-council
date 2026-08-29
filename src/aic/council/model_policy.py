@@ -10,12 +10,23 @@ from .models import B4Model
 
 
 MODEL_POLICY_VERSION = "MODEL_POLICY_vB4_0_1"
+OUTPUT_TOKEN_BUDGET_VERSION = "B4_STAGE_OUTPUT_TOKEN_BUDGET_v0_1"
 
 
 class CouncilModelStage(StrEnum):
     INITIAL = "INITIAL"
     REBUTTAL = "REBUTTAL"
     JUDGE = "JUDGE"
+
+
+# Engineering resource ceilings only. These caps do not grant or change any
+# investment/trade authority. Responses max_output_tokens includes visible and
+# reasoning tokens, so every paid B4 call is hard-bounded before dispatch.
+STAGE_MAX_OUTPUT_TOKENS: dict[CouncilModelStage, int] = {
+    CouncilModelStage.INITIAL: 4096,
+    CouncilModelStage.REBUTTAL: 6144,
+    CouncilModelStage.JUDGE: 8192,
+}
 
 
 class CouncilModelCandidate(B4Model):
