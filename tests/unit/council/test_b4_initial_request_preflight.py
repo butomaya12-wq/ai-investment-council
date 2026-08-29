@@ -15,7 +15,7 @@ def _load_preflight_module():
     return module
 
 
-def test_b4_initial_request_preflight_is_zero_call_surface() -> None:
+def test_b4_initial_request_preflight_is_zero_call_bounded_surface() -> None:
     source = SCRIPT.read_text(encoding="utf-8")
     assert "StdlibResponsesTransport" not in source
     assert "load_openai_api_key" not in source
@@ -23,8 +23,9 @@ def test_b4_initial_request_preflight_is_zero_call_surface() -> None:
     assert ".post(" not in source
     assert "urllib" not in source
     assert "requests." not in source
-    assert "build_initial_request" in source
-    assert "assert_request_invariants" in source
+    assert "build_bounded_initial_request" in source
+    assert "assert_bounded_request_invariants" in source
+    assert "max_output_tokens" in source
     assert '"model_calls": 0' in source
     assert '"provider_reads": 0' in source
     assert '"broker_writes": 0' in source
