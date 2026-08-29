@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Mapping
 
-from aic.domain.canonical import canonical_rfc3339_datetime, canonical_sha256
+from aic.domain.canonical import canonical_datetime, canonical_sha256
 from aic.domain.contracts import COUNCIL_OPINION_V1, MATERIAL_CLAIM_V1
 
 from .models import (
@@ -334,7 +334,7 @@ def promote_initial_council_opinion(
         material_claim_ids=[claim.claim_id for claim in promoted],
         assumption_claim_ids=mapped(proposal.critical_assumption_claim_ids),
         data_gap_refs=data_gap_refs,
-        initial_frozen_at=canonical_rfc3339_datetime(frozen_at),
+        initial_frozen_at=canonical_datetime(frozen_at),
         rebuttal_material_claim_ids=[],
         rebuttal_frozen_at=None,
         model_run_ref=proposal.model_run_ref,
