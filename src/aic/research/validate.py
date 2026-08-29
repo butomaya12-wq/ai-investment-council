@@ -242,15 +242,7 @@ def _validate_questions_and_gaps(
         raise CandidatePacketValidationError(
             "application-owned source gaps may not be hidden by synthesis"
         )
-    if draft.packet.research_status == "COMPLETE":
-        if unresolved:
-            raise CandidatePacketValidationError(
-                "COMPLETE CandidatePacket cannot contain unresolved research questions"
-            )
-        if draft.packet.source_gaps:
-            raise CandidatePacketValidationError(
-                "COMPLETE CandidatePacket cannot contain source_gaps"
-            )
+
     if synthesis_input.evidence_status.value != "COMPLETE":
         if draft.packet.research_status == "COMPLETE":
             raise CandidatePacketValidationError(
@@ -263,6 +255,17 @@ def _validate_questions_and_gaps(
         if not unresolved:
             raise CandidatePacketValidationError(
                 "non-COMPLETE evidence requires at least one unresolved research question"
+            )
+        return
+
+    if draft.packet.research_status == "COMPLETE":
+        if unresolved:
+            raise CandidatePacketValidationError(
+                "COMPLETE CandidatePacket cannot contain unresolved research questions"
+            )
+        if draft.packet.source_gaps:
+            raise CandidatePacketValidationError(
+                "COMPLETE CandidatePacket cannot contain source_gaps"
             )
 
 
