@@ -38,7 +38,10 @@ def test_independent_review_runner_is_local_one_shot_and_bounded() -> None:
     assert "provider_adapters" not in source
     assert "submit_order(" not in source
     assert "repair_attempts\": 0" in source
-    assert "tools\": []" not in source  # tools are frozen in the review contract module, not rebuilt here.
+    assert '"tools": []' in source
+    assert '"provider_credentials": False' in source
+    assert '"broker_credentials": False' in source
+    assert '"repair_attempt_limit": 0' in source
 
 
 def test_independent_review_secret_scan_and_public_summary_do_not_expose_review_input() -> None:
