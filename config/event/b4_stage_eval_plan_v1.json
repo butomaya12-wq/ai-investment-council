@@ -1,0 +1,79 @@
+{
+  "full_eval_paid_call_count_max": 69,
+  "owner_threshold_required": false,
+  "plan_hash": "f09107e6272a618550ddc2ec53b084e2d9c8e12ed5d5cc2acd0cc9764c40c1ff",
+  "plan_version": "B4_STAGE_EVAL_PLAN_v0_1",
+  "representative_eval_case_ids": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10",
+    "E11",
+    "E12",
+    "E13",
+    "E14",
+    "E15",
+    "E16"
+  ],
+  "selection_rule": "LOWEST_COST_PASSING_CONFIG_THEN_LATENCY_THEN_TOKENS",
+  "source_authority": "P-B4_IMPLEMENTATION_PACKET_v0.1 + P-B4_PROMPT_AND_SCHEMA_CONTRACT_v0.2",
+  "stages": {
+    "INITIAL": {
+      "candidate_keys": [
+        "L1",
+        "L2",
+        "L3",
+        "L4"
+      ],
+      "case_ids": [
+        "E1",
+        "E2",
+        "E5",
+        "E6",
+        "E7",
+        "E8",
+        "E9",
+        "E13",
+        "E16"
+      ],
+      "paid_call_count_max": 36
+    },
+    "JUDGE": {
+      "candidate_keys": [
+        "J1",
+        "J2",
+        "J3"
+      ],
+      "case_ids": [
+        "E3",
+        "E4",
+        "E10",
+        "E11",
+        "E12",
+        "E14",
+        "E15"
+      ],
+      "paid_call_count_max": 21
+    },
+    "REBUTTAL": {
+      "candidate_keys": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "case_ids": [
+        "E4",
+        "E8",
+        "E13",
+        "E16"
+      ],
+      "paid_call_count_max": 12
+    }
+  }
+}
