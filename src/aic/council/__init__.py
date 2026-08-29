@@ -27,12 +27,30 @@ from .policy import (
     JUDGE_POLICY,
     JUDGE_POLICY_VERSION,
 )
+from .policy_refs import (
+    build_council_model_policy_reference,
+    build_council_policy_reference,
+    council_model_policy_payload,
+)
+from .promotion import (
+    CLAIM_PROMOTION_NORMALIZATION_VERSION,
+    CouncilPromotionError,
+    InitialOpinionPromotionResult,
+    promote_initial_council_opinion,
+)
+from .proposal import (
+    CouncilClaimMetadata,
+    InitialCouncilOpinionProposal,
+    validate_initial_proposal_lineage,
+)
 
 __all__ = [
     "API_INVARIANTS",
+    "CLAIM_PROMOTION_NORMALIZATION_VERSION",
     "COUNCIL_POLICY",
     "COUNCIL_POLICY_VERSION",
     "CouncilClaimKind",
+    "CouncilClaimMetadata",
     "CouncilClaimType",
     "CouncilInputBundle",
     "CouncilInputFreezeArtifact",
@@ -40,9 +58,12 @@ __all__ = [
     "CouncilLane",
     "CouncilMateriality",
     "CouncilModelStage",
+    "CouncilPromotionError",
     "CouncilSupportStatus",
     "INITIAL_COUNCIL_LANES",
     "INITIAL_MODEL_LADDER",
+    "InitialCouncilOpinionProposal",
+    "InitialOpinionPromotionResult",
     "JUDGE_MODEL_LADDER",
     "JUDGE_POLICY",
     "JUDGE_POLICY_VERSION",
@@ -50,5 +71,10 @@ __all__ = [
     "ProposedCouncilClaim",
     "REBUTTAL_MODEL_LADDER",
     "build_council_input_freeze",
+    "build_council_model_policy_reference",
+    "build_council_policy_reference",
+    "council_model_policy_payload",
+    "promote_initial_council_opinion",
     "select_stage_model_from_eval",
+    "validate_initial_proposal_lineage",
 ]
