@@ -33,6 +33,36 @@ class ResponsesProtocolError(ResponsesRuntimeError):
     pass
 
 
+class ResponsesHttpError(ResponsesRuntimeError):
+    """Safe, bounded HTTP failure metadata with no provider response message/body."""
+
+    def __init__(
+        self,
+        *,
+        status_code: int,
+        diagnostics: Mapping[str, str | int | None],
+    ) -> None:
+        self.status_code = status_code
+        self.diagnostics = dict(diagnostics)
+        parts = [f"OpenAI Responses HTTP failure: {status_code}"]
+        for key in (
+            "error_type",
+            "error_code",
+            "request_id",
+            "retry_after",
+            "ratelimit_limit_requests",
+            "ratelimit_remaining_requests",
+            "ratelimit_reset_requests",
+            "ratelimit_limit_tokens",
+            "ratelimit_remaining_tokens",
+            "ratelimit_reset_tokens",
+        ):
+            value = self.diagnostics.get(key)
+            if value is not None:
+                parts.append(f"{key}={value}")
+        super().__init__("; ".join(parts))
+
+
 class ResponsesTransport(Protocol):
     def post(
         self,
@@ -41,6 +71,56 @@ class ResponsesTransport(Protocol):
         api_key: str,
     ) -> Mapping[str, Any]:
         ...
+
+
+def _safe_provider_token(value: Any, *, max_len: int = 160) -> str | None:
+    if not isinstance(value, str):
+        return None
+    token = value.strip()
+    if not token or len(token) > max_len:
+        return None
+    allowed = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._:-/,;=+ ")
+    if any(ch not in allowed for ch in token):
+        return None
+    return token
+
+
+def _http_error_diagnostics(exc: HTTPError) -> dict[str, str | int | None]:
+    error_type: str | None = None
+    error_code: str | None = None
+    try:
+        # The provider body is read only to extract two allowlisted machine fields.
+        # The message/body itself is never persisted or surfaced because it may echo input.
+        raw = exc.read(65_536)
+        decoded = json.loads(raw.decode("utf-8"))
+        if isinstance(decoded, Mapping):
+            error = decoded.get("error")
+            if isinstance(error, Mapping):
+                error_type = _safe_provider_token(error.get("type"))
+                error_code = _safe_provider_token(error.get("code"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, AttributeError):
+        pass
+
+    headers = exc.headers
+
+    def header(name: str) -> str | None:
+        if headers is None:
+            return None
+        return _safe_provider_token(headers.get(name))
+
+    return {
+        "status_code": exc.code,
+        "error_type": error_type,
+        "error_code": error_code,
+        "request_id": header("x-request-id"),
+        "retry_after": header("retry-after"),
+        "ratelimit_limit_requests": header("x-ratelimit-limit-requests"),
+        "ratelimit_remaining_requests": header("x-ratelimit-remaining-requests"),
+        "ratelimit_reset_requests": header("x-ratelimit-reset-requests"),
+        "ratelimit_limit_tokens": header("x-ratelimit-limit-tokens"),
+        "ratelimit_remaining_tokens": header("x-ratelimit-remaining-tokens"),
+        "ratelimit_reset_tokens": header("x-ratelimit-reset-tokens"),
+    }
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,9 +160,10 @@ class StdlibResponsesTransport:
             with urlopen(request, timeout=self.timeout_seconds) as response:
                 raw = response.read()
         except HTTPError as exc:
-            # Do not include the provider response body: it can echo sensitive input.
-            raise ResponsesRuntimeError(
-                f"OpenAI Responses HTTP failure: {exc.code}"
+            diagnostics = _http_error_diagnostics(exc)
+            raise ResponsesHttpError(
+                status_code=exc.code,
+                diagnostics=diagnostics,
             ) from exc
         except URLError as exc:
             raise ResponsesRuntimeError("OpenAI Responses network failure") from exc
