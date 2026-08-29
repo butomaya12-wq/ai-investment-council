@@ -1,0 +1,89 @@
+{
+  "active": true,
+  "artifact_version": "ALPACA_COMPETITION_OPTIONS_POLICY_V1",
+  "broker_write_authority": false,
+  "commit_revalidation": {
+    "contract_active_required": true,
+    "contract_tradable_required": true,
+    "decision_ttl_valid_required": true,
+    "mandate_hash_match_required": true,
+    "material_economic_drift_behavior": "BLOCK_REQUIRE_NEW_APPROVAL",
+    "max_relative_spread": "0.10",
+    "policy_hash_match_required": true,
+    "quote_max_age_seconds": 15
+  },
+  "live_execution": false,
+  "order": {
+    "action": "BUY_TO_OPEN",
+    "automatic_price_chase": false,
+    "blind_retry": false,
+    "environment": "PAPER",
+    "exactly_one_send": true,
+    "extended_hours": false,
+    "human_approval_required": true,
+    "initial_limit_price_rule": "SELECTION_TIME_ASK_NORMALIZED_TO_PROVIDER_TICK",
+    "order_type": "LIMIT",
+    "time_in_force": "DAY"
+  },
+  "owner_approved_at": "2026-08-29T07:42:00.000000Z",
+  "owner_id": "MAYA",
+  "policy_hash": "a4e5f95746cf1e928069454e23bd0bf76e92afe38208c4d8cc0c9cb7a16f00a6",
+  "policy_id": "ALPACA_2026_COMPETITION_OPTIONS_POLICY",
+  "policy_name": "ALPACA_COMPETITION_OPTIONS",
+  "primary_track": "Options Alpha Agents",
+  "risk": {
+    "advanced_correlation_cluster_cap_enabled": false,
+    "advanced_sector_theme_cap_enabled": false,
+    "advanced_volatility_budget_enabled": false,
+    "hard_block_override_allowed": false,
+    "max_aggregate_open_long_option_premium_at_risk_fraction_of_equity": "0.06",
+    "max_contracts_per_new_order": 2,
+    "max_new_position_premium_at_risk_fraction_of_equity": "0.03",
+    "max_same_underlying_premium_at_risk_fraction_of_equity": "0.03",
+    "method_id": "OPTION_PREMIUM_RISK_CAPPED_V1",
+    "min_post_proposal_equity_safety_reserve_fraction": "0.50",
+    "missing_required_input_behavior": "INCOMPLETE_DATA"
+  },
+  "selector": {
+    "ask_positive_required": true,
+    "bid_positive_required": true,
+    "contract_type": "CALL",
+    "delta_max": "0.60",
+    "delta_min": "0.45",
+    "delta_target": "0.50",
+    "dte_max_calendar_days": 49,
+    "dte_min_calendar_days": 21,
+    "dte_target_calendar_days": 35,
+    "greeks_required": true,
+    "max_relative_spread": "0.10",
+    "min_open_interest": 100,
+    "no_eligible_contract_behavior": "BLOCK_INCOMPLETE_OPTION_MARKET",
+    "opening_direction": "BUY_TO_OPEN",
+    "ranking": [
+      "ABS_DTE_DISTANCE_TO_35_ASC",
+      "ABS_DELTA_DISTANCE_TO_0_50_ASC",
+      "RELATIVE_SPREAD_ASC",
+      "OPEN_INTEREST_DESC",
+      "CANONICAL_OPTION_SYMBOL_ASC"
+    ],
+    "selection_quote_max_age_seconds": 60,
+    "standard_contract_size": 100,
+    "status_required": "ACTIVE",
+    "tradable_required": true
+  },
+  "sizing": {
+    "deep_otm_cheaper_contract_fallback": false,
+    "max_loss_formula": "approved_limit_price*100*qty",
+    "numeric_authority": "DETERMINISTIC_APPLICATION_ONLY",
+    "premium_per_contract_formula": "approved_limit_price*100",
+    "qty_below_one_behavior": "BLOCK_INSUFFICIENT_RISK_BUDGET",
+    "qty_budget_formula": "FLOOR(safe_premium_budget/premium_per_contract)",
+    "qty_formula": "MIN(qty_budget,2)",
+    "quantity_type": "POSITIVE_INTEGER",
+    "safe_premium_budget_rule": "MIN(remaining_new_position_budget,remaining_same_underlying_budget,remaining_aggregate_options_budget,remaining_after_equity_safety_reserve,current_alpaca_broker_capacity)"
+  },
+  "strategy_allowlist": [
+    "SINGLE_LEG_LONG_CALL_ONLY"
+  ],
+  "version": "ALPACA_COMPETITION_V1_2026_08_29"
+}
