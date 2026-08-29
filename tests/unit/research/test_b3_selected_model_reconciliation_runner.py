@@ -1,17 +1,24 @@
 from __future__ import annotations
 
 import importlib.util
+import sys
 from pathlib import Path
+from uuid import uuid4
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[3] / "scripts" / "b3_reconcile_selected_model.py"
 
 
 def _load_script():
-    spec = importlib.util.spec_from_file_location("b3_reconcile_selected_model_test", SCRIPT_PATH)
+    module_name = f"b3_reconcile_selected_model_test_{uuid4().hex}"
+    spec = importlib.util.spec_from_file_location(module_name, SCRIPT_PATH)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    sys.modules[module_name] = module
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.modules.pop(module_name, None)
     return module
 
 
