@@ -4,7 +4,7 @@ import json
 from time import perf_counter_ns
 from typing import Any, Mapping
 
-from pydantic import model_validator
+from pydantic import ValidationError, model_validator
 
 from aic.domain.canonical import canonical_sha256
 
@@ -39,7 +39,10 @@ SYNTHESIS_REPAIR_REQUEST_VERSION = "B3_SYNTHESIS_REPAIR_REQUEST_v0_1"
 class CandidateSynthesisRuntimeResult(B3Model):
     initial_call: ResponsesCallResult
     repair_call: ResponsesCallResult | None
-    initial_draft: CandidateSynthesisDraft
+    # Persist the exact first structured payload even when a custom Pydantic
+    # invariant (for example duplicate claim_id values) prevents construction
+    # of CandidateSynthesisDraft. This keeps bounded-repair evidence reconstructible.
+    initial_draft: Mapping[str, Any]
     draft: CandidateSynthesisDraft
     repair_attempts: int
     repair_request_hash: str | None
@@ -57,7 +60,9 @@ class CandidateSynthesisRuntimeResult(B3Model):
                 or self.initial_validator_error is not None
             ):
                 raise ValueError("zero-repair result cannot contain repair state")
-            if canonical_sha256(self.initial_draft) != canonical_sha256(self.draft):
+            if canonical_sha256(self.initial_draft) != canonical_sha256(
+                self.draft.model_dump(mode="json")
+            ):
                 raise ValueError("zero-repair result must preserve initial draft as final draft")
         else:
             if (
@@ -117,11 +122,21 @@ def _execute_call(
     )
 
 
+def _raw_structured_payload(output_text: str) -> dict[str, Any]:
+    try:
+        payload = json.loads(output_text)
+    except json.JSONDecodeError as exc:
+        raise ResponsesRuntimeError("synthesis output is not valid JSON") from exc
+    if not isinstance(payload, dict):
+        raise ResponsesRuntimeError("synthesis structured output root must be an object")
+    return payload
+
+
 def _build_repair_request(
     *,
     original_request: SynthesisRequestEnvelope,
     synthesis_input: SynthesisInputEnvelope,
-    invalid_draft: CandidateSynthesisDraft,
+    invalid_draft: Mapping[str, Any],
     validator_error: str,
 ) -> SynthesisRequestEnvelope:
     original_payload = dict(original_request.request_payload)
@@ -130,7 +145,7 @@ def _build_repair_request(
         raise ResponsesRuntimeError("original synthesis request lost text configuration")
     repair_input = {
         "frozen_synthesis_input": synthesis_input.model_dump(mode="json"),
-        "previous_invalid_draft": invalid_draft.model_dump(mode="json"),
+        "previous_invalid_draft": dict(invalid_draft),
         "validator_finding": validator_error,
     }
     repair_payload: dict[str, Any] = {
@@ -159,6 +174,54 @@ def _build_repair_request(
     )
 
 
+def _execute_repair(
+    *,
+    request: SynthesisRequestEnvelope,
+    synthesis_input: SynthesisInputEnvelope,
+    initial_call: ResponsesCallResult,
+    invalid_payload: Mapping[str, Any],
+    first_error: Exception,
+    api_key: str,
+    transport: ResponsesTransport,
+) -> CandidateSynthesisRuntimeResult:
+    repair_request = _build_repair_request(
+        original_request=request,
+        synthesis_input=synthesis_input,
+        invalid_draft=invalid_payload,
+        validator_error=str(first_error),
+    )
+    repair_call = _execute_call(
+        request=repair_request,
+        api_key=api_key,
+        transport=transport,
+    )
+    try:
+        repaired_draft = parse_synthesis_output(
+            repair_call.output_text,
+            synthesis_input=synthesis_input,
+        )
+        repaired_results = validate_synthesis_draft(
+            repaired_draft,
+            synthesis_input=synthesis_input,
+        )
+    except (ValidationError, CandidatePacketValidationError, ValueError) as repair_error:
+        raise CandidatePacketValidationError(
+            "B3 synthesis repair exhausted after exactly one attempt: "
+            + str(repair_error)
+        ) from repair_error
+
+    return CandidateSynthesisRuntimeResult(
+        initial_call=initial_call,
+        repair_call=repair_call,
+        initial_draft=dict(invalid_payload),
+        draft=repaired_draft,
+        repair_attempts=1,
+        repair_request_hash=repair_request.request_hash,
+        validator_results=repaired_results,
+        initial_validator_error=str(first_error),
+    )
+
+
 def execute_synthesis_runtime(
     *,
     request: SynthesisRequestEnvelope,
@@ -179,56 +242,46 @@ def execute_synthesis_runtime(
         api_key=key,
         transport=runtime_transport,
     )
-    initial_draft = parse_synthesis_output(
-        initial_call.output_text,
-        synthesis_input=synthesis_input,
-    )
+    try:
+        initial_draft = parse_synthesis_output(
+            initial_call.output_text,
+            synthesis_input=synthesis_input,
+        )
+    except ValidationError as first_error:
+        # Strict JSON Schema cannot express every application invariant (for example
+        # uniqueness of a property across array items). Such a structured DTO failure
+        # is an invalid synthesis result and receives the same single bounded repair.
+        return _execute_repair(
+            request=request,
+            synthesis_input=synthesis_input,
+            initial_call=initial_call,
+            invalid_payload=_raw_structured_payload(initial_call.output_text),
+            first_error=first_error,
+            api_key=key,
+            transport=runtime_transport,
+        )
+
+    initial_payload = initial_draft.model_dump(mode="json")
     try:
         validator_results = validate_synthesis_draft(
             initial_draft,
             synthesis_input=synthesis_input,
         )
     except CandidatePacketValidationError as first_error:
-        repair_request = _build_repair_request(
-            original_request=request,
+        return _execute_repair(
+            request=request,
             synthesis_input=synthesis_input,
-            invalid_draft=initial_draft,
-            validator_error=str(first_error),
-        )
-        repair_call = _execute_call(
-            request=repair_request,
+            initial_call=initial_call,
+            invalid_payload=initial_payload,
+            first_error=first_error,
             api_key=key,
             transport=runtime_transport,
-        )
-        repaired_draft = parse_synthesis_output(
-            repair_call.output_text,
-            synthesis_input=synthesis_input,
-        )
-        try:
-            repaired_results = validate_synthesis_draft(
-                repaired_draft,
-                synthesis_input=synthesis_input,
-            )
-        except CandidatePacketValidationError as repair_error:
-            raise CandidatePacketValidationError(
-                "B3 synthesis repair exhausted after exactly one attempt: "
-                + str(repair_error)
-            ) from repair_error
-        return CandidateSynthesisRuntimeResult(
-            initial_call=initial_call,
-            repair_call=repair_call,
-            initial_draft=initial_draft,
-            draft=repaired_draft,
-            repair_attempts=1,
-            repair_request_hash=repair_request.request_hash,
-            validator_results=repaired_results,
-            initial_validator_error=str(first_error),
         )
 
     return CandidateSynthesisRuntimeResult(
         initial_call=initial_call,
         repair_call=None,
-        initial_draft=initial_draft,
+        initial_draft=initial_payload,
         draft=initial_draft,
         repair_attempts=0,
         repair_request_hash=None,
