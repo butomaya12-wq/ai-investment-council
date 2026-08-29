@@ -126,6 +126,40 @@ def _validate_claim_support(claim: MaterialClaimDraft) -> None:
         )
 
 
+def _validate_semantic_source_authority(
+    draft: CandidateSynthesisDraft,
+    synthesis_input: SynthesisInputEnvelope,
+) -> None:
+    """Reject cross-category provenance that is syntactically valid but semantically irrelevant.
+
+    Direct FACT claims and SUPPORTED MATERIAL claims that do not rely on a supplied
+    deterministic ComputedValue must cite at least one EvidenceItem whose
+    application-owned authoritative_for metadata includes the claim category.
+    This is the production counterpart of B3-V014/B3-V039 and lets the existing
+    one-repair orchestration correct a model output instead of discovering the
+    mismatch only in an eval scorer after the repair window has closed.
+    """
+
+    evidence_by_id = {
+        item.evidence_id: item for item in synthesis_input.evidence_items
+    }
+    for claim in draft.claims:
+        requires_category_authority = claim.claim_kind == "FACT" or (
+            claim.materiality == "MATERIAL" and claim.support_status == "SUPPORTED"
+        )
+        if not requires_category_authority or claim.computed_value_ids:
+            continue
+        if any(
+            ref in evidence_by_id
+            and claim.category in evidence_by_id[ref].authoritative_for
+            for ref in claim.evidence_ids
+        ):
+            continue
+        raise CandidatePacketValidationError(
+            f"claim lacks category-authoritative evidence: {claim.claim_id}"
+        )
+
+
 def _validate_claim_groups(draft: CandidateSynthesisDraft) -> None:
     claim_by_id = {claim.claim_id: claim for claim in draft.claims}
     grouped_ids: list[str] = []
@@ -182,6 +216,15 @@ def _validate_questions_and_gaps(
         raise CandidatePacketValidationError(
             "application-owned source gaps may not be hidden by synthesis"
         )
+    if draft.packet.research_status == "COMPLETE":
+        if unresolved:
+            raise CandidatePacketValidationError(
+                "COMPLETE CandidatePacket cannot contain unresolved research questions"
+            )
+        if draft.packet.source_gaps:
+            raise CandidatePacketValidationError(
+                "COMPLETE CandidatePacket cannot contain source_gaps"
+            )
     if synthesis_input.evidence_status.value != "COMPLETE":
         if draft.packet.research_status == "COMPLETE":
             raise CandidatePacketValidationError(
@@ -304,6 +347,7 @@ def validate_synthesis_draft(
     _validate_refs(draft, synthesis_input)
     for claim in draft.claims:
         _validate_claim_support(claim)
+    _validate_semantic_source_authority(draft, synthesis_input)
     _validate_claim_groups(draft)
     _validate_packet_ref_closure(draft)
     _validate_questions_and_gaps(draft, synthesis_input)
@@ -312,7 +356,11 @@ def validate_synthesis_draft(
     _validate_cutoff(synthesis_input)
     return (
         _result("B3-P1-P3", "PASS", "schema/lineage/reference closure valid"),
-        _result("B3-P4-P5", "PASS", "claim graph complete and material claims supported"),
+        _result(
+            "B3-P4-P5",
+            "PASS",
+            "claim graph complete; material claims supported with semantic source authority",
+        ),
         _result("B3-P6", "PASS", "numeric provenance validated"),
         _result("B3-P7-P10", "PASS", "no forbidden decision/tool/injection residue"),
         _result("B3-P8", "PASS", "research cutoff preserved"),
