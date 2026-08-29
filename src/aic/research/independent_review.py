@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Any, Literal, Mapping, Self
@@ -273,7 +274,7 @@ def _file_manifest(path: Path) -> dict[str, Any]:
     text = path.read_text(encoding="utf-8")
     return {
         "path": str(path),
-        "sha256": canonical_sha256({"utf8_text": text}),
+        "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "text": text,
     }
 
