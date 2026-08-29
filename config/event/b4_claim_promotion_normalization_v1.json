@@ -1,0 +1,27 @@
+{
+  "normalization_version": "B4_CLAIM_PROMOTION_NORMALIZATION_v0_1",
+  "drive_amendment_id": "18OsdjKybP0iOheGkZN6oNvWWO02TjkfDC0T6iHObH7E",
+  "category_mapping": {
+    "source_field": "claim_type",
+    "mode": "EXACT_VALUE"
+  },
+  "claim_kind_mapping": {
+    "FACT_RESTATEMENT": "FACT",
+    "INFERENCE": "INFERENCE",
+    "PROCESS_FINDING": "INFERENCE"
+  },
+  "provenance_closure": {
+    "evidence_ids": "ORDERED_UNIQUE_PARENT_UNION",
+    "computed_value_ids": "ORDERED_UNIQUE_PARENT_UNION_PLUS_DIRECT",
+    "conflict_ids": "ORDERED_UNIQUE_PARENT_UNION_PLUS_DIRECT",
+    "assumptions": "ORDERED_UNIQUE_PARENT_UNION",
+    "uncertainty_note": "NULL_ONLY"
+  },
+  "material_requires_supported": true,
+  "fact_restatement_parent_inference_forbidden": true,
+  "local_ref_persistence_allowed": false,
+  "legacy_council_claim_id_allowed": false,
+  "numeric_authority": "SOURCE_CLAIM_TOKEN_OR_EXACT_COMPUTED_VALUE_ONLY",
+  "process_finding_metadata_only": true,
+  "normalization_hash": "c6c51c2471d10facca4dafb6b9a5c0132f040d066027552f1d5324b51b845fe9"
+}
