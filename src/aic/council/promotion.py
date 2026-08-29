@@ -8,6 +8,7 @@ from typing import Mapping
 from aic.domain.canonical import canonical_datetime, canonical_sha256
 from aic.domain.contracts import COUNCIL_OPINION_V1, MATERIAL_CLAIM_V1
 
+from .claim_promotion_authority import load_claim_promotion_normalization
 from .models import (
     CouncilClaimKind,
     CouncilClaimType,
@@ -27,18 +28,6 @@ from .proposal import (
     validate_initial_proposal_lineage,
 )
 
-
-CLAIM_PROMOTION_NORMALIZATION_VERSION = "B4_CLAIM_PROMOTION_NORMALIZATION_v0_1"
-
-# Current P-B4 model DTO has three model-side claim kinds, while the current
-# machine-authoritative MATERIAL_CLAIM_V1:v0.2 has only FACT|INFERENCE. The
-# PROCESS_FINDING role semantics remain in CouncilClaimMetadata.claim_type and
-# the canonical claim is represented conservatively as INFERENCE.
-_CANONICAL_CLAIM_KIND = {
-    CouncilClaimKind.FACT_RESTATEMENT: "FACT",
-    CouncilClaimKind.INFERENCE: "INFERENCE",
-    CouncilClaimKind.PROCESS_FINDING: "INFERENCE",
-}
 
 _FORBIDDEN_AUTHORITY_RE = re.compile(
     r"(?i)(?:\bBUY\b|\bSELL\b|\bSHORT\b|\bTARGET\s+PRICE\b|"
@@ -190,6 +179,7 @@ def _canonical_claim_from_proposal(
     opinion_id: str,
     parents: tuple[object, ...],
 ) -> object:
+    authority = load_claim_promotion_normalization()
     evidence_ids = _ordered_unique(
         [ref for parent in parents for ref in parent.evidence_ids]
     )
@@ -210,9 +200,15 @@ def _canonical_claim_from_proposal(
     if not set(conflict_ids).issubset(set(bundle.allowed_conflict_ids)):
         raise CouncilPromotionError("promoted claim conflict closure escapes frozen bundle")
 
+    try:
+        canonical_claim_kind = authority.claim_kind_mapping[claim.claim_kind.value]
+    except KeyError as exc:
+        raise CouncilPromotionError("claim kind lacks frozen normalization authority") from exc
+
     identity_seed = canonical_sha256(
         {
-            "normalization_version": CLAIM_PROMOTION_NORMALIZATION_VERSION,
+            "normalization_version": authority.normalization_version,
+            "normalization_hash": authority.normalization_hash,
             "bundle_hash": bundle.bundle_hash,
             "opinion_id": opinion_id,
             "candidate_id": bundle.candidate_id,
@@ -233,7 +229,7 @@ def _canonical_claim_from_proposal(
         candidate_id=bundle.candidate_id,
         category=claim.claim_type.value,
         claim_text=claim.claim_text,
-        claim_kind=_CANONICAL_CLAIM_KIND[claim.claim_kind],
+        claim_kind=canonical_claim_kind,
         materiality=claim.materiality.value,
         evidence_ids=evidence_ids,
         computed_value_ids=computed_value_ids,
