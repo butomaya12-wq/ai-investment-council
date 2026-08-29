@@ -130,6 +130,6 @@ def prompt_manifest() -> dict[str, dict[str, str]]:
         },
         "JUDGE": {
             "prompt_version": JUDGE_PROMPT_VERSION,
-            "prompt_hash": judge_initial_prompt_hash() if False else judge_prompt_hash(),
+            "prompt_hash": judge_prompt_hash(),
         },
     }
