@@ -1,0 +1,79 @@
+{
+  "artifact_version": "B4_INITIAL_SELECTED_MODEL_AUTHORITY_v0_1",
+  "stage": "INITIAL",
+  "model_policy_version": "MODEL_POLICY_vB4_0_1",
+  "model_eval_artifact_version": "B4_INITIAL_MODEL_EVAL_ARTIFACT_v0_3",
+  "model_eval_artifact_hash": "f843e044e771ad99b49c6603e1c593fd16e3cbb83163b16247b28b4f5be32271",
+  "eval_version": "B4_INITIAL_MODEL_EVAL_v0_2",
+  "source_git_commit": "7e5b53e41ef20deb28661275486236021fb6aa7d",
+  "prompt_contract_version": "P-B4-PROMPTS-v0.2",
+  "bull_initial_prompt_version": "BULL_INITIAL_vB4_0_2",
+  "bear_initial_prompt_version": "BEAR_INITIAL_vB4_0_2",
+  "red_team_initial_prompt_version": "RED_TEAM_INITIAL_vB4_0_2",
+  "request_preflight_artifact_hash": "b61498c1504a37fbd24613e9f9136242ab098e966ef72e5f5b1ffabfa9728699",
+  "cost_preflight_artifact_hash": "36b96e2a39991a713b0a16a66970752be2107408dbccb791d86ef66151d02545",
+  "dry_run_manifest_hash": "e5f996930bdd9e8848f42f3007964346b3ecf41bcd18114e67820c9c6a6d1d15",
+  "paid_run_id": "AIC-B4-INITIAL-EVAL-20260829T202359180359Z-b1348a46a2ed",
+  "paid_authorization_artifact_hash": "8ebb3ca4a71d630797899c9084eb108b23761c7e26e486e2dcf175df307b28cc",
+  "receipt_manifest_hash": "459161aa8c80a6a3e726f725f7a616bb251cf8adc5a1f6bf7637d6a4a8eca14a",
+  "cost_receipt_status": "COMPLETE",
+  "semantic_replay_receipts_complete": 36,
+  "selection_status": "SELECTED",
+  "selected_candidate": {
+    "candidate_key": "L2",
+    "stage": "INITIAL",
+    "model": "gpt-5.6-terra",
+    "reasoning_effort": "low",
+    "ladder_position": 2
+  },
+  "selection_reason_code": "LOWEST_COST_PASSING_CONFIG_THEN_LATENCY_THEN_TOKENS",
+  "selected_eval_metrics": {
+    "passed_cases": 9,
+    "required_cases": 9,
+    "critical_safety_failures": 0,
+    "estimated_cost_usd": "0.091082",
+    "latency_ms": 43804,
+    "total_tokens": 20171,
+    "record_hash": "0f07cccb695044e9aab41ad264d63a65bc0ea997930d33b16c2b3136e87a8b4b"
+  },
+  "full_ladder_pass_summary": {
+    "L1": {
+      "passed_cases": 8,
+      "required_cases": 9,
+      "critical_safety_failures": 1,
+      "estimated_cost_usd": "0.0139010",
+      "latency_ms": 85326,
+      "total_tokens": 24165,
+      "record_hash": "b1dc1f2f4f6e8c02c87ef6e6cf2cc06e8ad7a777e294cfd575d57bf073462f04"
+    },
+    "L2": {
+      "passed_cases": 9,
+      "required_cases": 9,
+      "critical_safety_failures": 0,
+      "estimated_cost_usd": "0.091082",
+      "latency_ms": 43804,
+      "total_tokens": 20171,
+      "record_hash": "0f07cccb695044e9aab41ad264d63a65bc0ea997930d33b16c2b3136e87a8b4b"
+    },
+    "L3": {
+      "passed_cases": 9,
+      "required_cases": 9,
+      "critical_safety_failures": 0,
+      "estimated_cost_usd": "0.098582",
+      "latency_ms": 50619,
+      "total_tokens": 20796,
+      "record_hash": "5b53e4e179d3e02e14d13b210d545e6d64c14edaea42b0293d80788be9880094"
+    },
+    "L4": {
+      "passed_cases": 9,
+      "required_cases": 9,
+      "critical_safety_failures": 0,
+      "estimated_cost_usd": "0.247948",
+      "latency_ms": 112796,
+      "total_tokens": 24475,
+      "record_hash": "890df01a0836b75807b9034d2fbdde80e8b42d3f07472a5beed4005c375f4cd5"
+    }
+  },
+  "actual_paid_eval_cost_usd": "0.4515130",
+  "selection_hash": "0554900c0e7c1b696a681301d249d011f6d500331fe53751998024477269d1e0"
+}
