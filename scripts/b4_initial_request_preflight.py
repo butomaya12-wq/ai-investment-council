@@ -6,15 +6,20 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping
 
+from aic.council.bounded_request import (
+    assert_bounded_request_invariants,
+    build_bounded_initial_request,
+)
 from aic.council.claim_promotion_authority import load_claim_promotion_normalization
 from aic.council.model_input import build_initial_model_inputs
-from aic.council.model_policy import INITIAL_MODEL_LADDER
-from aic.council.models import CouncilInputFreezeArtifact, CouncilLane
-from aic.council.request import (
-    CouncilRequestStage,
-    assert_request_invariants,
-    build_initial_request,
+from aic.council.model_policy import (
+    INITIAL_MODEL_LADDER,
+    OUTPUT_TOKEN_BUDGET_VERSION,
+    STAGE_MAX_OUTPUT_TOKENS,
+    CouncilModelStage,
 )
+from aic.council.models import CouncilInputFreezeArtifact, CouncilLane
+from aic.council.request import CouncilRequestStage
 from aic.domain.canonical import canonical_sha256
 from aic.research.handoff import load_real_event_handoff
 
@@ -119,7 +124,7 @@ def main() -> int:
                         f"B4_INITIAL_{model_input.candidate_id}_{lane.value}_"
                         f"{model_candidate.candidate_key}_{model_input.model_input_hash[:12]}"
                     )
-                    request = build_initial_request(
+                    request = build_bounded_initial_request(
                         stage=stage,
                         model_candidate=model_candidate,
                         bundle=freeze.bundles[freeze.candidate_order.index(model_input.candidate_id)],
@@ -127,7 +132,7 @@ def main() -> int:
                         model_input=model_input_payload,
                         allowed_data_gap_refs=model_input.data_gap_refs,
                     )
-                    assert_request_invariants(request)
+                    assert_bounded_request_invariants(request)
                     request_payload = request.request_payload
                     schema = request_payload["text"]["format"]["schema"]
                     schema_hash = canonical_sha256(schema)
@@ -147,6 +152,7 @@ def main() -> int:
                             "schema_hash": schema_hash,
                             "semantic_schema_hash": semantic_schema_hash,
                             "request_body_utf8_bytes": _request_bytes(request_payload),
+                            "max_output_tokens": request_payload["max_output_tokens"],
                             "store": request_payload["store"],
                             "tools": request_payload["tools"],
                             "parallel_tool_calls": request_payload["parallel_tool_calls"],
@@ -179,11 +185,14 @@ def main() -> int:
             raise ValueError(
                 "B4 logical-call semantic schema varies beyond application-owned model_run_ref"
             )
+        expected_cap = STAGE_MAX_OUTPUT_TOKENS[CouncilModelStage.INITIAL]
+        if any(item["max_output_tokens"] != expected_cap for item in request_variants):
+            raise ValueError("B4 initial request variant lacks exact hard output token cap")
 
         artifact: dict[str, Any] = {
             "artifact_version": ARTIFACT_VERSION,
             "run_class": RUN_CLASS,
-            "status": "READY_FOR_INITIAL_STAGE_MODEL_EVAL_PREFLIGHT",
+            "status": "READY_FOR_INITIAL_STAGE_MODEL_EVAL_COST_PREFLIGHT",
             "b4_input_freeze_artifact_hash": freeze.artifact_hash,
             "b3_reconciliation_artifact_hash": freeze.b3_reconciliation_artifact_hash,
             "b2_handoff_hash": handoff.handoff_hash,
@@ -192,6 +201,8 @@ def main() -> int:
             "claim_promotion_normalization_hash": normalization.normalization_hash,
             "semantic_schema_normalization_version": SEMANTIC_SCHEMA_NORMALIZATION_VERSION,
             "semantic_schema_allowed_variation": "model_run_ref.const only",
+            "output_token_budget_version": OUTPUT_TOKEN_BUDGET_VERSION,
+            "initial_max_output_tokens": expected_cap,
             "candidate_order": list(freeze.candidate_order),
             "model_inputs": [
                 {
