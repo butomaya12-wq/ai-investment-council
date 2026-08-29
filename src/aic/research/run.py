@@ -36,13 +36,21 @@ from .validate import CandidatePacketValidationError, validate_synthesis_draft
 SYNTHESIS_REPAIR_REQUEST_VERSION = "B3_SYNTHESIS_REPAIR_REQUEST_v0_1"
 
 
+class RawCandidateSynthesisDraft(B3Model):
+    """Exact structured payload retained when custom DTO validation rejects it."""
+
+    payload: Mapping[str, Any]
+
+    def model_dump(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        # Artifact code historically calls initial_draft.model_dump(); return the
+        # exact raw structured draft rather than wrapping it under a payload key.
+        return dict(self.payload)
+
+
 class CandidateSynthesisRuntimeResult(B3Model):
     initial_call: ResponsesCallResult
     repair_call: ResponsesCallResult | None
-    # Persist the exact first structured payload even when a custom Pydantic
-    # invariant (for example duplicate claim_id values) prevents construction
-    # of CandidateSynthesisDraft. This keeps bounded-repair evidence reconstructible.
-    initial_draft: Mapping[str, Any]
+    initial_draft: CandidateSynthesisDraft | RawCandidateSynthesisDraft
     draft: CandidateSynthesisDraft
     repair_attempts: int
     repair_request_hash: str | None
@@ -60,9 +68,9 @@ class CandidateSynthesisRuntimeResult(B3Model):
                 or self.initial_validator_error is not None
             ):
                 raise ValueError("zero-repair result cannot contain repair state")
-            if canonical_sha256(self.initial_draft) != canonical_sha256(
-                self.draft.model_dump(mode="json")
-            ):
+            if not isinstance(self.initial_draft, CandidateSynthesisDraft):
+                raise ValueError("zero-repair result requires a validated initial draft")
+            if canonical_sha256(self.initial_draft) != canonical_sha256(self.draft):
                 raise ValueError("zero-repair result must preserve initial draft as final draft")
         else:
             if (
@@ -179,6 +187,7 @@ def _execute_repair(
     request: SynthesisRequestEnvelope,
     synthesis_input: SynthesisInputEnvelope,
     initial_call: ResponsesCallResult,
+    initial_draft_record: CandidateSynthesisDraft | RawCandidateSynthesisDraft,
     invalid_payload: Mapping[str, Any],
     first_error: Exception,
     api_key: str,
@@ -213,7 +222,7 @@ def _execute_repair(
     return CandidateSynthesisRuntimeResult(
         initial_call=initial_call,
         repair_call=repair_call,
-        initial_draft=dict(invalid_payload),
+        initial_draft=initial_draft_record,
         draft=repaired_draft,
         repair_attempts=1,
         repair_request_hash=repair_request.request_hash,
@@ -251,11 +260,13 @@ def execute_synthesis_runtime(
         # Strict JSON Schema cannot express every application invariant (for example
         # uniqueness of a property across array items). Such a structured DTO failure
         # is an invalid synthesis result and receives the same single bounded repair.
+        invalid_payload = _raw_structured_payload(initial_call.output_text)
         return _execute_repair(
             request=request,
             synthesis_input=synthesis_input,
             initial_call=initial_call,
-            invalid_payload=_raw_structured_payload(initial_call.output_text),
+            initial_draft_record=RawCandidateSynthesisDraft(payload=invalid_payload),
+            invalid_payload=invalid_payload,
             first_error=first_error,
             api_key=key,
             transport=runtime_transport,
@@ -272,6 +283,7 @@ def execute_synthesis_runtime(
             request=request,
             synthesis_input=synthesis_input,
             initial_call=initial_call,
+            initial_draft_record=initial_draft,
             invalid_payload=initial_payload,
             first_error=first_error,
             api_key=key,
@@ -281,7 +293,7 @@ def execute_synthesis_runtime(
     return CandidateSynthesisRuntimeResult(
         initial_call=initial_call,
         repair_call=None,
-        initial_draft=initial_payload,
+        initial_draft=initial_draft,
         draft=initial_draft,
         repair_attempts=0,
         repair_request_hash=None,
