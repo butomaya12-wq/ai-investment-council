@@ -15,3 +15,12 @@ def test_independent_review_gate_runs_review_once_and_has_no_retry_or_broker_pat
     assert "execute_synthesis_runtime" not in source
     assert "while " not in source
     assert "for attempt" not in source
+
+
+def test_independent_review_gate_can_verify_existing_without_reviewer_call() -> None:
+    source = GATE_PATH.read_text(encoding="utf-8")
+    assert '"--verify-existing"' in source
+    assert "if args.verify_existing:" in source
+    assert "return _verify_existing()" in source
+    assert '"model_calls_performed_by_this_verification": 0' in source
+    assert source.index("if args.verify_existing:") < source.index("completed = subprocess.run(")
