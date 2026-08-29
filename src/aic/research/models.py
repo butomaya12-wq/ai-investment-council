@@ -254,8 +254,6 @@ class ResearchGapPlan(B3Model):
 
     @model_validator(mode="after")
     def _lineage_and_refs(self) -> Self:
-        if not self.material_questions:
-            raise ValueError("material_questions must not be empty")
         question_ids = tuple(question.question_id for question in self.material_questions)
         if len(set(question_ids)) != len(question_ids):
             raise ValueError("question_id values must be unique")
