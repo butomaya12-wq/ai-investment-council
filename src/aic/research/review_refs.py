@@ -9,14 +9,18 @@ class IndependentReviewReferenceError(ValueError):
     pass
 
 
+_ALLOWED_REVIEW_REF_FIELDS = frozenset({"review_ref", "bundle_review_ref"})
+
+
 def collect_review_refs(value: Any) -> frozenset[str]:
     refs: set[str] = set()
 
     def visit(node: Any) -> None:
         if isinstance(node, Mapping):
-            review_ref = node.get("review_ref")
-            if isinstance(review_ref, str) and review_ref:
-                refs.add(review_ref)
+            for field in _ALLOWED_REVIEW_REF_FIELDS:
+                review_ref = node.get(field)
+                if isinstance(review_ref, str) and review_ref:
+                    refs.add(review_ref)
             for child in node.values():
                 visit(child)
             return
