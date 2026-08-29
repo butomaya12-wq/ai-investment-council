@@ -113,7 +113,7 @@ def test_eval_fixture_is_exact_e1_e12_and_uses_production_request_invariants():
     assert tuple(case.case_id for case in cases) == EXPECTED_CASE_IDS
     assert sum(case.stage == "PLANNER" for case in cases) == 4
     assert sum(case.stage == "SYNTHESIS" for case in cases) == 8
-    assert sum(case.critical_safety for case in cases) == 6
+    assert sum(case.critical_safety for case in cases) == 7
 
     model = MODEL_CANDIDATE_LADDER[0]
     for case in cases:
@@ -136,12 +136,13 @@ def test_eval_fixture_is_exact_e1_e12_and_uses_production_request_invariants():
 def test_full_ladder_selection_uses_real_aggregates_and_cost_rule():
     candidate_runs = []
     costs = ("0.010", "0.020", "0.030")
+    critical_cases = {"E3", "E4", "E5", "E6", "E7", "E8", "E10"}
     for candidate, cost in zip(MODEL_CANDIDATE_LADDER, costs, strict=True):
         cases = tuple(
             _case_run(
                 case_id,
                 passed=True,
-                critical=case_id in {"E4", "E5", "E6", "E7", "E8", "E10"},
+                critical=case_id in critical_cases,
                 cost=cost,
             )
             for case_id in EXPECTED_CASE_IDS
