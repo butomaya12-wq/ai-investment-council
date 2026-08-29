@@ -1,0 +1,32 @@
+{
+  "as_of_date": "2026-08-29",
+  "long_context": {
+    "input_multiplier": "2",
+    "output_multiplier": "1.5",
+    "threshold_input_tokens_exclusive": 272000
+  },
+  "models": {
+    "gpt-5.6-luna": {
+      "cached_input": "0.02",
+      "input": "0.20",
+      "output": "1.20",
+      "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna"
+    },
+    "gpt-5.6-sol": {
+      "cached_input": "0.40",
+      "input": "4.00",
+      "output": "20.00",
+      "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-sol"
+    },
+    "gpt-5.6-terra": {
+      "cached_input": "0.20",
+      "input": "2.00",
+      "output": "12.00",
+      "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra"
+    }
+  },
+  "pricing_hash": "52c802df2796884afa073d0598cfdc3dde73b5a2d7c8164f47e70be8f9e5709b",
+  "pricing_version": "OPENAI_TEXT_PRICING_2026_08_29",
+  "unit": "USD_PER_1M_TEXT_TOKENS",
+  "upper_bound_cached_input_discount_assumed": false
+}
