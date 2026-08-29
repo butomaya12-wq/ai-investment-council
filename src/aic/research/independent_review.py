@@ -19,6 +19,7 @@ INDEPENDENT_REVIEW_REQUEST_VERSION = "B3_INDEPENDENT_REVIEW_REQUEST_v0_1"
 INDEPENDENT_REVIEW_SCHEMA_NAME = "b3_independent_review_v1"
 REVIEWER_CANDIDATE = MODEL_CANDIDATE_LADDER[2]
 MAX_REVIEW_EVIDENCE_CHARS = 20_000
+PRIVACY_RETENTION_BOUNDARY_PATH = Path("config/event/b3_privacy_retention_boundary_v1.json")
 
 ATTACK_CLASSES = (
     "MODEL_TOOL_AUTHORITY_LEAKAGE",
@@ -279,18 +280,79 @@ def _file_manifest(path: Path) -> dict[str, Any]:
     }
 
 
+def build_privacy_retention_boundary(repo_root: Path) -> dict[str, Any]:
+    path = repo_root / PRIVACY_RETENTION_BOUNDARY_PATH
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("unable to read B3 privacy/retention boundary") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("B3 privacy/retention boundary must be an object")
+    if payload.get("boundary_version") != "B3_PRIVACY_RETENTION_BOUNDARY_v0_1":
+        raise ValueError("unexpected B3 privacy/retention boundary version")
+    if payload.get("acceptance_scope") != "B3_RESEARCH_ORCHESTRATOR":
+        raise ValueError("unexpected privacy/retention acceptance scope")
+
+    application = payload.get("application_boundary")
+    provider = payload.get("provider_boundary")
+    semantics = payload.get("review_semantics")
+    if not isinstance(application, dict) or not isinstance(provider, dict) or not isinstance(semantics, dict):
+        raise ValueError("privacy/retention boundary sections missing")
+    if application.get("responses_store") is not False:
+        raise ValueError("B3 privacy boundary must require store=false")
+    if application.get("agents_sdk_tracing_enabled") is not False:
+        raise ValueError("B3 privacy boundary cannot enable Agents SDK tracing")
+    if application.get("secret_values_may_be_serialized") is not False:
+        raise ValueError("B3 privacy boundary cannot permit serialized secrets")
+    if provider.get("provider") != "OPENAI" or provider.get("endpoint") != "/v1/responses":
+        raise ValueError("privacy boundary must bind the OpenAI Responses endpoint")
+    if provider.get("application_state_requested") is not False:
+        raise ValueError("B3 must not request Responses application-state storage")
+    if provider.get("application_state_control") != "store=false":
+        raise ValueError("B3 provider boundary must bind store=false")
+    if provider.get("default_abuse_monitoring_retention") != "UP_TO_30_DAYS_UNLESS_LEGALLY_REQUIRED_LONGER":
+        raise ValueError("unexpected default abuse-monitoring retention boundary")
+    if provider.get("zero_data_retention_claimed") is not False or provider.get("modified_abuse_monitoring_claimed") is not False:
+        raise ValueError("B3 may not claim unverified ZDR/MAM")
+    if provider.get("source_url") != "https://platform.openai.com/docs/models/default-usage-policies-by-endpoint":
+        raise ValueError("privacy boundary must bind official OpenAI data-controls source")
+    if semantics.get("claims_zero_provider_retention") is not False:
+        raise ValueError("B3 privacy boundary may not claim zero provider retention")
+    if semantics.get("residual_provider_retention_is_explicit") is not True:
+        raise ValueError("residual provider retention must be explicit")
+
+    boundary_hash = canonical_sha256(payload)
+    return {
+        "review_ref": f"PRIVACY_BOUNDARY:{boundary_hash}",
+        "boundary_hash": boundary_hash,
+        "file_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        **payload,
+    }
+
+
 def build_static_safety_manifest(repo_root: Path) -> dict[str, Any]:
     paths = {
         "model_policy": repo_root / "src/aic/research/model_policy.py",
+        "research_policy": repo_root / "src/aic/research/policy.py",
         "synthesis": repo_root / "src/aic/research/synthesize.py",
+        "synthesis_runtime": repo_root / "src/aic/research/run.py",
         "runtime": repo_root / "src/aic/research/runtime.py",
         "reconciliation": repo_root / "scripts/b3_reconcile_selected_model.py",
     }
     files = {name: _file_manifest(path) for name, path in paths.items()}
     model_policy = files["model_policy"]["text"]
+    research_policy = files["research_policy"]["text"]
     synthesis = files["synthesis"]["text"]
+    synthesis_runtime = files["synthesis_runtime"]["text"]
     runtime = files["runtime"]["text"]
     reconciliation = files["reconciliation"]["text"]
+
+    public_summary_source = ""
+    if "def _public_summary" in reconciliation and "def main" in reconciliation:
+        public_summary_source = reconciliation.split("def _public_summary", 1)[1].split("def main", 1)[0]
+    safe_call_source = ""
+    if "def _safe_call_receipt" in reconciliation and "@dataclass" in reconciliation:
+        safe_call_source = reconciliation.split("def _safe_call_receipt", 1)[1].split("@dataclass", 1)[0]
 
     checks = {
         "model_policy_store_false": "store: Literal[False] = False" in model_policy,
@@ -298,11 +360,23 @@ def build_static_safety_manifest(repo_root: Path) -> dict[str, Any]:
         "model_policy_hosted_web_disabled": "hosted_web_search_enabled: Literal[False] = False" in model_policy,
         "model_policy_hosted_mcp_disabled": "hosted_mcp_enabled: Literal[False] = False" in model_policy,
         "model_policy_code_interpreter_disabled": "code_interpreter_enabled: Literal[False] = False" in model_policy,
+        "research_policy_repair_attempt_limit_one": "REPAIR_ATTEMPT_LIMIT = 1" in research_policy,
+        "research_policy_enforces_frozen_repair_limit": "if self.repair_attempt_limit != REPAIR_ATTEMPT_LIMIT:" in research_policy,
         "synthesis_request_store_policy_bound": '"store": API_INVARIANTS.store' in synthesis,
         "synthesis_request_tools_empty": '"tools": []' in synthesis,
         "synthesis_parallel_tools_false": '"parallel_tool_calls": False' in synthesis,
+        "synthesis_runtime_result_repair_attempts_zero_or_one": "if self.repair_attempts not in (0, 1):" in synthesis_runtime,
+        "synthesis_runtime_requires_repair_limit_one": "if research_policy.repair_attempt_limit != 1:" in synthesis_runtime,
+        "synthesis_runtime_repair_exhausts_after_one": "repair exhausted after exactly one attempt" in synthesis_runtime,
+        "synthesis_runtime_repair_binds_same_frozen_input": '"input_hash": canonical_sha256(synthesis_input)' in synthesis_runtime,
         "runtime_requires_returned_store_false": 'if payload.get("store") is not False:' in runtime,
         "runtime_rejects_returned_tools": "runtime response unexpectedly reports enabled tools" in runtime,
+        "runtime_has_no_logging_framework": "import logging" not in runtime and "logger." not in runtime and "logging." not in runtime,
+        "runtime_has_no_stdout_prints": "print(" not in runtime,
+        "runtime_http_error_body_not_persisted": "message/body itself is never persisted or surfaced" in runtime,
+        "reconciliation_public_summary_excludes_raw_drafts": bool(public_summary_source) and '"initial_draft"' not in public_summary_source and '"validated_draft"' not in public_summary_source,
+        "reconciliation_public_summary_excludes_claim_and_evidence_text": bool(public_summary_source) and '"claim_text"' not in public_summary_source and '"material_claims"' not in public_summary_source and '"normalized_value"' not in public_summary_source and '"evidence_items"' not in public_summary_source,
+        "reconciliation_safe_call_receipt_excludes_model_output_text": bool(safe_call_source) and "output_text" not in safe_call_source,
         "reconciliation_declares_provider_reads_zero": '"provider_reads": 0' in reconciliation,
         "reconciliation_declares_broker_writes_zero": '"broker_writes": 0' in reconciliation,
         "reconciliation_declares_alpaca_orders_zero": '"alpaca_orders": 0' in reconciliation,
@@ -311,7 +385,7 @@ def build_static_safety_manifest(repo_root: Path) -> dict[str, Any]:
         "reconciliation_has_no_submit_order_call": "submit_order(" not in reconciliation,
     }
     return {
-        "manifest_version": "B3_STATIC_SAFETY_MANIFEST_v0_1",
+        "manifest_version": "B3_STATIC_SAFETY_MANIFEST_v0_2",
         "files": {
             name: {"path": item["path"], "sha256": item["sha256"]}
             for name, item in files.items()
