@@ -30,6 +30,7 @@ from .prompts import (
 SELECTED_MODEL_AUTHORITY_VERSION = "B3_SELECTED_MODEL_AUTHORITY_v0_1"
 SELECTED_MODEL_EVAL_VERSION = "B3_MODEL_EVAL_v0_3"
 DEFAULT_SELECTED_MODEL_AUTHORITY_PATH = Path("config/event/b3_selected_model_v1.json")
+EXPECTED_MODEL_EVAL_CASE_IDS = tuple(f"E{index}" for index in range(1, 13))
 
 
 class SelectedModelAuthorityError(ValueError):
@@ -152,6 +153,51 @@ def load_selected_model_authority(
         raise SelectedModelAuthorityError(str(exc)) from exc
 
 
+def _metrics_from_full_candidate_record(
+    item: Mapping[str, Any],
+    *,
+    expected_required_cases: int,
+) -> SelectedEvalMetrics:
+    cases = item.get("cases")
+    if not isinstance(cases, list):
+        raise SelectedModelAuthorityError("model-eval candidate full record requires cases array")
+    if len(cases) != expected_required_cases:
+        raise SelectedModelAuthorityError("model-eval candidate case count differs from frozen authority")
+
+    observed_case_ids: list[str] = []
+    passed_cases = 0
+    for case in cases:
+        if not isinstance(case, Mapping):
+            raise SelectedModelAuthorityError("model-eval case record must be an object")
+        case_id = case.get("case_id")
+        passed = case.get("passed")
+        if not isinstance(case_id, str):
+            raise SelectedModelAuthorityError("model-eval case_id missing")
+        if type(passed) is not bool:
+            raise SelectedModelAuthorityError("model-eval case passed flag must be boolean")
+        observed_case_ids.append(case_id)
+        if passed:
+            passed_cases += 1
+
+    if tuple(observed_case_ids) != EXPECTED_MODEL_EVAL_CASE_IDS:
+        raise SelectedModelAuthorityError("model-eval candidate cases must be exact ordered E1-E12")
+
+    all_required = item.get("all_required_checks_passed")
+    if type(all_required) is not bool:
+        raise SelectedModelAuthorityError("model-eval all_required_checks_passed must be boolean")
+    if all_required != (passed_cases == expected_required_cases):
+        raise SelectedModelAuthorityError("model-eval all-required flag disagrees with case records")
+
+    return SelectedEvalMetrics(
+        passed_cases=passed_cases,
+        required_cases=expected_required_cases,
+        critical_safety_failures=item.get("critical_safety_failures"),
+        estimated_cost_usd=item.get("estimated_cost_usd"),
+        latency_ms=item.get("latency_ms"),
+        total_tokens=item.get("total_tokens"),
+    )
+
+
 def verify_model_eval_artifact(
     payload: Mapping[str, Any],
     *,
@@ -165,6 +211,10 @@ def verify_model_eval_artifact(
     if payload.get("eval_version") != authority.eval_version:
         raise SelectedModelAuthorityError("model-eval version mismatch")
 
+    top_level_case_ids = payload.get("case_ids")
+    if not isinstance(top_level_case_ids, list) or tuple(top_level_case_ids) != EXPECTED_MODEL_EVAL_CASE_IDS:
+        raise SelectedModelAuthorityError("model-eval artifact case_ids must be exact E1-E12")
+
     raw_manifest = payload.get("prompt_manifest")
     if not isinstance(raw_manifest, Mapping):
         raise SelectedModelAuthorityError("model-eval artifact prompt manifest missing")
@@ -173,7 +223,7 @@ def verify_model_eval_artifact(
 
     candidates = payload.get("candidates")
     if not isinstance(candidates, list) or len(candidates) != 3:
-        raise SelectedModelAuthorityError("model-eval artifact requires exact M1/M2/M3 summaries")
+        raise SelectedModelAuthorityError("model-eval artifact requires exact M1/M2/M3 full records")
     by_key = {
         item.get("candidate_key"): item
         for item in candidates
@@ -183,13 +233,9 @@ def verify_model_eval_artifact(
         raise SelectedModelAuthorityError("model-eval artifact candidate coverage mismatch")
     for key, expected in authority.full_ladder_pass_summary.items():
         item = by_key[key]
-        observed = SelectedEvalMetrics(
-            passed_cases=item.get("passed_cases"),
-            required_cases=item.get("required_cases"),
-            critical_safety_failures=item.get("critical_safety_failures"),
-            estimated_cost_usd=item.get("estimated_cost_usd"),
-            latency_ms=item.get("latency_ms"),
-            total_tokens=item.get("total_tokens"),
+        observed = _metrics_from_full_candidate_record(
+            item,
+            expected_required_cases=expected.required_cases,
         )
         if observed != expected:
             raise SelectedModelAuthorityError(f"model-eval metrics drift for {key}")
