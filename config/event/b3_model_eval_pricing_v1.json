@@ -19,7 +19,7 @@
     "Requests above provider long-context pricing thresholds are not expected in the bounded B3 eval; if observed, the eval must fail cost-accounting rather than silently use these base rates."
   ],
   "observed_at": "2026-08-29T08:20:00Z",
-  "pricing_hash": "97aff8e8f505d0fd67a3adb94bd440f051f1bf19f7a2883d7e7dd292280206de",
+  "pricing_hash": "2f835825cc3a13b10699720718824f5c15d325c5cba2141933b34ea74f32a430",
   "pricing_version": "OPENAI_TEXT_PRICING_2026_08_29",
   "sources": {
     "gpt-5.6-sol": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
