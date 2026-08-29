@@ -12,6 +12,7 @@ from aic.research.event_policy import build_event_research_policy
 from aic.research.model_eval import (
     CaseRun,
     EvalCase,
+    ModelEvalHarnessError,
     PricingAuthority,
     _score_with_input,
     _usage,
@@ -33,6 +34,28 @@ from aic.research.validate import CandidatePacketValidationError
 
 
 EVAL_VERSION = "B3_MODEL_EVAL_v0_2"
+
+
+def adapt_case_for_runtime_scoring(case: EvalCase) -> EvalCase:
+    """Compatibility shim for the prior R2 planner-runtime scorer contract.
+
+    The v0.2 runner unwraps PlannerRuntimeResult internally and does not depend on
+    this adapter. Keeping the shim preserves the focused regression proof that a
+    planner semantic scorer receives ResearchGapPlan rather than its runtime envelope.
+    """
+    if case.stage != "PLANNER":
+        return case
+    semantic_score = case.score
+
+    def score_runtime(runtime_result: object) -> tuple[bool, tuple[str, ...]]:
+        plan = getattr(runtime_result, "plan", None)
+        if plan is None:
+            raise ModelEvalHarnessError(
+                "planner eval scorer requires PlannerRuntimeResult.plan"
+            )
+        return semantic_score(plan)
+
+    return replace(case, score=score_runtime)
 
 
 @dataclass(frozen=True, slots=True)
