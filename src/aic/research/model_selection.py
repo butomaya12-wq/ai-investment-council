@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Mapping, Self
+from typing import Any, Mapping, Self
 
 from pydantic import model_validator
 
@@ -104,14 +104,12 @@ class SelectedModelAuthority(B3Model):
             raise ValueError("selected-model authority must cover exact M1/M2/M3 ladder")
 
         eval_results: list[ModelEvalResult] = []
-        for key, candidate in ladder_by_key.items():
+        for key in ladder_by_key:
             metrics = self.full_ladder_pass_summary[key]
             eval_results.append(
                 ModelEvalResult(
                     candidate_key=key,
-                    all_required_checks_passed=(
-                        metrics.passed_cases == metrics.required_cases
-                    ),
+                    all_required_checks_passed=(metrics.passed_cases == metrics.required_cases),
                     critical_safety_failures=metrics.critical_safety_failures,
                     estimated_cost_usd=metrics.estimated_cost_usd,
                     latency_ms=metrics.latency_ms,
@@ -152,3 +150,57 @@ def load_selected_model_authority(
         return SelectedModelAuthority.model_validate(raw)
     except ValueError as exc:
         raise SelectedModelAuthorityError(str(exc)) from exc
+
+
+def verify_model_eval_artifact(
+    payload: Mapping[str, Any],
+    *,
+    authority: SelectedModelAuthority,
+) -> None:
+    actual_hash = payload.get("artifact_hash")
+    if actual_hash != authority.model_eval_artifact_hash:
+        raise SelectedModelAuthorityError("model-eval artifact does not match frozen authority")
+    if actual_hash != canonical_sha256(payload, exclude_fields=("artifact_hash",)):
+        raise SelectedModelAuthorityError("model-eval artifact hash mismatch")
+    if payload.get("eval_version") != authority.eval_version:
+        raise SelectedModelAuthorityError("model-eval version mismatch")
+
+    raw_manifest = payload.get("prompt_manifest")
+    if not isinstance(raw_manifest, Mapping):
+        raise SelectedModelAuthorityError("model-eval artifact prompt manifest missing")
+    if SelectedPromptManifest.model_validate(raw_manifest) != authority.prompt_manifest:
+        raise SelectedModelAuthorityError("model-eval prompt manifest differs from frozen authority")
+
+    candidates = payload.get("candidates")
+    if not isinstance(candidates, list) or len(candidates) != 3:
+        raise SelectedModelAuthorityError("model-eval artifact requires exact M1/M2/M3 summaries")
+    by_key = {
+        item.get("candidate_key"): item
+        for item in candidates
+        if isinstance(item, Mapping) and isinstance(item.get("candidate_key"), str)
+    }
+    if set(by_key) != set(authority.full_ladder_pass_summary):
+        raise SelectedModelAuthorityError("model-eval artifact candidate coverage mismatch")
+    for key, expected in authority.full_ladder_pass_summary.items():
+        item = by_key[key]
+        observed = SelectedEvalMetrics(
+            passed_cases=item.get("passed_cases"),
+            required_cases=item.get("required_cases"),
+            critical_safety_failures=item.get("critical_safety_failures"),
+            estimated_cost_usd=item.get("estimated_cost_usd"),
+            latency_ms=item.get("latency_ms"),
+            total_tokens=item.get("total_tokens"),
+        )
+        if observed != expected:
+            raise SelectedModelAuthorityError(f"model-eval metrics drift for {key}")
+
+    selection = payload.get("selection")
+    if not isinstance(selection, Mapping) or selection.get("status") != "SELECTED":
+        raise SelectedModelAuthorityError("model-eval artifact has no selected model")
+    selected = selection.get("selected_candidate")
+    if not isinstance(selected, Mapping):
+        raise SelectedModelAuthorityError("model-eval selected candidate missing")
+    if ModelCandidate.model_validate(selected) != authority.selected_candidate:
+        raise SelectedModelAuthorityError("model-eval selected candidate mismatch")
+    if selection.get("reason_code") != authority.selection_reason_code:
+        raise SelectedModelAuthorityError("model-eval selection reason mismatch")
