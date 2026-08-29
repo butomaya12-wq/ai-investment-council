@@ -1,5 +1,8 @@
 """Bounded B4 Council/Judge contracts and deterministic orchestration foundations."""
 
+from .claim_promotion_authority import (
+    NORMALIZATION_VERSION as CLAIM_PROMOTION_NORMALIZATION_VERSION,
+)
 from .input_bundle import CouncilInputFreezeError, build_council_input_freeze
 from .model_policy import (
     API_INVARIANTS,
@@ -33,7 +36,6 @@ from .policy_refs import (
     council_model_policy_payload,
 )
 from .promotion import (
-    CLAIM_PROMOTION_NORMALIZATION_VERSION,
     CouncilPromotionError,
     InitialOpinionPromotionResult,
     promote_initial_council_opinion,
