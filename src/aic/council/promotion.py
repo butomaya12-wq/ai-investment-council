@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Mapping
 
-from aic.domain.canonical import canonical_sha256
+from aic.domain.canonical import canonical_rfc3339_datetime, canonical_sha256
 from aic.domain.contracts import COUNCIL_OPINION_V1, MATERIAL_CLAIM_V1
 
 from .models import (
@@ -31,7 +31,7 @@ from .proposal import (
 CLAIM_PROMOTION_NORMALIZATION_VERSION = "B4_CLAIM_PROMOTION_NORMALIZATION_v0_1"
 
 # Current P-B4 model DTO has three model-side claim kinds, while the current
-# machine-authoritative MATERIAL_CLAIM_V1:v0.2 has only FACT|INFERENCE.  The
+# machine-authoritative MATERIAL_CLAIM_V1:v0.2 has only FACT|INFERENCE. The
 # PROCESS_FINDING role semantics remain in CouncilClaimMetadata.claim_type and
 # the canonical claim is represented conservatively as INFERENCE.
 _CANONICAL_CLAIM_KIND = {
@@ -74,7 +74,7 @@ def _validator(check_id: str, detail: str) -> Mapping[str, str]:
 def _canonical_source_claim(value: object):
     try:
         return MATERIAL_CLAIM_V1.model_validate(value)
-    except Exception as exc:  # pydantic/json-schema validation detail is lower-level evidence
+    except Exception as exc:
         raise CouncilPromotionError(f"source MaterialClaim is not canonical: {exc}") from exc
 
 
@@ -334,7 +334,7 @@ def promote_initial_council_opinion(
         material_claim_ids=[claim.claim_id for claim in promoted],
         assumption_claim_ids=mapped(proposal.critical_assumption_claim_ids),
         data_gap_refs=data_gap_refs,
-        initial_frozen_at=frozen_at,
+        initial_frozen_at=canonical_rfc3339_datetime(frozen_at),
         rebuttal_material_claim_ids=[],
         rebuttal_frozen_at=None,
         model_run_ref=proposal.model_run_ref,
