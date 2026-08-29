@@ -21,6 +21,7 @@ from aic.research.model_eval import (
     run_case,
     select_from_candidate_runs,
 )
+from aic.research.model_eval_runtime import adapt_case_for_runtime_scoring
 from aic.research.model_policy import MODEL_CANDIDATE_LADDER, MODEL_POLICY_VERSION
 from aic.research.runtime import load_openai_api_key
 
@@ -120,7 +121,10 @@ def main() -> int:
     api_key = load_openai_api_key()
     mandate = load_competition_investment_mandate()
     pricing = load_pricing_authority()
-    cases = build_eval_cases(mandate.version)
+    cases = tuple(
+        adapt_case_for_runtime_scoring(case)
+        for case in build_eval_cases(mandate.version)
+    )
     if tuple(case.case_id for case in cases) != EXPECTED_CASE_IDS:
         print("B3 eval fixture set is not exact E1-E12", file=sys.stderr)
         return 2
