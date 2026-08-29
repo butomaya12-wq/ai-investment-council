@@ -42,6 +42,15 @@ _GROUP_FIELDS: dict[str, str] = {
     "portfolio_interaction": "portfolio_interaction_claim_ids",
 }
 
+_SEC_SECTION_CATEGORY_AUTHORITY: dict[str, frozenset[str]] = {
+    "Business": frozenset({"business_model", "competitive_position"}),
+    "Risk Factors": frozenset({"risk"}),
+    "MD&A": frozenset(
+        {"growth_quality", "financial_quality", "capital_allocation", "risk"}
+    ),
+}
+_NEWS_CATEGORY_AUTHORITY = frozenset({"market_context", "catalyst"})
+
 _FORBIDDEN_DECISION_RE = re.compile(
     r"(?i)(?:\bBUY\b|\bSELL\b|\bINVEST\b|\bABSTAIN\b|"
     r"\bPOSITION\s+SIZE\b|\bTARGET\s+PRICE\b|\bTRADE\s+ACTION\b|"
@@ -126,18 +135,35 @@ def _validate_claim_support(claim: MaterialClaimDraft) -> None:
         )
 
 
+def _evidence_authoritative_categories(item: object) -> frozenset[str]:
+    tags = {
+        value
+        for value in getattr(item, "authoritative_for", ())
+        if isinstance(value, str)
+    }
+    categories = {value for value in tags if value in CLAIM_CATEGORIES}
+
+    if "B3_QUALITATIVE_SEC_RESEARCH" in tags:
+        section = getattr(item, "field_or_claim", None)
+        if isinstance(section, str):
+            categories.update(_SEC_SECTION_CATEGORY_AUTHORITY.get(section, ()))
+
+    if "CURRENT_NEWS_CONTEXT" in tags:
+        categories.update(_NEWS_CATEGORY_AUTHORITY)
+
+    return frozenset(categories)
+
+
 def _validate_semantic_source_authority(
     draft: CandidateSynthesisDraft,
     synthesis_input: SynthesisInputEnvelope,
 ) -> None:
-    """Reject cross-category provenance that is syntactically valid but semantically irrelevant.
+    """Reject syntactically valid but semantically irrelevant claim provenance.
 
-    Direct FACT claims and SUPPORTED MATERIAL claims that do not rely on a supplied
-    deterministic ComputedValue must cite at least one EvidenceItem whose
-    application-owned authoritative_for metadata includes the claim category.
-    This is the production counterpart of B3-V014/B3-V039 and lets the existing
-    one-repair orchestration correct a model output instead of discovering the
-    mismatch only in an eval scorer after the repair window has closed.
+    Eval fixtures can carry exact claim-category authority directly. Real frozen B3
+    provider evidence carries stable source-class authority instead, so the
+    application deterministically maps the already-frozen SEC section/news source
+    classes to the claim categories they may support. Models cannot widen this map.
     """
 
     evidence_by_id = {
@@ -151,7 +177,7 @@ def _validate_semantic_source_authority(
             continue
         if any(
             ref in evidence_by_id
-            and claim.category in evidence_by_id[ref].authoritative_for
+            and claim.category in _evidence_authoritative_categories(evidence_by_id[ref])
             for ref in claim.evidence_ids
         ):
             continue
