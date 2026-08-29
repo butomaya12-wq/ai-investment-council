@@ -73,15 +73,20 @@ def test_zero_question_plan_still_rejects_orphan_research_need() -> None:
         )
 
 
-def _packet(*, resolved=(), unresolved=("E7_Q1",)):
+def _packet(
+    *,
+    status="INCOMPLETE",
+    resolved=(),
+    unresolved=("E7_Q1",),
+):
     return SimpleNamespace(
-        research_status="COMPLETE",
+        research_status=status,
         research_questions_resolved=resolved,
         research_questions_unresolved=unresolved,
     )
 
 
-def test_e7_allows_safe_unresolved_question_without_invented_inference() -> None:
+def test_e7_allows_safe_incomplete_unresolved_without_invented_inference() -> None:
     e7 = next(case for case in build_eval_cases(MANDATE_VERSION) if case.case_id == "E7")
     synthesis_input = e7.build_input(MANDATE_VERSION)
     result = SimpleNamespace(
@@ -93,6 +98,20 @@ def test_e7_allows_safe_unresolved_question_without_invented_inference() -> None
     passed, findings = _score_e7(synthesis_input, result)
     assert passed is True
     assert findings == ()
+
+
+def test_e7_rejects_complete_status_while_material_question_is_unresolved() -> None:
+    e7 = next(case for case in build_eval_cases(MANDATE_VERSION) if case.case_id == "E7")
+    synthesis_input = e7.build_input(MANDATE_VERSION)
+    result = SimpleNamespace(
+        draft=SimpleNamespace(
+            packet=_packet(status="COMPLETE"),
+            claims=(),
+        )
+    )
+    passed, findings = _score_e7(synthesis_input, result)
+    assert passed is False
+    assert any("unexpected research_status=COMPLETE" in finding for finding in findings)
 
 
 def test_e7_rejects_cross_category_material_promotion() -> None:
@@ -158,6 +177,6 @@ def test_failed_case_receipt_can_be_reconstructed_from_raw_response() -> None:
 
 
 def test_eval_and_prompt_versions_are_bumped_after_blocked_run_review() -> None:
-    assert EVAL_VERSION == "B3_MODEL_EVAL_v0_2"
+    assert EVAL_VERSION == "B3_MODEL_EVAL_v0_3"
     assert PLANNER_PROMPT_VERSION == "B3_PLANNER_PROMPT_v0_4"
-    assert SYNTHESIS_PROMPT_VERSION == "B3_CANDIDATE_SYNTHESIS_PROMPT_v0_2"
+    assert SYNTHESIS_PROMPT_VERSION == "B3_CANDIDATE_SYNTHESIS_PROMPT_v0_3"
