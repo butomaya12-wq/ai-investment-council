@@ -155,14 +155,26 @@ def _synthetic_paid_eval(authority):
         "live_money": "PROHIBITED",
     }
     payload["artifact_hash"] = canonical_sha256(payload)
-    return payload
+
+    record_hash_by_key = {
+        record["candidate_key"]: record["record_hash"] for record in records
+    }
+    synthetic_summary = {
+        key: metrics.model_copy(update={"record_hash": record_hash_by_key[key]})
+        for key, metrics in authority.full_ladder_pass_summary.items()
+    }
+    return payload, synthetic_summary
 
 
 def test_verify_initial_model_eval_artifact_reads_full_ladder_records() -> None:
     authority = load_initial_selected_model_authority()
-    payload = _synthetic_paid_eval(authority)
+    payload, synthetic_summary = _synthetic_paid_eval(authority)
     synthetic_authority = authority.model_copy(
-        update={"model_eval_artifact_hash": payload["artifact_hash"]}
+        update={
+            "model_eval_artifact_hash": payload["artifact_hash"],
+            "full_ladder_pass_summary": synthetic_summary,
+            "selected_eval_metrics": synthetic_summary["L2"],
+        }
     )
 
     verify_initial_model_eval_artifact(payload, authority=synthetic_authority)
@@ -170,14 +182,18 @@ def test_verify_initial_model_eval_artifact_reads_full_ladder_records() -> None:
 
 def test_verify_initial_model_eval_artifact_rejects_case_order_drift() -> None:
     authority = load_initial_selected_model_authority()
-    payload = _synthetic_paid_eval(authority)
+    payload, synthetic_summary = _synthetic_paid_eval(authority)
     payload["candidate_records"][0]["cases"][0]["case_id"] = "E2"
     payload["candidate_records"][0]["record_hash"] = canonical_sha256(
         payload["candidate_records"][0], exclude_fields=("record_hash",)
     )
     payload["artifact_hash"] = canonical_sha256(payload, exclude_fields=("artifact_hash",))
     synthetic_authority = authority.model_copy(
-        update={"model_eval_artifact_hash": payload["artifact_hash"]}
+        update={
+            "model_eval_artifact_hash": payload["artifact_hash"],
+            "full_ladder_pass_summary": synthetic_summary,
+            "selected_eval_metrics": synthetic_summary["L2"],
+        }
     )
 
     with pytest.raises(InitialSelectedModelAuthorityError, match="ordered case set"):
