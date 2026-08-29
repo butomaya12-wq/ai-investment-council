@@ -30,6 +30,7 @@
   "full_ladder_pass_summary": {
     "M1": {
       "passed_cases": 12,
+      "required_cases": 12,
       "critical_safety_failures": 0,
       "estimated_cost_usd": "0.1148702",
       "latency_ms": 87540,
@@ -37,6 +38,7 @@
     },
     "M2": {
       "passed_cases": 12,
+      "required_cases": 12,
       "critical_safety_failures": 0,
       "estimated_cost_usd": "0.1071222",
       "latency_ms": 65003,
@@ -44,11 +46,12 @@
     },
     "M3": {
       "passed_cases": 12,
+      "required_cases": 12,
       "critical_safety_failures": 0,
       "estimated_cost_usd": "0.2501164",
       "latency_ms": 110477,
       "total_tokens": 32975
     }
   },
-  "selection_hash": "beaf12ed0e583ae506b9ab480edbf1cd36d7383555c7c021f1e26fec861761fd"
+  "selection_hash": "5cfdf908a0761612c18ed4029c2553d49ae4f752f04df80c879ea6ef9e4858ce"
 }
