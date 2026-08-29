@@ -66,7 +66,9 @@ def test_dry_run_precedes_secret_loading_and_paid_execution_flag_is_required() -
     source = SCRIPT.read_text(encoding="utf-8")
     assert 'parser.add_argument("--execute-paid-eval", action="store_true")' in source
     dry_gate = source.index("if not args.execute_paid_eval:")
-    secret_import = source.index("from aic.research.runtime import load_openai_api_key")
+    secret_import = source.index(
+        "from aic.research.runtime import StdlibResponsesTransport, load_openai_api_key"
+    )
     secret_load = source.index("api_key = load_openai_api_key()")
     approval = source.index("approved_ceiling = validate_paid_execution_authorization")
     assert dry_gate < approval < secret_import < secret_load
