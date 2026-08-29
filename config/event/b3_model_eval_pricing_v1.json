@@ -1,0 +1,29 @@
+{
+  "cached_input_note": "Cached input token rates are applied only to usage.input_tokens_details.cached_tokens returned by the Responses API.",
+  "currency": "USD",
+  "models": {
+    "gpt-5.6-sol": {
+      "cached_input": "0.40",
+      "input": "4.00",
+      "output": "20.00"
+    },
+    "gpt-5.6-terra": {
+      "cached_input": "0.20",
+      "input": "2.00",
+      "output": "12.00"
+    }
+  },
+  "notes": [
+    "Text-token rates only.",
+    "Reasoning tokens are included in output token usage and are not double-counted.",
+    "Requests above provider long-context pricing thresholds are not expected in the bounded B3 eval; if observed, the eval must fail cost-accounting rather than silently use these base rates."
+  ],
+  "observed_at": "2026-08-29T08:20:00Z",
+  "pricing_hash": "97aff8e8f505d0fd67a3adb94bd440f051f1bf19f7a2883d7e7dd292280206de",
+  "pricing_version": "OPENAI_TEXT_PRICING_2026_08_29",
+  "sources": {
+    "gpt-5.6-sol": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+    "gpt-5.6-terra": "https://developers.openai.com/api/docs/models/gpt-5.6-terra"
+  },
+  "unit": "PER_1M_TEXT_TOKENS"
+}
