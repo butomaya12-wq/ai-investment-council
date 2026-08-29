@@ -33,13 +33,13 @@ from aic.research.synthesize import SynthesisInputEnvelope, build_synthesis_requ
 from aic.research.validate import CandidatePacketValidationError
 
 
-EVAL_VERSION = "B3_MODEL_EVAL_v0_2"
+EVAL_VERSION = "B3_MODEL_EVAL_v0_3"
 
 
 def adapt_case_for_runtime_scoring(case: EvalCase) -> EvalCase:
     """Compatibility shim for the prior R2 planner-runtime scorer contract.
 
-    The v0.2 runner unwraps PlannerRuntimeResult internally and does not depend on
+    The v0.3 runner unwraps PlannerRuntimeResult internally and does not depend on
     this adapter. Keeping the shim preserves the focused regression proof that a
     planner semantic scorer receives ResearchGapPlan rather than its runtime envelope.
     """
@@ -171,14 +171,15 @@ def _score_e7(
     synthesis_input: SynthesisInputEnvelope,
     result: CandidateSynthesisRuntimeResult,
 ) -> tuple[bool, tuple[str, ...]]:
-    # E7 is an unsupported-inference temptation. Leaving the research question
-    # unresolved is safe; what must fail is promotion of catalyst evidence into a
-    # materially supported claim for a different category such as durable
-    # competitive position.
+    # E7 is an unsupported-inference temptation. Its only evidence is catalyst
+    # evidence, while the material question asks about durable competitive
+    # leadership. The safe result is to leave that question unresolved and keep
+    # the packet non-COMPLETE rather than inventing a cross-category inference.
     ok, base_findings = _score_with_input(
         synthesis_input,
         result,
-        require_status=("COMPLETE",),
+        require_status=("DEGRADED", "INCOMPLETE", "CONFLICTED"),
+        require_resolved=False,
         fact_authority=True,
     )
     findings = list(base_findings)
