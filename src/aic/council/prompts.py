@@ -4,9 +4,9 @@ from aic.domain.canonical import canonical_sha256
 
 
 PROMPT_CONTRACT_VERSION = "P-B4-PROMPTS-v0.2"
-BULL_INITIAL_PROMPT_VERSION = "BULL_INITIAL_vB4_0_1"
-BEAR_INITIAL_PROMPT_VERSION = "BEAR_INITIAL_vB4_0_1"
-RED_TEAM_INITIAL_PROMPT_VERSION = "RED_TEAM_INITIAL_vB4_0_1"
+BULL_INITIAL_PROMPT_VERSION = "BULL_INITIAL_vB4_0_2"
+BEAR_INITIAL_PROMPT_VERSION = "BEAR_INITIAL_vB4_0_2"
+RED_TEAM_INITIAL_PROMPT_VERSION = "RED_TEAM_INITIAL_vB4_0_2"
 REBUTTAL_PROMPT_VERSION = "REBUTTAL_vB4_0_1"
 JUDGE_PROMPT_VERSION = "JUDGE_vB4_0_1"
 
@@ -19,12 +19,20 @@ Do not provide hidden chain-of-thought. Return only the required strict structur
 No provider or broker credentials are available to you.
 """.strip()
 
+INITIAL_REFERENCE_LIST_INVARIANTS = """Reference-list invariants for InitialCouncilOpinionProposal:
+- primary_claim_ids may reference only claim_local_ref values present in proposed_claims.
+- critical_assumption_claim_ids may reference only proposed claims whose claim_type is ASSUMPTION.
+- falsifier_claim_ids may reference only proposed claims whose claim_type is FALSIFIER.
+Use an empty list when no valid local ref of the required type exists; never place an ARGUMENT, CHALLENGE, INTEGRITY_FINDING, or other claim type into a typed reference list.
+""".strip()
+
 BULL_INITIAL_INSTRUCTIONS = f"""{GLOBAL_MODEL_BOUNDARY}
 
 ROLE: BULL_INITIAL.
 Construct the strongest evidence-grounded case FOR owning the one supplied candidate while explicitly preserving known risks, conflicts, unknowns, assumptions, and falsifiers.
 Use only source MaterialClaim IDs, ComputedValue IDs, and Conflict IDs supplied for this candidate. Proposed claims use response-local claim_local_ref only; never assign canonical claim_id or council_claim_id.
 Identify the strongest supported positive thesis elements, critical assumptions, and evidence/facts that would falsify or materially weaken the case. Mark inference/process findings explicitly. If a credible Bull case is not supported, say so structurally; do not force optimism.
+{INITIAL_REFERENCE_LIST_INVARIANTS}
 Forbidden: BUY/SELL, INVEST/WATCH/ABSTAIN, position sizing, risk approval, target price, new evidence, arithmetic, tools, browsing, URLs, or broker actions.
 """.strip()
 
@@ -33,7 +41,9 @@ BEAR_INITIAL_INSTRUCTIONS = f"""{GLOBAL_MODEL_BOUNDARY}
 ROLE: BEAR_INITIAL.
 Construct the strongest evidence-grounded case to AVOID/WAIT on the one supplied candidate. This is not a SELL/SHORT recommendation.
 Use frozen evidence only. Identify thesis fragility, downside drivers, expectation dependence, execution risks, assumptions/catalyst failure modes, and evidence that would falsify or materially soften the Bear case. Preserve favorable evidence when it directly contradicts the Bear thesis. Mark inferences explicitly and do not manufacture negativity.
+For the Bear lane, represent the evidence-grounded downside/execution-risk thesis as CHALLENGE claims. Represent supplied favorable/counterevidence that directly falsifies or materially softens the Bear thesis as FALSIFIER claims. Do not hide either side by relabeling or omitting its source refs.
 Proposed claims use response-local claim_local_ref only; never assign canonical claim_id or council_claim_id.
+{INITIAL_REFERENCE_LIST_INVARIANTS}
 Forbidden: SELL/SHORT, trade action, target price or downside arithmetic, new evidence, tools, browsing, risk/approval authority, or broker actions.
 """.strip()
 
@@ -44,6 +54,7 @@ Audit DECISION INTEGRITY. You are not a third directional investor and are not a
 Inspect unsupported inference, omitted/asymmetric evidence, source-authority conflict, stale/point-in-time weakness, selection/confirmation/narrative anchoring, overreliance on one catalyst/source, hidden assumptions, research gaps, mandate/context omission, CandidatePacket narrative outrunning evidence, and conditions requiring a new B3 research lifecycle.
 Each material integrity finding must bind exact supplied object/claim/conflict/gap refs. If new information is required, set research_reopen_required=true with reason code; do not retrieve it.
 Proposed claims use response-local claim_local_ref only; never assign canonical claim_id or council_claim_id.
+{INITIAL_REFERENCE_LIST_INVARIANTS}
 Forbidden: directional voting, BUY/SELL/INVEST, trade/risk/size authority, new evidence, arbitrary facts, tools, browsing, or broker actions.
 """.strip()
 
@@ -119,6 +130,6 @@ def prompt_manifest() -> dict[str, dict[str, str]]:
         },
         "JUDGE": {
             "prompt_version": JUDGE_PROMPT_VERSION,
-            "prompt_hash": judge_prompt_hash(),
+            "prompt_hash": judge_initial_prompt_hash() if False else judge_prompt_hash(),
         },
     }
