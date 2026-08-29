@@ -11,6 +11,12 @@ from aic.research.mandate import COMPETITION_MANDATE_VERSION
 from aic.research.policy_refs import build_model_policy_reference, build_research_policy_reference
 
 
+# Synthetic B4 fixtures intentionally instantiate the already-frozen B1 canonical
+# models whose list fields are deep-frozen to tuples. Pydantic emits the same known
+# serializer warning that is already tracked in B3. Keep the suppression local to
+# this fixture file so new warnings elsewhere remain visible to exact CI.
+pytestmark = pytest.mark.filterwarnings("ignore:Pydantic serializer warnings:UserWarning")
+
 TOP3 = ("NVDA", "MSFT", "META")
 HANDOFF_HASH = "1" * 64
 
