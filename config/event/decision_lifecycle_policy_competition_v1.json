@@ -1,0 +1,12 @@
+{
+  "active": true,
+  "decision_ttl_seconds": 7200,
+  "next_review_trigger_mode": "TTL_EXPIRY",
+  "owner_approved_at": "2026-08-29T07:42:00.000000Z",
+  "policy_hash": "cceb58997b139b59039313d892ff330915ff49f2a5a236bcdb57141501bd98ce",
+  "policy_id": "ALPACA_2026_COMPETITION_DECISION_LIFECYCLE",
+  "policy_name": "DECISION_LIFECYCLE",
+  "ttl_anchor": "APPLICATION_ASSIGNED_CANONICAL_DECISION_CREATED_AT",
+  "validation_schema_version": "DECISION_LIFECYCLE_POLICY_V1",
+  "version": "ALPACA_COMPETITION_V1_2026_08_29"
+}
