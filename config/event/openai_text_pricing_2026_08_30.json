@@ -1,0 +1,41 @@
+{
+  "as_of_date": "2026-08-30",
+  "cache_write": {
+    "billing_basis": "INPUT_TOKEN_SUBSET",
+    "implicit_prompt_caching_default": true,
+    "input_rate_multiplier": "1.25",
+    "source_url_guidance": "https://developers.openai.com/api/docs/guides/latest-model",
+    "source_url_model": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+    "usage_field": "usage.input_tokens_details.cache_write_tokens"
+  },
+  "long_context": {
+    "input_multiplier": "2",
+    "output_multiplier": "1.5",
+    "threshold_input_tokens_exclusive": 272000
+  },
+  "models": {
+    "gpt-5.6-luna": {
+      "cached_input": "0.02",
+      "input": "0.20",
+      "output": "1.20",
+      "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-luna"
+    },
+    "gpt-5.6-sol": {
+      "cached_input": "0.40",
+      "input": "4.00",
+      "output": "20.00",
+      "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-sol"
+    },
+    "gpt-5.6-terra": {
+      "cached_input": "0.20",
+      "input": "2.00",
+      "output": "12.00",
+      "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra"
+    }
+  },
+  "pricing_hash": "13b67bf92f56b2962694f463850e0a0e289fc08f0c4a3d3cafe8eb928d0ee336",
+  "pricing_version": "OPENAI_TEXT_PRICING_2026_08_30_CACHE_WRITE_AWARE",
+  "unit": "USD_PER_1M_TEXT_TOKENS",
+  "upper_bound_cache_write_all_input_assumed": true,
+  "upper_bound_cached_input_discount_assumed": false
+}
