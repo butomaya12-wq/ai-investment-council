@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import subprocess
 
-from aic.council.reopen_rebuttal_production_cost_preflight import (
+from aic.council.reopen_rebuttal_production_cost_preflight_v02 import (
     load_and_build_b4_reopen_rebuttal_production_cost_preflight,
 )
 
@@ -23,7 +23,7 @@ DEFAULT_HANDOFF = Path("config/event/b2_real_event_handoff_v0_1.json")
 DEFAULT_INITIAL_AUTHORITY = Path("config/event/b4_initial_selected_model_v1.json")
 DEFAULT_PRICING = Path("config/event/openai_text_pricing_2026_08_30.json")
 DEFAULT_OUTPUT = Path(
-    ".aic-runtime/b4_reopen_rebuttal_production_cost_preflight_zero_call_v0_1.json"
+    ".aic-runtime/b4_reopen_rebuttal_production_cost_preflight_zero_call_v0_2.json"
 )
 EXPECTED_BRANCH = "hackathon/alpaca-2026"
 
