@@ -627,8 +627,11 @@ def build_research_reopen_request(
         "requested_at": canonical_datetime(requested_at.astimezone(UTC)),
         "new_run_start_state": "S00",
     }
-    provisional = RESEARCH_REOPEN_REQUEST_V1.model_construct(**values, request_hash="0" * 64)
-    request_hash = canonical_sha256(provisional, exclude_fields=("request_hash",))
+    provisional = RESEARCH_REOPEN_REQUEST_V1.model_validate(
+        {**values, "request_hash": "0" * 64}
+    )
+    normalized = provisional.model_dump(mode="json", exclude_none=False, warnings=False)
+    request_hash = canonical_sha256(normalized, exclude_fields=("request_hash",))
     return RESEARCH_REOPEN_REQUEST_V1.model_validate({**values, "request_hash": request_hash})
 
 
