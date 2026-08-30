@@ -123,7 +123,10 @@ def _claim_schema(schema: dict) -> dict:
 
     walk(schema)
     assert len(matches) == 1
-    return matches[0]
+    result = dict(matches[0])
+    if "$defs" in schema:
+        result["$defs"] = schema["$defs"]
+    return result
 
 
 def _claim(
