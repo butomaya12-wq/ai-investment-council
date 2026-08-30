@@ -33,6 +33,8 @@ from aic.domain.canonical import canonical_sha256
 from aic.domain.contracts import MATERIAL_CLAIM_V1
 
 
+pytestmark = pytest.mark.filterwarnings("ignore:Pydantic serializer warnings:UserWarning")
+
 CANDIDATES = ("AAA", "BBB", "CCC")
 MANDATE = "TEST_B4_INITIAL_RUNTIME_MANDATE"
 FROZEN_AT = datetime(2026, 8, 30, 4, 0, tzinfo=UTC)
