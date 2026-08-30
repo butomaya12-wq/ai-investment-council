@@ -208,6 +208,7 @@ def _initial_freeze(freeze: CouncilInputFreezeArtifact) -> dict:
         "dispatch_attempts": 9,
         "model_calls": 9,
         "automatic_repair_calls": 0,
+        "initial_freeze_barrier": True,
         "rebuttal_authorized": False,
         "judge_authorized": False,
         "broker_writes": 0,
