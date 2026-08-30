@@ -24,7 +24,8 @@ B2_CUTOFF = datetime(2026, 8, 27, 20, 0, tzinfo=UTC)
 RESEARCH_CUTOFF = datetime(2026, 8, 28, 17, 34, tzinfo=UTC)
 B2_LAST_COMPLETED_BAR_TS = datetime(2026, 8, 27, 19, 59, tzinfo=UTC)
 RESEARCH_LAST_COMPLETED_BAR_TS = datetime(2026, 8, 28, 17, 33, tzinfo=UTC)
-MARKET_WINDOW_START = datetime(2026, 8, 27, 19, 55, tzinfo=UTC)
+PORTFOLIO_HISTORY_START = datetime(2026, 8, 27, 19, 55, tzinfo=UTC)
+MARKET_WINDOW_START = PORTFOLIO_HISTORY_START
 MARKET_WINDOW_END = RESEARCH_CUTOFF
 MARKET_BAR_LIMIT = 1000
 ACTIVITY_PAGE_SIZE = 100
@@ -249,7 +250,7 @@ def build_minimal_external_read_preflight(
             "read_id": "R3_B2_CUTOFF_PORTFOLIO_EQUITY",
             "provider": "ALPACA_TRADING_API",
             "cli_command": ["alpaca", "account", "portfolio"],
-            "start": _utc(B2_CUTOFF.replace(minute=55) if False else datetime(2026, 8, 27, 19, 55, tzinfo=UTC)),
+            "start": _utc(PORTFOLIO_HISTORY_START),
             "end": _utc(B2_CUTOFF),
             "timeframe": "1Min",
             "intraday_reporting": "market_hours",
