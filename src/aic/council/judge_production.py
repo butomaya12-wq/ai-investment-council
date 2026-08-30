@@ -627,12 +627,7 @@ def build_research_reopen_request(
         "requested_at": canonical_datetime(requested_at.astimezone(UTC)),
         "new_run_start_state": "S00",
     }
-    provisional = RESEARCH_REOPEN_REQUEST_V1.model_validate(
-        {**values, "request_hash": "0" * 64}
-    )
-    normalized = provisional.model_dump(mode="json", exclude_none=False, warnings=False)
-    request_hash = canonical_sha256(normalized, exclude_fields=("request_hash",))
-    return RESEARCH_REOPEN_REQUEST_V1.model_validate({**values, "request_hash": request_hash})
+    return RESEARCH_REOPEN_REQUEST_V1.from_unhashed(**values)
 
 
 def execute_judge_production_once(
@@ -695,7 +690,7 @@ def execute_judge_production_once(
         )
         reopen_payload = reopen.model_dump(mode="json", exclude_none=False, warnings=False)
         reopen_hash = reopen.request_hash
-        if reopen_hash != canonical_sha256(reopen_payload, exclude_fields=("request_hash",)):
+        if reopen_hash != canonical_sha256(reopen, exclude_fields=("request_hash",)):
             raise JudgeProductionError("research reopen canonical hash mismatch")
     except Exception as exc:
         latency_ms = max(0, (perf_counter_ns() - started) // 1_000_000)
