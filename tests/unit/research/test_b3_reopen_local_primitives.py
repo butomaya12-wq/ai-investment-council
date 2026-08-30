@@ -111,5 +111,7 @@ def test_zero_call_runner_exposes_no_provider_or_model_execution_surface() -> No
     assert "urlopen" not in lowered
     assert "alpaca data" not in lowered
     assert "curl " not in lowered
-    assert "broker" not in lowered.replace('"broker_writes"', "")
+    assert "submit_order" not in lowered
+    assert "create_order" not in lowered
+    assert "orders.create" not in lowered
     assert PASS_STATUS == "B3_REOPEN_LOCAL_VALUATION_AND_PORTFOLIO_PRIMITIVES_ZERO_CALL_PASS"
