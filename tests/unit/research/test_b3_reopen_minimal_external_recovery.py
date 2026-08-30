@@ -84,10 +84,8 @@ def test_portfolio_equity_selects_latest_datapoint_not_after_b2_cutoff():
             "equity": ["99000", "100000", "100100"],
         }
     )
-    assert observed["selected_equity"] == "1"
-    # _decimal_text intentionally canonicalizes trailing zeros; 100000 becomes "1" only
-    # if normalization is wrong. This assertion catches that regression explicitly.
-    assert observed["selected_equity"] != "1"
+    assert observed["selected_equity"] == "100000"
+    assert observed["selected_equity_timestamp_utc"] == "2026-08-27T20:00:00Z"
 
 
 def test_market_close_selects_latest_completed_bar_at_or_before_cutoff():
@@ -121,10 +119,7 @@ def _with_hash(payload: dict, field: str = "artifact_hash") -> dict:
     return value
 
 
-def test_full_zero_call_recovery_reuses_four_captured_responses_and_computes_evidence(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-):
+def _build_fixture(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     raw_dir = tmp_path / "raw"
     raw_dir.mkdir()
     raw_payloads = {
@@ -244,7 +239,14 @@ def test_full_zero_call_recovery_reuses_four_captured_responses_and_computes_evi
     result_path = tmp_path / "result.json"
     result_path.write_text(json.dumps(result), encoding="utf-8")
     monkeypatch.setattr(recovery, "EXPECTED_BLOCKED_RESULT_HASH", result["artifact_hash"])
+    return raw_dir, result_path, auth_path, receipts_path
 
+
+def test_full_zero_call_recovery_reuses_four_captured_responses_and_computes_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    raw_dir, result_path, auth_path, receipts_path = _build_fixture(tmp_path, monkeypatch)
     artifact = build_recovery_artifact(
         code_commit_sha="2" * 40,
         blocked_result_path=result_path,
@@ -259,10 +261,27 @@ def test_full_zero_call_recovery_reuses_four_captured_responses_and_computes_evi
     assert artifact["valuation_recovery"]["MSFT"]["price"]["close"] == "510"
     assert artifact["valuation_recovery"]["META"]["price"]["close"] == "520"
     assert artifact["portfolio_recovery"]["reconstructed_meta_quantity_at_b2_cutoff"] == "2"
-    assert artifact["portfolio_recovery"]["reconstructed_meta_market_value_at_b2_cutoff"] == "1"
-    assert artifact["portfolio_recovery"]["reconstructed_meta_market_value_at_b2_cutoff"] != "1"
+    assert artifact["portfolio_recovery"]["reconstructed_meta_market_value_at_b2_cutoff"] == "1000"
+    assert artifact["portfolio_recovery"]["reconstructed_meta_portfolio_weight"] == "0.010000000000"
     assert artifact["portfolio_recovery"]["portfolio_interaction_evidence_complete"] is True
     assert artifact["next_gate"] == recovery.NEXT_GATE
+
+
+def test_full_recovery_rejects_tampered_raw_capture(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    raw_dir, result_path, auth_path, receipts_path = _build_fixture(tmp_path, monkeypatch)
+    target = raw_dir / f"{recovery.READ_IDS[3]}.json"
+    target.write_text('{"bars":{},"next_page_token":""}\n', encoding="utf-8")
+    with pytest.raises(MinimalExternalRecoveryError, match="raw byte-size mismatch|raw SHA256 mismatch"):
+        build_recovery_artifact(
+            code_commit_sha="2" * 40,
+            blocked_result_path=result_path,
+            authorization_path=auth_path,
+            receipts_path=receipts_path,
+            raw_dir=raw_dir,
+        )
 
 
 def test_runner_has_no_alpaca_or_model_execution_surface():
