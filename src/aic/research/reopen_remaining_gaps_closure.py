@@ -1,0 +1,485 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Mapping
+
+from aic.domain.canonical import canonical_sha256
+
+
+ARTIFACT_VERSION = "B3_REOPEN_REMAINING_GAPS_CLOSURE_v0_1"
+PASS_STATUS = "B3_REOPEN_REMAINING_GAPS_CLOSURE_ZERO_CALL_PASS"
+NEXT_GATE = "B4_REOPEN_INPUT_OVERLAY_ZERO_CALL"
+
+EXPECTED_RECOVERY_HASH = "6abcb9b51e6001b64d82481ad8156ae0a2a0924f9249ccae73a96b3b4d90244c"
+EXPECTED_RECOVERY_STATUS = "B3_REOPEN_MINIMAL_EXTERNAL_READ_RECOVERY_ZERO_CALL_PASS"
+EXPECTED_CLAIM_RECON_HASH = "d4987a581c107f9caf729641a2a972b973995454446c9c2bbd531213e2b6c832"
+EXPECTED_CLAIM_RECON_STATUS = "B3_REOPEN_BOUNDED_NEWS_CLAIM_RECONCILIATION_ZERO_CALL_PASS"
+EXPECTED_EVIDENCE_PLAN_HASH = "13c6e5da3e5d2b9b2369a8998abb9285d20e91a7c86452539a623301805e4b61"
+EXPECTED_EVIDENCE_PLAN_STATUS = "B3_REOPEN_REMAINING_GAPS_EVIDENCE_PLAN_ZERO_CALL_PASS"
+EXPECTED_SCOPE_HASH = "948d3dbd28200d94726e97e39abd7955a0aa428ece22ee7b1ad6bbec6d20ba4a"
+EXPECTED_SCOPE_STATUS = "B3_REOPEN_REMAINING_GAPS_SCOPE_ZERO_CALL_PASS"
+EXPECTED_PRIMITIVES_HASH = "64c76249a36d650c79e95c80720061f3cbe48be900c6d1cdab2fda44240a5ee7"
+EXPECTED_SELECTED_HASH = "938b7eecfee58d1074be662d30a1bf183f1133f92815028637de4cd662307f27"
+EXPECTED_JUDGE_HASH = "3354123bc0244ec258fad0cdab57d5551d5ed8e5d58088d11482bdcd489d259e"
+EXPECTED_JUDGE_STATUS = "B4_COMPLETE_RESEARCH_REOPEN_REQUESTED"
+EXPECTED_REOPEN_REQUEST_HASH = "eb4c06f47f372413d25b25632ba84a35057fdbb9d244c4f1960f6b7fb40dfeb1"
+EXPECTED_REOPEN_REQUEST_ID = "B4_RESEARCH_REOPEN_4dceff8d109cff9642cad677"
+EXPECTED_NEWS_GAP = "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+EXPECTED_NEWS_CLOSURE = "ALPACA_NEWS_BOUNDED_TOP_N_SATISFIED"
+EXPECTED_REASONS = (
+    "VALUATION_SPECIFIC_EVIDENCE_MISSING",
+    "PORTFOLIO_INTERACTION_EVIDENCE_MISSING",
+)
+EXPECTED_CANDIDATES = ("NVDA", "MSFT", "META")
+
+MSFT_VALUATION_EVIDENCE_ID = "B3_REOPEN_EVID_MSFT_VALUATION_20260828T173300Z"
+META_VALUATION_EVIDENCE_ID = "B3_REOPEN_EVID_META_VALUATION_20260828T173300Z"
+META_PORTFOLIO_EVIDENCE_ID = "B3_REOPEN_EVID_META_PORTFOLIO_20260827T200000Z"
+
+MSFT_VALUATION_CLAIM_ID = "B3_REOPEN_SUPPLEMENTAL_MSFT_VALUATION_001"
+META_VALUATION_CLAIM_ID = "B3_REOPEN_SUPPLEMENTAL_META_VALUATION_001"
+META_PORTFOLIO_CLAIM_ID = "B3_REOPEN_SUPPLEMENTAL_META_PORTFOLIO_001"
+
+
+class RemainingGapsClosureError(ValueError):
+    pass
+
+
+def _read_json(path: str | Path, *, label: str) -> dict[str, Any]:
+    try:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RemainingGapsClosureError(f"unable to read {label}") from exc
+    if not isinstance(payload, dict):
+        raise RemainingGapsClosureError(f"{label} root must be an object")
+    return payload
+
+
+def _verify_self_hash(
+    payload: Mapping[str, Any],
+    *,
+    label: str,
+    expected_hash: str,
+    field: str = "artifact_hash",
+) -> str:
+    observed = payload.get(field)
+    if not isinstance(observed, str) or len(observed) != 64:
+        raise RemainingGapsClosureError(f"{label} {field} missing")
+    expected = canonical_sha256(payload, exclude_fields=(field,))
+    if observed != expected:
+        raise RemainingGapsClosureError(f"{label} {field} self-hash mismatch")
+    if observed != expected_hash:
+        raise RemainingGapsClosureError(f"{label} {field} lineage drift")
+    return observed
+
+
+def _selected_claim_manifest(selected: Mapping[str, Any]) -> dict[str, Any]:
+    rows = selected.get("candidates")
+    if not isinstance(rows, list):
+        raise RemainingGapsClosureError("selected B3 candidates missing")
+    claims: list[Mapping[str, Any]] = []
+    ids: list[str] = []
+    candidates: list[str] = []
+    per_candidate: dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, Mapping):
+            raise RemainingGapsClosureError("selected B3 candidate row malformed")
+        candidate = row.get("candidate")
+        material_claims = row.get("material_claims")
+        if not isinstance(candidate, str) or not isinstance(material_claims, list):
+            raise RemainingGapsClosureError("selected B3 candidate/claims malformed")
+        candidates.append(candidate)
+        per_candidate[candidate] = len(material_claims)
+        for claim in material_claims:
+            if not isinstance(claim, Mapping):
+                raise RemainingGapsClosureError("legacy MaterialClaim malformed")
+            claim_id = claim.get("claim_id")
+            if not isinstance(claim_id, str) or not claim_id:
+                raise RemainingGapsClosureError("legacy MaterialClaim id missing")
+            ids.append(claim_id)
+            claims.append(claim)
+    if tuple(candidates) != EXPECTED_CANDIDATES:
+        raise RemainingGapsClosureError("selected B3 candidate order drift")
+    if len(claims) != 34 or len(set(ids)) != 34:
+        raise RemainingGapsClosureError("legacy MaterialClaim surface must remain exactly 34 unique claims")
+    return {
+        "claim_count": len(claims),
+        "claim_ids": ids,
+        "claim_id_manifest_hash": canonical_sha256({"claim_ids": ids}),
+        "claim_payload_manifest_hash": canonical_sha256({"material_claims": claims}),
+        "per_candidate_claim_counts": per_candidate,
+    }
+
+
+def _judge_conditions(judge: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+    structured = judge.get("structured_output")
+    rows = structured.get("what_would_change_decision") if isinstance(structured, Mapping) else None
+    if not isinstance(rows, list):
+        raise RemainingGapsClosureError("production Judge conditions missing")
+    result: dict[str, Mapping[str, Any]] = {}
+    for row in rows:
+        if not isinstance(row, Mapping) or not isinstance(row.get("condition_id"), str):
+            raise RemainingGapsClosureError("production Judge condition malformed")
+        result[str(row["condition_id"])] = row
+    if tuple(result) != ("CONDITION_001", "CONDITION_002", "CONDITION_003"):
+        raise RemainingGapsClosureError("production Judge condition surface drift")
+    if "valuation evidence for MSFT" not in str(result["CONDITION_002"].get("condition_text", "")):
+        raise RemainingGapsClosureError("MSFT Judge condition drift")
+    meta_text = str(result["CONDITION_003"].get("condition_text", ""))
+    if "valuation-specific" not in meta_text or "portfolio-interaction" not in meta_text:
+        raise RemainingGapsClosureError("META Judge condition drift")
+    return result
+
+
+def _validate_recovery(recovery: Mapping[str, Any]) -> None:
+    if recovery.get("status") != EXPECTED_RECOVERY_STATUS:
+        raise RemainingGapsClosureError("recovery is not PASS")
+    if recovery.get("next_gate") != "B3_REOPEN_REMAINING_GAPS_CLOSURE_ZERO_CALL":
+        raise RemainingGapsClosureError("recovery next-gate drift")
+    if recovery.get("valuation_specific_evidence_ready") is not True:
+        raise RemainingGapsClosureError("valuation evidence is not ready")
+    if recovery.get("portfolio_interaction_evidence_ready") is not True:
+        raise RemainingGapsClosureError("portfolio evidence is not ready")
+    if recovery.get("new_provider_dispatch_attempts") != 0 or recovery.get("new_provider_reads") != 0:
+        raise RemainingGapsClosureError("recovery is not zero-call")
+    if recovery.get("model_calls") != 0 or recovery.get("broker_writes") != 0 or recovery.get("alpaca_orders") != 0:
+        raise RemainingGapsClosureError("recovery side-effect boundary drift")
+    if recovery.get("live_money") != "PROHIBITED":
+        raise RemainingGapsClosureError("recovery live-money boundary drift")
+    if recovery.get("final_decision_created") is not False or recovery.get("b5_handoff_created") is not False:
+        raise RemainingGapsClosureError("recovery unexpectedly advanced beyond B3")
+
+    pagination = recovery.get("pagination_recovery")
+    if not isinstance(pagination, Mapping):
+        raise RemainingGapsClosureError("pagination recovery missing")
+    if pagination.get("terminal_page_recovered") is not True:
+        raise RemainingGapsClosureError("market terminal page was not recovered")
+    if pagination.get("observed_next_page_token_representation") != "EMPTY_STRING":
+        raise RemainingGapsClosureError("market terminal token representation drift")
+    if pagination.get("pagination_continuation_required") is not False or pagination.get("provider_rerun_required") is not False:
+        raise RemainingGapsClosureError("recovery still requires provider continuation")
+
+    valuations = recovery.get("valuation_recovery")
+    if not isinstance(valuations, Mapping):
+        raise RemainingGapsClosureError("valuation recovery missing")
+    required = {
+        "MSFT": ("17.95", "FY2026", "517.35", "28.821727019499"),
+        "META": ("23.49", "FY2025", "576.68", "24.550021285653"),
+    }
+    for candidate, expected in required.items():
+        row = valuations.get(candidate)
+        if not isinstance(row, Mapping) or row.get("valuation_evidence_complete") is not True:
+            raise RemainingGapsClosureError(f"{candidate} valuation evidence incomplete")
+        price = row.get("price")
+        if not isinstance(price, Mapping):
+            raise RemainingGapsClosureError(f"{candidate} valuation price missing")
+        observed = (
+            row.get("annual_gaap_diluted_eps"),
+            row.get("eps_period"),
+            price.get("close"),
+            row.get("price_to_eps"),
+        )
+        if observed != expected:
+            raise RemainingGapsClosureError(f"{candidate} valuation evidence drift")
+        if price.get("bar_timestamp_utc") != "2026-08-28T17:33:00Z" or price.get("feed") != "iex":
+            raise RemainingGapsClosureError(f"{candidate} valuation price lineage drift")
+
+    portfolio = recovery.get("portfolio_recovery")
+    if not isinstance(portfolio, Mapping) or portfolio.get("portfolio_interaction_evidence_complete") is not True:
+        raise RemainingGapsClosureError("META portfolio interaction evidence incomplete")
+    if portfolio.get("reconstructed_meta_quantity_at_b2_cutoff") != "0":
+        raise RemainingGapsClosureError("META B2 quantity drift")
+    if portfolio.get("reconstructed_meta_market_value_at_b2_cutoff") != "0":
+        raise RemainingGapsClosureError("META B2 market value drift")
+    if portfolio.get("reconstructed_meta_portfolio_weight") != "0.000000000000":
+        raise RemainingGapsClosureError("META B2 weight drift")
+    equity = portfolio.get("b2_cutoff_portfolio_equity")
+    price = portfolio.get("meta_b2_cutoff_price")
+    if not isinstance(equity, Mapping) or equity.get("selected_equity") != "200000":
+        raise RemainingGapsClosureError("B2 cutoff equity drift")
+    if equity.get("selected_equity_timestamp_utc") != "2026-08-27T20:00:00Z":
+        raise RemainingGapsClosureError("B2 cutoff equity timestamp drift")
+    if not isinstance(price, Mapping) or price.get("close") != "571.03":
+        raise RemainingGapsClosureError("META B2 cutoff price drift")
+    if price.get("bar_timestamp_utc") != "2026-08-27T19:59:00Z":
+        raise RemainingGapsClosureError("META B2 price timestamp drift")
+
+
+def _supplemental_evidence(recovery_hash: str, primitives_hash: str) -> list[dict[str, Any]]:
+    return [
+        {
+            "evidence_id": MSFT_VALUATION_EVIDENCE_ID,
+            "candidate_id": "MSFT",
+            "category": "valuation_context",
+            "evidence_kind": "POINT_IN_TIME_VALUATION_MULTIPLE",
+            "source_refs": [
+                f"RECOVERY:{recovery_hash}",
+                f"PRIMITIVES:{primitives_hash}",
+                "SEC_EVIDENCE:B3_SEC_MSFT_N3_SEC_MDA_1",
+                "RAW_CAPTURE:R4_MSFT_META_POINT_IN_TIME_BARS:74a808a5a5d9a66aca9585ffe05d120ab6227fdef4937e73e8629ee4a88e8638",
+            ],
+            "observed": {
+                "price": "517.35",
+                "price_timestamp_utc": "2026-08-28T17:33:00Z",
+                "price_feed": "iex",
+                "annual_gaap_diluted_eps": "17.95",
+                "eps_period": "FY2026",
+                "price_to_eps": "28.821727019499",
+            },
+        },
+        {
+            "evidence_id": META_VALUATION_EVIDENCE_ID,
+            "candidate_id": "META",
+            "category": "valuation_context",
+            "evidence_kind": "POINT_IN_TIME_VALUATION_MULTIPLE",
+            "source_refs": [
+                f"RECOVERY:{recovery_hash}",
+                f"PRIMITIVES:{primitives_hash}",
+                "SEC_EVIDENCE:B3_SEC_META_META_N3_SEC_MDA_1",
+                "RAW_CAPTURE:R4_MSFT_META_POINT_IN_TIME_BARS:74a808a5a5d9a66aca9585ffe05d120ab6227fdef4937e73e8629ee4a88e8638",
+            ],
+            "observed": {
+                "price": "576.68",
+                "price_timestamp_utc": "2026-08-28T17:33:00Z",
+                "price_feed": "iex",
+                "annual_gaap_diluted_eps": "23.49",
+                "eps_period": "FY2025",
+                "price_to_eps": "24.550021285653",
+            },
+        },
+        {
+            "evidence_id": META_PORTFOLIO_EVIDENCE_ID,
+            "candidate_id": "META",
+            "category": "portfolio_interaction",
+            "evidence_kind": "HISTORICAL_DIRECT_PORTFOLIO_EXPOSURE",
+            "source_refs": [
+                f"RECOVERY:{recovery_hash}",
+                "RAW_CAPTURE:R1_CURRENT_POSITIONS_ANCHOR:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+                "RAW_CAPTURE:R2_POST_CUTOFF_ACCOUNT_ACTIVITIES_FIRST_PAGE:3af30aff3449021972a46789c7b7f513afd1098ae79231ba34a91a0f6c211384",
+                "RAW_CAPTURE:R3_B2_CUTOFF_PORTFOLIO_EQUITY:725272b34d623d71770817efcf04585ceef2ad228df40d4852b448225108aed6",
+                "RAW_CAPTURE:R4_MSFT_META_POINT_IN_TIME_BARS:74a808a5a5d9a66aca9585ffe05d120ab6227fdef4937e73e8629ee4a88e8638",
+            ],
+            "observed": {
+                "b2_cutoff_utc": "2026-08-27T20:00:00Z",
+                "portfolio_equity": "200000",
+                "meta_price": "571.03",
+                "meta_price_timestamp_utc": "2026-08-27T19:59:00Z",
+                "meta_quantity": "0",
+                "meta_market_value": "0",
+                "meta_portfolio_weight": "0.000000000000",
+                "direct_position_exposure": "ZERO",
+            },
+        },
+    ]
+
+
+def _supplemental_claims() -> list[dict[str, Any]]:
+    return [
+        {
+            "claim_id": MSFT_VALUATION_CLAIM_ID,
+            "candidate_id": "MSFT",
+            "category": "valuation_context",
+            "claim_kind": "FACT",
+            "support_status": "SUPPORTED",
+            "evidence_ids": [MSFT_VALUATION_EVIDENCE_ID],
+            "claim_text": "At the 2026-08-28T17:33:00Z research cutoff, MSFT's IEX 1-minute close was USD 517.35; against FY2026 GAAP diluted EPS of USD 17.95, the point-in-time price-to-latest-reported-annual-GAAP-diluted-EPS multiple was 28.821727019499x.",
+        },
+        {
+            "claim_id": META_VALUATION_CLAIM_ID,
+            "candidate_id": "META",
+            "category": "valuation_context",
+            "claim_kind": "FACT",
+            "support_status": "SUPPORTED",
+            "evidence_ids": [META_VALUATION_EVIDENCE_ID],
+            "claim_text": "At the 2026-08-28T17:33:00Z research cutoff, META's IEX 1-minute close was USD 576.68; against FY2025 GAAP diluted EPS of USD 23.49, the point-in-time price-to-latest-reported-annual-GAAP-diluted-EPS multiple was 24.550021285653x.",
+        },
+        {
+            "claim_id": META_PORTFOLIO_CLAIM_ID,
+            "candidate_id": "META",
+            "category": "portfolio_interaction",
+            "claim_kind": "FACT",
+            "support_status": "SUPPORTED",
+            "evidence_ids": [META_PORTFOLIO_EVIDENCE_ID],
+            "claim_text": "At the 2026-08-27T20:00:00Z B2 cutoff, deterministic reverse reconstruction found zero META shares in the paper portfolio; reconstructed META market value was USD 0 and direct portfolio weight was 0.000000000000, so direct existing-position exposure to META was zero at that cutoff.",
+        },
+    ]
+
+
+def build_remaining_gaps_closure(
+    *,
+    code_commit_sha: str,
+    recovery_path: str | Path,
+    claim_reconciliation_path: str | Path,
+    evidence_plan_path: str | Path,
+    scope_path: str | Path,
+    primitives_path: str | Path,
+    selected_reconciliation_path: str | Path,
+    judge_result_path: str | Path,
+) -> dict[str, Any]:
+    if len(code_commit_sha) != 40 or any(ch not in "0123456789abcdef" for ch in code_commit_sha):
+        raise RemainingGapsClosureError("code_commit_sha must be lowercase 40-char SHA")
+
+    recovery = _read_json(recovery_path, label="minimal external recovery")
+    recovery_hash = _verify_self_hash(recovery, label="minimal external recovery", expected_hash=EXPECTED_RECOVERY_HASH)
+    _validate_recovery(recovery)
+
+    claim_recon = _read_json(claim_reconciliation_path, label="bounded-news claim reconciliation")
+    claim_recon_hash = _verify_self_hash(claim_recon, label="bounded-news claim reconciliation", expected_hash=EXPECTED_CLAIM_RECON_HASH)
+    if claim_recon.get("status") != EXPECTED_CLAIM_RECON_STATUS:
+        raise RemainingGapsClosureError("bounded-news claim reconciliation is not PASS")
+    if claim_recon.get("news_gap_closed") is not True or claim_recon.get("closure_evidence_ref") != EXPECTED_NEWS_CLOSURE:
+        raise RemainingGapsClosureError("bounded-news closure missing")
+    if tuple(claim_recon.get("remaining_reopen_reason_codes", [])) != EXPECTED_REASONS:
+        raise RemainingGapsClosureError("claim reconciliation remaining-reason scope drift")
+
+    plan = _read_json(evidence_plan_path, label="remaining-gap evidence plan")
+    plan_hash = _verify_self_hash(plan, label="remaining-gap evidence plan", expected_hash=EXPECTED_EVIDENCE_PLAN_HASH)
+    if plan.get("status") != EXPECTED_EVIDENCE_PLAN_STATUS:
+        raise RemainingGapsClosureError("remaining-gap evidence plan is not PASS")
+    if plan.get("target_candidates") != ["MSFT", "META"] or plan.get("non_target_candidate_ids") != ["NVDA"]:
+        raise RemainingGapsClosureError("remaining-gap evidence target scope drift")
+    if tuple(plan.get("active_reopen_reason_codes", [])) != EXPECTED_REASONS:
+        raise RemainingGapsClosureError("evidence plan active reasons drift")
+
+    scope = _read_json(scope_path, label="remaining-gap scope")
+    scope_hash = _verify_self_hash(scope, label="remaining-gap scope", expected_hash=EXPECTED_SCOPE_HASH)
+    if scope.get("status") != EXPECTED_SCOPE_STATUS:
+        raise RemainingGapsClosureError("remaining-gap scope is not PASS")
+    if tuple(scope.get("remaining_reopen_reason_codes", [])) != EXPECTED_REASONS:
+        raise RemainingGapsClosureError("remaining-gap scope reason drift")
+
+    primitives = _read_json(primitives_path, label="local primitives")
+    primitives_hash = _verify_self_hash(primitives, label="local primitives", expected_hash=EXPECTED_PRIMITIVES_HASH)
+
+    selected = _read_json(selected_reconciliation_path, label="selected B3 reconciliation")
+    selected_hash = _verify_self_hash(selected, label="selected B3 reconciliation", expected_hash=EXPECTED_SELECTED_HASH)
+    if claim_recon.get("source_b3_selected_model_reconciliation_hash") != selected_hash:
+        raise RemainingGapsClosureError("selected B3 lineage mismatch")
+    legacy_manifest = _selected_claim_manifest(selected)
+
+    judge = _read_json(judge_result_path, label="production Judge result")
+    judge_hash = _verify_self_hash(judge, label="production Judge result", expected_hash=EXPECTED_JUDGE_HASH)
+    if judge.get("status") != EXPECTED_JUDGE_STATUS:
+        raise RemainingGapsClosureError("production Judge status drift")
+    if claim_recon.get("source_production_judge_result_hash") != judge_hash:
+        raise RemainingGapsClosureError("production Judge lineage mismatch")
+    conditions = _judge_conditions(judge)
+    reopen = judge.get("research_reopen_request")
+    if not isinstance(reopen, Mapping):
+        raise RemainingGapsClosureError("production Judge reopen request missing")
+    if reopen.get("reopen_request_id") != EXPECTED_REOPEN_REQUEST_ID:
+        raise RemainingGapsClosureError("reopen request id drift")
+    reopen_hash = reopen.get("reopen_request_hash")
+    if reopen_hash != EXPECTED_REOPEN_REQUEST_HASH:
+        raise RemainingGapsClosureError("reopen request hash drift")
+    if tuple(reopen.get("reason_codes", [])) != (EXPECTED_NEWS_GAP, *EXPECTED_REASONS):
+        raise RemainingGapsClosureError("reopen request reason surface drift")
+
+    evidence = _supplemental_evidence(recovery_hash, primitives_hash)
+    supplemental_claims = _supplemental_claims()
+    evidence_ids = [row["evidence_id"] for row in evidence]
+    claim_ids = [row["claim_id"] for row in supplemental_claims]
+    if len(set(evidence_ids)) != 3 or len(set(claim_ids)) != 3:
+        raise RemainingGapsClosureError("supplemental overlay identity collision")
+    if set(claim_ids) & set(legacy_manifest["claim_ids"]):
+        raise RemainingGapsClosureError("supplemental claims collide with legacy MaterialClaim ids")
+
+    condition_closure = [
+        {
+            "condition_id": "CONDITION_001",
+            "candidate_id": "NVDA",
+            "satisfied": True,
+            "closure_basis_refs": [EXPECTED_NEWS_CLOSURE, f"CLAIM_RECONCILIATION:{claim_recon_hash}"],
+            "historical_condition_text": conditions["CONDITION_001"].get("condition_text"),
+        },
+        {
+            "condition_id": "CONDITION_002",
+            "candidate_id": "MSFT",
+            "satisfied": True,
+            "closure_basis_refs": [EXPECTED_NEWS_CLOSURE, MSFT_VALUATION_EVIDENCE_ID, MSFT_VALUATION_CLAIM_ID],
+            "historical_condition_text": conditions["CONDITION_002"].get("condition_text"),
+        },
+        {
+            "condition_id": "CONDITION_003",
+            "candidate_id": "META",
+            "satisfied": True,
+            "closure_basis_refs": [
+                EXPECTED_NEWS_CLOSURE,
+                META_VALUATION_EVIDENCE_ID,
+                META_VALUATION_CLAIM_ID,
+                META_PORTFOLIO_EVIDENCE_ID,
+                META_PORTFOLIO_CLAIM_ID,
+            ],
+            "historical_condition_text": conditions["CONDITION_003"].get("condition_text"),
+        },
+    ]
+
+    artifact: dict[str, Any] = {
+        "artifact_version": ARTIFACT_VERSION,
+        "status": PASS_STATUS,
+        "code_commit_sha": code_commit_sha,
+        "source_recovery_hash": recovery_hash,
+        "source_claim_reconciliation_hash": claim_recon_hash,
+        "source_evidence_plan_hash": plan_hash,
+        "source_remaining_gaps_scope_hash": scope_hash,
+        "source_local_primitives_hash": primitives_hash,
+        "source_selected_b3_reconciliation_hash": selected_hash,
+        "source_production_judge_result_hash": judge_hash,
+        "source_reopen_request_id": EXPECTED_REOPEN_REQUEST_ID,
+        "source_reopen_request_hash": EXPECTED_REOPEN_REQUEST_HASH,
+        "legacy_material_claims": {
+            **legacy_manifest,
+            "payloads_mutated": False,
+            "ids_mutated": False,
+        },
+        "legacy_frozen_artifacts_mutated": False,
+        "legacy_material_claim_payloads_mutated": False,
+        "reopen_overlay_is_additive": True,
+        "supplemental_evidence_units": evidence,
+        "supplemental_evidence_unit_count": 3,
+        "supplemental_claims": supplemental_claims,
+        "supplemental_claim_count": 3,
+        "supplemental_claims_are_separate_from_legacy_material_claims": True,
+        "judge_condition_closure": condition_closure,
+        "all_judge_conditions_satisfied": True,
+        "closed_reopen_reason_codes": [EXPECTED_NEWS_GAP, *EXPECTED_REASONS],
+        "reason_closure": [
+            {
+                "reason_code": EXPECTED_NEWS_GAP,
+                "closed": True,
+                "closure_ref": EXPECTED_NEWS_CLOSURE,
+            },
+            {
+                "reason_code": "VALUATION_SPECIFIC_EVIDENCE_MISSING",
+                "closed": True,
+                "candidate_ids": ["MSFT", "META"],
+                "closure_refs": [MSFT_VALUATION_EVIDENCE_ID, META_VALUATION_EVIDENCE_ID],
+            },
+            {
+                "reason_code": "PORTFOLIO_INTERACTION_EVIDENCE_MISSING",
+                "closed": True,
+                "candidate_ids": ["META"],
+                "closure_refs": [META_PORTFOLIO_EVIDENCE_ID],
+            },
+        ],
+        "remaining_reopen_reason_codes": [],
+        "news_gap_state": "CLOSED",
+        "valuation_gap_state": "CLOSED",
+        "portfolio_interaction_gap_state": "CLOSED",
+        "research_reopen_request_satisfied": True,
+        "overall_research_reopen_complete": True,
+        "historical_provider_reads_reused": 4,
+        "new_provider_dispatch_attempts": 0,
+        "new_provider_reads": 0,
+        "model_calls": 0,
+        "broker_writes": 0,
+        "alpaca_orders": 0,
+        "live_money": "PROHIBITED",
+        "final_decision_created": False,
+        "b5_handoff_created": False,
+        "historical_production_judge_rerun_authorized": False,
+        "next_gate": NEXT_GATE,
+    }
+    artifact["artifact_hash"] = canonical_sha256(artifact)
+    return artifact
