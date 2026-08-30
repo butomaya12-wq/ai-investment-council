@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -16,6 +15,9 @@ from aic.research.reopen_s00 import (
 )
 
 
+REQUESTED_AT = "2026-08-30T16:00:00.000000Z"
+
+
 def _synthetic() -> tuple[dict, B3ResearchReopenAuthority]:
     reopen = RESEARCH_REOPEN_REQUEST_V1.from_unhashed(
         reopen_request_id="REOPEN_TEST",
@@ -24,7 +26,7 @@ def _synthetic() -> tuple[dict, B3ResearchReopenAuthority]:
         trigger_bundle_id=None,
         reason_codes=["ALPACA_NEWS_PAGINATION_INCOMPLETE"],
         source_ref_ids=["ALPACA_NEWS_PAGINATION_INCOMPLETE"],
-        requested_at=datetime(2026, 8, 30, 16, 0, tzinfo=UTC),
+        requested_at=REQUESTED_AT,
         new_run_start_state="S00",
     )
     source_hash = canonical_sha256({"synthetic": "production-result"})
@@ -110,7 +112,7 @@ def test_s00_link_rejects_missing_required_gap(monkeypatch) -> None:
         trigger_bundle_id=None,
         reason_codes=["OTHER_GAP"],
         source_ref_ids=["OTHER_GAP"],
-        requested_at=datetime(2026, 8, 30, 16, 0, tzinfo=UTC),
+        requested_at=REQUESTED_AT,
         new_run_start_state="S00",
     )
     production["research_reopen_request"] = reopen.model_dump(
