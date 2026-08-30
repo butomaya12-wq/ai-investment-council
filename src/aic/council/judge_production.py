@@ -8,7 +8,7 @@ import json
 from time import perf_counter_ns
 from typing import Any, Mapping, Sequence
 
-from aic.domain.canonical import canonical_sha256
+from aic.domain.canonical import canonical_datetime, canonical_sha256
 from aic.domain.contracts import (
     CANDIDATE_PACKET_V1,
     COUNCIL_OPINION_V1,
@@ -624,7 +624,7 @@ def build_research_reopen_request(
         "trigger_bundle_id": None,
         "reason_codes": list(proposal.research_reopen_reason_codes),
         "source_ref_ids": list(source_refs),
-        "requested_at": requested_at.astimezone(UTC),
+        "requested_at": canonical_datetime(requested_at.astimezone(UTC)),
         "new_run_start_state": "S00",
     }
     provisional = RESEARCH_REOPEN_REQUEST_V1.model_construct(**values, request_hash="0" * 64)
