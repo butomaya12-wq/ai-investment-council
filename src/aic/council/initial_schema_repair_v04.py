@@ -396,12 +396,6 @@ def _rebuild_request(
     rebuilt = CouncilRequestEnvelope(**body, request_hash=canonical_sha256(body))
     request_module.assert_request_invariants(rebuilt)
     schema = rebuilt.request_payload["text"]["format"]["schema"]
-    fact_ids = _fact_source_ids(
-        rebuilt.request_payload.get("_aic_model_input_for_validation", {})
-        if isinstance(rebuilt.request_payload, Mapping)
-        else {},
-        bundle=CouncilInputBundle.model_construct(),
-    ) if False else None
     assert_initial_schema_repair_v04(schema)
     return rebuilt
 
