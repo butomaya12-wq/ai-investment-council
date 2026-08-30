@@ -1,0 +1,28 @@
+{
+  "authority_version": "B3_REOPEN_PAGINATED_PROVIDER_READ_AUTHORITY_v0_1",
+  "owner_approval_id": "OWNER-B3-REOPEN-PAGINATED-ALPACA-NEWS-READ-V01",
+  "source_zero_call_preflight_hash": "b490dcef9b1248ed1cf79444f89d024bd50bbe59ed7945e2b69068b3565614c2",
+  "source_s00_artifact_hash": "0b5df0e2361575ee3c1cb7f823cc665183bd0206e118ce965977f1e43071eec9",
+  "source_production_judge_result_hash": "3354123bc0244ec258fad0cdab57d5551d5ed8e5d58088d11482bdcd489d259e",
+  "source_research_reopen_request_hash": "eb4c06f47f372413d25b25632ba84a35057fdbb9d244c4f1960f6b7fb40dfeb1",
+  "required_source_ref_ids": [
+    "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+  ],
+  "approved_candidate_ids": [
+    "NVDA",
+    "MSFT",
+    "META"
+  ],
+  "approved_provider": "ALPACA_NEWS",
+  "approved_auth_mode": "CLI_PROFILE:paper",
+  "approved_max_pages_per_candidate": 6,
+  "approved_page_size_max": 5,
+  "approved_provider_dispatch_attempts_max": 18,
+  "authorization_consumption_rule": "CONSUMED_ON_FIRST_PROVIDER_DISPATCH_ATTEMPT",
+  "automatic_retries": 0,
+  "rerun_authorized": false,
+  "model_calls_authorized": 0,
+  "broker_writes_authorized": 0,
+  "alpaca_orders_authorized": 0,
+  "live_money": "PROHIBITED"
+}
