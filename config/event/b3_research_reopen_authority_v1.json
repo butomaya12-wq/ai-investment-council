@@ -1,0 +1,17 @@
+{
+  "authority_version": "B3_RESEARCH_REOPEN_AUTHORITY_v0_1",
+  "source_production_judge_result_hash": "3354123bc0244ec258fad0cdab57d5551d5ed8e5d58088d11482bdcd489d259e",
+  "source_research_reopen_request_hash": "eb4c06f47f372413d25b25632ba84a35057fdbb9d244c4f1960f6b7fb40dfeb1",
+  "required_source_ref_ids": [
+    "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+  ],
+  "expected_new_run_start_state": "S00",
+  "expected_next_lifecycle": "B3_RESEARCH_REOPEN_LINKED_S00",
+  "final_decision_allowed": false,
+  "b5_handoff_allowed": false,
+  "paid_model_calls_authorized_at_s00": false,
+  "provider_reads_authorized_at_s00": false,
+  "broker_writes_authorized": false,
+  "alpaca_orders_authorized": false,
+  "live_money": "PROHIBITED"
+}
