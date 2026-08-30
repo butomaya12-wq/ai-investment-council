@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 from typing import Any, Mapping
 
+from aic.council import initial_runtime as initial_runtime_module
 from aic.council import initial_runtime_authorization as authorization_runtime
 from aic.council.initial_runtime_cost_v02 import (
     actual_cost_usd,
@@ -108,6 +109,9 @@ def _blocked_artifact_v02(**kwargs: Any) -> dict[str, Any]:
 
 
 def _patch_runner() -> None:
+    initial_runtime_module.verify_initial_runtime_cost_preflight = (
+        verify_initial_runtime_cost_preflight
+    )
     authorization_runtime.verify_initial_runtime_cost_preflight = (
         verify_initial_runtime_cost_preflight
     )
