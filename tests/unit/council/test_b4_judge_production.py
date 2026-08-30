@@ -220,12 +220,14 @@ def test_production_judge_validation_and_canonical_reopen_request() -> None:
         judge_proposal_hash=canonical_sha256(proposal),
         requested_at=datetime(2026, 8, 30, 13, 30, tzinfo=UTC),
     )
-    raw = reopen.model_dump(mode="json", exclude_none=False, warnings=False)
     assert reopen.new_run_start_state == "S00"
     assert reopen.parent_decision_id is None
     assert reopen.trigger_bundle_id is None
     assert EXPECTED_REQUIRED_UNKNOWN_REFS[0] in reopen.source_ref_ids
-    assert reopen.request_hash == canonical_sha256(raw, exclude_fields=("request_hash",))
+    assert reopen.request_hash == canonical_sha256(
+        reopen,
+        exclude_fields=("request_hash",),
+    )
 
 
 def test_production_judge_validation_rejects_reopen_suppression() -> None:
