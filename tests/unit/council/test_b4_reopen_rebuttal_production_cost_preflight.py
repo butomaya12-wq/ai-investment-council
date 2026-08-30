@@ -13,8 +13,12 @@ from aic.council.reopen_rebuttal_production_cost_preflight import (
     _decimal_text,
     _request_body_utf8_bytes,
     _selected_rebuttal_candidate,
-    verify_recovered_initial_freeze,
     verify_reopen_lifecycle_for_rebuttal,
+)
+from aic.council.reopen_rebuttal_production_cost_preflight_v02 import (
+    ARTIFACT_VERSION,
+    VALIDATED_RECORD_CONTRACT,
+    verify_recovered_initial_freeze,
 )
 
 
@@ -34,6 +38,11 @@ def test_selected_rebuttal_candidate_is_frozen_r3_sol_medium() -> None:
         "reasoning_effort": "medium",
         "ladder_position": 3,
     }
+
+
+def test_v02_supersedes_v01_record_return_assumption() -> None:
+    assert ARTIFACT_VERSION == "B4_REOPEN_REBUTTAL_PRODUCTION_COST_PREFLIGHT_v0_2"
+    assert VALIDATED_RECORD_CONTRACT == "INITIAL_PROCESSED_RECORD_VALIDATE_THEN_EXTRACT_IDENTITY_v0_2"
 
 
 def test_recovered_initial_cost_bounds_are_frozen() -> None:
