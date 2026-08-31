@@ -62,11 +62,16 @@ def option(symbol: str = "NVDA_TEST", *, ask: str = "10.00"):
 def snapshot(**overrides):
     values = {
         "observed_at": NOW,
+        "paper_account_id": "paper-account-1",
         "equity": Decimal("100000"),
         "same_underlying_committed_premium_at_risk": Decimal("500"),
         "aggregate_committed_long_option_premium_at_risk": Decimal("1500"),
         "remaining_after_equity_safety_reserve": Decimal("50000"),
         "options_buying_power_after_open_orders": Decimal("40000"),
+        "account_trading_eligible": True,
+        "unsupported_short_option_position": False,
+        "conflicting_open_option_sell_order": False,
+        "unvalued_open_option_exposure": False,
         "account_receipt_id": "receipt:account",
         "positions_receipt_id": "receipt:positions",
         "open_orders_receipt_id": "receipt:orders",
@@ -105,6 +110,7 @@ def test_b5_pipeline_produces_paper_limit_proposal_but_no_authority():
         policy=POLICY,
     )
     assert result.status == "PASS"
+    assert result.paper_account_id == "paper-account-1"
     assert result.option_symbol == "NVDA_TEST"
     assert result.quantity == 2
     assert result.action == "BUY_TO_OPEN"
@@ -183,3 +189,35 @@ def test_b5_snapshot_requires_lineage_receipts():
     )
     assert result.status == "INCOMPLETE_DATA"
     assert result.source_receipt_ids[-1] == ""
+
+
+def test_account_block_and_portfolio_state_gates_are_fail_closed():
+    blocked = run_b5_competition_options(
+        final_decision=invest_decision(),
+        underlying_symbol="NVDA",
+        option_contracts=[option()],
+        snapshot=snapshot(account_trading_eligible=False),
+        policy=POLICY,
+    )
+    assert blocked.status == "BLOCK"
+    assert blocked.reason_codes == ("ACCOUNT_TRADING_STATE_BLOCKED",)
+
+    short = run_b5_competition_options(
+        final_decision=invest_decision(),
+        underlying_symbol="NVDA",
+        option_contracts=[option()],
+        snapshot=snapshot(unsupported_short_option_position=True),
+        policy=POLICY,
+    )
+    assert short.status == "BLOCK"
+    assert short.reason_codes == ("UNSUPPORTED_SHORT_OPTION_POSITION_STATE",)
+
+    unknown_order = run_b5_competition_options(
+        final_decision=invest_decision(),
+        underlying_symbol="NVDA",
+        option_contracts=[option()],
+        snapshot=snapshot(unvalued_open_option_exposure=True),
+        policy=POLICY,
+    )
+    assert unknown_order.status == "INCOMPLETE_DATA"
+    assert unknown_order.reason_codes == ("UNVALUED_OPEN_OPTION_EXPOSURE",)
