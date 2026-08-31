@@ -13,6 +13,16 @@ from .alpaca_options_readonly_v1 import (
     assert_read_only_request_plan,
     build_b5_read_only_request_plan,
 )
+from .b5_competition_artifacts_v1 import (
+    B5CompetitionAcceptedProposal,
+    B5CompetitionArtifactBundle,
+    B5CompetitionArtifactError,
+    B5CompetitionPortfolioImpactArtifact,
+    B5CompetitionProposalArtifact,
+    B5CompetitionRiskResultArtifact,
+    B5CompetitionSnapshotArtifact,
+    materialize_b5_competition_artifacts,
+)
 from .b5_competition_pipeline_v1 import (
     B5CompetitionProposal,
     B5ReadOnlyRiskSnapshot,
@@ -35,8 +45,15 @@ from .options_competition_v1 import (
 
 __all__ = [
     "B5AlpacaNormalizationError",
+    "B5CompetitionAcceptedProposal",
+    "B5CompetitionArtifactBundle",
+    "B5CompetitionArtifactError",
     "B5CompetitionOptionsError",
+    "B5CompetitionPortfolioImpactArtifact",
     "B5CompetitionProposal",
+    "B5CompetitionProposalArtifact",
+    "B5CompetitionRiskResultArtifact",
+    "B5CompetitionSnapshotArtifact",
     "B5NormalizedAlpacaInputs",
     "B5ReadOnlyRiskSnapshot",
     "CompetitionOptionsPolicy",
@@ -50,6 +67,7 @@ __all__ = [
     "build_b5_read_only_request_plan",
     "derive_premium_risk_budgets",
     "load_competition_options_policy",
+    "materialize_b5_competition_artifacts",
     "normalize_b5_alpaca_inputs",
     "run_b5_competition_options",
     "select_long_call",
