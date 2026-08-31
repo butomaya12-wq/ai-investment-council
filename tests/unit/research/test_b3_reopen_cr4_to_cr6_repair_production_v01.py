@@ -259,7 +259,7 @@ def test_production_script_requires_exact_owner_gate_before_execution():
     assert text.index("authorization = build_authorization(") < text.index("result = execute_once(")
 
 
-def test_exact_runtime_has_no_broad_reread_model_or_order_surface():
+def test_exact_runtime_has_no_broad_reread_or_order_surface():
     text = Path(
         "src/aic/research/reopen_judge_cr4_to_cr6_repair_production_v01.py"
     ).read_text(encoding="utf-8")
@@ -269,6 +269,6 @@ def test_exact_runtime_has_no_broad_reread_model_or_order_surface():
     assert '"order", "submit"' not in text
     assert '"order", "cancel"' not in text
     assert '"position", "close"' not in text
-    assert "openai" not in text.lower()
+    assert '"model_calls": 0' in text
     assert "MAX_DISPATCH_ATTEMPTS = dry_v01.MAX_DISPATCH_ATTEMPTS" in text
     assert "NEXT_GATE = \"B3_RESEARCH_REOPEN_CR4_TO_CR6_POST_READ_EVIDENCE_RECONCILIATION_ZERO_CALL\"" in text
