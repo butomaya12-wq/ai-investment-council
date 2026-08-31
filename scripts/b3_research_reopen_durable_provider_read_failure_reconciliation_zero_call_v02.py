@@ -7,6 +7,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+from aic.research.reopen_judge_durable_provider_read_failure_reconciliation_v01 import (
+    DurableProviderReadFailureReconciliationError,
+)
 from aic.research.reopen_judge_durable_provider_read_failure_reconciliation_v02 import (
     DurableProviderReadFailureReconciliationV02Error,
     build_reconciliation_v02,
@@ -127,6 +130,7 @@ def main() -> int:
         return 0
     except (
         DurableProviderReadFailureReconciliationV02Error,
+        DurableProviderReadFailureReconciliationError,
         subprocess.CalledProcessError,
         OSError,
     ) as exc:
