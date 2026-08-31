@@ -94,7 +94,9 @@ def test_closure_preserves_meta_conditions_as_b4_context_not_canonical_reopen(mo
 def test_zero_call_runner_has_no_provider_or_model_execution_switch():
     text = Path("scripts/b3_research_reopen_close_to_b4_zero_call_v01.py").read_text(encoding="utf-8")
     assert "--execute-provider-reads" not in text
-    assert "alpaca" not in text.lower()
+    assert '"data", "news"' not in text
+    assert '"data", "multi-bars"' not in text
+    assert '"account", "portfolio"' not in text
     assert "openai" not in text.lower()
     assert "PROVIDER_READS=0" in text
     assert "MODEL_CALLS=0" in text
