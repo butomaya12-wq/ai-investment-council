@@ -89,29 +89,15 @@ def _need(condition: bool, message: str) -> None:
 
 def _self_hash(payload: Mapping[str, Any], *, field: str = "artifact_hash") -> str:
     observed = payload.get(field)
-    _need(
-        isinstance(observed, str)
-        and re.fullmatch(r"[0-9a-f]{64}", observed) is not None,
-        f"{field} missing",
-    )
-    _need(
-        observed == canonical_sha256(payload, exclude_fields=(field,)),
-        f"{field} self-hash mismatch",
-    )
+    _need(isinstance(observed, str) and re.fullmatch(r"[0-9a-f]{64}", observed) is not None, f"{field} missing")
+    _need(observed == canonical_sha256(payload, exclude_fields=(field,)), f"{field} self-hash mismatch")
     return observed
 
 
 def _event_hash(payload: Mapping[str, Any]) -> str:
     observed = payload.get("event_hash")
-    _need(
-        isinstance(observed, str)
-        and re.fullmatch(r"[0-9a-f]{64}", observed) is not None,
-        "journal event_hash missing",
-    )
-    _need(
-        observed == canonical_sha256(payload, exclude_fields=("event_hash",)),
-        "journal event self-hash mismatch",
-    )
+    _need(isinstance(observed, str) and re.fullmatch(r"[0-9a-f]{64}", observed) is not None, "journal event_hash missing")
+    _need(observed == canonical_sha256(payload, exclude_fields=("event_hash",)), "journal event self-hash mismatch")
     return observed
 
 
@@ -144,16 +130,10 @@ def read_journal(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def _portfolio_contract_from_original_preflight(
-    original_preflight: Mapping[str, Any],
-) -> Mapping[str, Any]:
+def _portfolio_contract_from_original_preflight(original_preflight: Mapping[str, Any]) -> Mapping[str, Any]:
     rows = original_preflight.get("request_preflights")
     _need(isinstance(rows, list), "original preflight request_preflights missing")
-    matches = [
-        row for row in rows
-        if isinstance(row, Mapping)
-        and row.get("bundle_id") == "ER5_CURRENT_PORTFOLIO_EQUITY"
-    ]
+    matches = [row for row in rows if isinstance(row, Mapping) and row.get("bundle_id") == "ER5_CURRENT_PORTFOLIO_EQUITY"]
     _need(len(matches) == 1, "original ER5 portfolio request row missing or duplicated")
     contract = matches[0].get("resolved_request_contract")
     _need(isinstance(contract, Mapping), "original ER5 resolved request contract missing")
@@ -161,8 +141,7 @@ def _portfolio_contract_from_original_preflight(
 
 
 def _verify_original_portfolio_contract(original_preflight: Mapping[str, Any]) -> None:
-    observed = _self_hash(original_preflight)
-    _need(observed == EXPECTED_ORIGINAL_PREFLIGHT_HASH, "original preflight hash drift")
+    _need(_self_hash(original_preflight) == EXPECTED_ORIGINAL_PREFLIGHT_HASH, "original preflight hash drift")
     contract = _portfolio_contract_from_original_preflight(original_preflight)
     _need(contract.get("cli_command") == ["alpaca", "account", "portfolio"], "ER5 CLI command drift")
     _need(contract.get("timeframe") == FROZEN_PORTFOLIO_TIMEFRAME_INVALID, "ER5 frozen timeframe drift")
@@ -200,14 +179,8 @@ def _verify_authorization(authorization: Mapping[str, Any]) -> str:
 
 
 def _verify_news_bundle(
-    row: Mapping[str, Any],
-    *,
-    bundle_id: str,
-    symbol: str,
-    response_hash: str,
-    aggregate_hash: str,
-    page_hashes: Sequence[str],
-    article_count: int,
+    row: Mapping[str, Any], *, bundle_id: str, symbol: str, response_hash: str,
+    aggregate_hash: str, page_hashes: Sequence[str], article_count: int,
 ) -> None:
     _need(row.get("bundle_id") == bundle_id, f"{bundle_id} identity drift")
     _need(row.get("status") == "PASS", f"{bundle_id} status drift")
@@ -266,22 +239,14 @@ def _verify_result(result: Mapping[str, Any], *, authorization_hash: str) -> str
     bundles = result.get("bundle_results")
     _need(isinstance(bundles, list) and len(bundles) == 3, "V02 completed bundle count drift")
     _verify_news_bundle(
-        bundles[0],
-        bundle_id="CR1_MSFT_NEWS_REFRESH",
-        symbol="MSFT",
-        response_hash=EXPECTED_MSFT_RESPONSE_ARTIFACT_HASH,
-        aggregate_hash=EXPECTED_MSFT_AGGREGATE_HASH,
-        page_hashes=EXPECTED_MSFT_PAGE_HASHES,
-        article_count=8,
+        bundles[0], bundle_id="CR1_MSFT_NEWS_REFRESH", symbol="MSFT",
+        response_hash=EXPECTED_MSFT_RESPONSE_ARTIFACT_HASH, aggregate_hash=EXPECTED_MSFT_AGGREGATE_HASH,
+        page_hashes=EXPECTED_MSFT_PAGE_HASHES, article_count=8,
     )
     _verify_news_bundle(
-        bundles[1],
-        bundle_id="CR2_META_NEWS_REFRESH",
-        symbol="META",
-        response_hash=EXPECTED_META_RESPONSE_ARTIFACT_HASH,
-        aggregate_hash=EXPECTED_META_AGGREGATE_HASH,
-        page_hashes=EXPECTED_META_PAGE_HASHES,
-        article_count=6,
+        bundles[1], bundle_id="CR2_META_NEWS_REFRESH", symbol="META",
+        response_hash=EXPECTED_META_RESPONSE_ARTIFACT_HASH, aggregate_hash=EXPECTED_META_AGGREGATE_HASH,
+        page_hashes=EXPECTED_META_PAGE_HASHES, article_count=6,
     )
     positions = bundles[2]
     _need(positions.get("bundle_id") == "CR3_CURRENT_PAPER_POSITIONS", "CR3 identity drift")
@@ -294,10 +259,7 @@ def _verify_result(result: Mapping[str, Any], *, authorization_hash: str) -> str
 
 
 def _verify_journal_and_raw(
-    journal_rows: Sequence[Mapping[str, Any]],
-    *,
-    raw_dir: Path,
-    authorization_hash: str,
+    journal_rows: Sequence[Mapping[str, Any]], *, raw_dir: Path, authorization_hash: str,
 ) -> None:
     _need(len(journal_rows) == len(EXPECTED_EVENT_TYPES), "V02 journal event count drift")
     _need(tuple(row.get("event_type") for row in journal_rows) == EXPECTED_EVENT_TYPES, "V02 journal event order drift")
@@ -320,27 +282,23 @@ def _verify_journal_and_raw(
     _need(failures[0].get("bundle_id") == "CR4_CURRENT_PORTFOLIO_EQUITY", "V02 failure bundle drift")
     _need(failures[0].get("reason") == EXPECTED_FAILURE_REASON, "V02 failure reason drift")
 
-    observed_snapshot_keys = tuple(
-        (row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256"))
-        for row in snapshots
-    )
-    _need(observed_snapshot_keys == EXPECTED_SNAPSHOT_KEYS, "V02 raw snapshot sequence/hash drift")
-    observed_receipt_keys = tuple(
-        (row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256"))
-        for row in receipts
-    )
-    _need(observed_receipt_keys == EXPECTED_SNAPSHOT_KEYS, "V02 response receipt sequence/hash drift")
+    snapshot_keys = tuple((row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256")) for row in snapshots)
+    receipt_keys = tuple((row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256")) for row in receipts)
+    _need(snapshot_keys == EXPECTED_SNAPSHOT_KEYS, "V02 raw snapshot sequence/hash drift")
+    _need(receipt_keys == EXPECTED_SNAPSHOT_KEYS, "V02 response receipt sequence/hash drift")
 
-    positions_by_key = {
-        (row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256")): index
-        for index, row in enumerate(journal_rows)
-        if row.get("event_type") in {"PROVIDER_RAW_RESPONSE_SNAPSHOT", "PROVIDER_RESPONSE_RECEIPT"}
-    }
     for key in EXPECTED_SNAPSHOT_KEYS:
-        snapshot_row = next(
-            row for row in snapshots
-            if (row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256")) == key
+        snapshot_index, snapshot_row = next(
+            (i, row) for i, row in enumerate(journal_rows)
+            if row.get("event_type") == "PROVIDER_RAW_RESPONSE_SNAPSHOT"
+            and (row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256")) == key
         )
+        receipt_index = next(
+            i for i, row in enumerate(journal_rows)
+            if row.get("event_type") == "PROVIDER_RESPONSE_RECEIPT"
+            and (row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256")) == key
+        )
+        _need(snapshot_index < receipt_index, "raw snapshot must precede matching response receipt")
         filename = snapshot_row.get("raw_snapshot_file")
         _need(isinstance(filename, str) and Path(filename).name == filename, "raw snapshot filename unsafe")
         path = raw_dir / filename
@@ -349,41 +307,19 @@ def _verify_journal_and_raw(
         _need(bool(raw), f"raw snapshot empty: {filename}")
         _need(hashlib.sha256(raw).hexdigest() == key[2], f"raw snapshot SHA mismatch: {filename}")
         _need(snapshot_row.get("response_bytes") == len(raw), f"raw snapshot byte count drift: {filename}")
-        snapshot_pos = positions_by_key[key]
-        receipt_pos = next(
-            i for i, row in enumerate(journal_rows)
-            if row.get("event_type") == "PROVIDER_RESPONSE_RECEIPT"
-            and (row.get("bundle_id"), row.get("dispatch_index_within_bundle"), row.get("response_sha256")) == key
-        )
-        _need(snapshot_pos < receipt_pos, f"raw snapshot must precede receipt: {filename}")
 
     raw_files = [path for path in raw_dir.iterdir() if path.is_file()]
     _need(len(raw_files) == 5, "raw response directory file count drift")
-    _need(
-        {hashlib.sha256(path.read_bytes()).hexdigest() for path in raw_files}
-        == {key[2] for key in EXPECTED_SNAPSHOT_KEYS},
-        "raw response directory hash set drift",
-    )
-    _need(
-        all(row.get("bundle_id") != "CR4_CURRENT_PORTFOLIO_EQUITY" for row in snapshots + receipts),
-        "CR4 unexpectedly has a durable provider response",
-    )
+    _need({hashlib.sha256(path.read_bytes()).hexdigest() for path in raw_files} == {key[2] for key in EXPECTED_SNAPSHOT_KEYS}, "raw response directory hash set drift")
+    _need(all(row.get("bundle_id") != "CR4_CURRENT_PORTFOLIO_EQUITY" for row in snapshots + receipts), "CR4 unexpectedly has a durable provider response")
 
 
 def build_reconciliation(
-    *,
-    authorization: Mapping[str, Any],
-    result: Mapping[str, Any],
-    original_preflight: Mapping[str, Any],
-    journal_rows: Sequence[Mapping[str, Any]],
-    raw_dir: Path,
-    code_commit_sha: str,
+    *, authorization: Mapping[str, Any], result: Mapping[str, Any],
+    original_preflight: Mapping[str, Any], journal_rows: Sequence[Mapping[str, Any]],
+    raw_dir: Path, code_commit_sha: str,
 ) -> dict[str, Any]:
-    _need(
-        isinstance(code_commit_sha, str)
-        and re.fullmatch(r"[0-9a-f]{40}", code_commit_sha) is not None,
-        "exact code SHA required",
-    )
+    _need(isinstance(code_commit_sha, str) and re.fullmatch(r"[0-9a-f]{40}", code_commit_sha) is not None, "exact code SHA required")
     _verify_original_portfolio_contract(original_preflight)
     auth_hash = _verify_authorization(authorization)
     result_hash = _verify_result(result, authorization_hash=auth_hash)
@@ -414,11 +350,7 @@ def build_reconciliation(
         "first_dispatch_event_hash": EXPECTED_FIRST_DISPATCH_HASH,
         "last_dispatch_event_hash": EXPECTED_LAST_DISPATCH_HASH,
         "completed_bundle_count": 3,
-        "completed_bundle_ids": [
-            "CR1_MSFT_NEWS_REFRESH",
-            "CR2_META_NEWS_REFRESH",
-            "CR3_CURRENT_PAPER_POSITIONS",
-        ],
+        "completed_bundle_ids": ["CR1_MSFT_NEWS_REFRESH", "CR2_META_NEWS_REFRESH", "CR3_CURRENT_PAPER_POSITIONS"],
         "completed_bundle_reread_allowed": False,
         "msft_news_reread_allowed": False,
         "meta_news_reread_allowed": False,
@@ -448,10 +380,7 @@ def build_reconciliation(
         "local_cli_version_probe_required": True,
         "future_cli_nonzero_stdout_stderr_snapshot_required": True,
         "undispatched_bundle_count": 2,
-        "undispatched_bundle_ids": [
-            "CR5_DYNAMIC_MARKET_CONTEXT",
-            "CR6_NVDA_NEWS_CONTINUATION",
-        ],
+        "undispatched_bundle_ids": ["CR5_DYNAMIC_MARKET_CONTEXT", "CR6_NVDA_NEWS_CONTINUATION"],
         "nvda_retained_pages_replay_allowed": False,
         "nvda_continuation_start_token_required": True,
         "future_provider_read_bundle_count": 3,
