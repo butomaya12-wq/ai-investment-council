@@ -25,6 +25,27 @@ Pre-event freeze commit: 6337068...
 - explicit human-approved Alpaca PAPER execution
 - cockpit / thesis monitor
 
+## B7-P0 Decision Integrity Cockpit
+
+The initial cockpit is a desktop-first, server-rendered FastAPI/Jinja2 UI. It
+is a read-only projection of the stable B4 judge-entry boundary on this branch;
+it has no path to create decisions, calculate risk, approve capital, or submit
+an Alpaca order.
+
+The supplied projection keeps the event's material research gap visible and
+therefore presents `NO FINAL DECISION`, `DATA INCOMPLETE`, and `NO ORDER` rather
+than manufacturing an `INVEST` lifecycle. B5/B6 data is intentionally pending:
+there is no options sizing, price, symbol, approval, or execution payload.
+
+Run locally:
+
+```bash
+PYTHONPATH=src uv run uvicorn aic.cockpit.app:app --reload
+```
+
+Open `/` for the cockpit, `/decisions` for the read-only registry, and
+`/decisions/b4-research-reopen` for the integrity detail and trace.
+
 ## Safety
 Paper only.
 No live-money execution.

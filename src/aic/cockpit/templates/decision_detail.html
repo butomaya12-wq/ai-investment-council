@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Decision Detail · Decision Integrity{% endblock %}
+{% block heading %}Decision detail{% endblock %}
+{% block content %}
+<section class="detail-title">
+  <div><p class="eyebrow">Read-only B4 boundary projection</p><h2>No final decision is available</h2><p>{{ view.projection_id }} is a presentation identifier, not a canonical decision.</p></div>
+  <div class="decision-state"><span class="eyebrow">Capital access</span><strong>DENIED</strong><span>NO ORDER · broker writes: 0</span></div>
+</section>
+
+<section class="detail-grid">
+  <article class="panel">
+    <p class="eyebrow">Evidence / unknowns / conflicts</p>
+    <h2>Data is incomplete</h2>
+    {% for unknown in view.unknown_refs %}<p><code>{{ unknown }}</code> is a material unknown kept visible by the B4 entry boundary.</p>{% endfor %}
+    <p><strong>Conflict status:</strong> UNKNOWN — no canonical conflict record was loaded.</p>
+    <p><strong>Evidence status:</strong> STALE/INCOMPLETE for decision purposes until the separate research lifecycle resolves the unknown.</p>
+  </article>
+  <article class="panel blocking-panel">
+    <p class="eyebrow">Blocking objection</p>
+    <h2>Capital cannot be released from this state.</h2>
+    <p>All frozen candidates require research reopen. The UI does not turn this boundary into a risk result, approval, or execution eligibility.</p>
+  </article>
+</section>
+
+<section class="panel change-panel">
+  <p class="eyebrow">What would change the decision</p>
+  <h2>Pending, non-authoritative condition</h2>
+  <p>A separate B3 research reopen must resolve the material unknown under its own lifecycle. No canonical <code>decision_change_condition</code> record is loaded, so this screen deliberately does not claim a sufficient condition, owner, or deadline.</p>
+</section>
+
+<section class="section-heading"><div><p class="eyebrow">Role separation</p><h2>Council and Judge</h2></div></section>
+<section class="lane-grid detail-lanes">
+  {% for lane in view.lanes %}
+  <article class="lane-card {{ lane.kind }}"><div class="lane-card-top"><span>{{ lane.role }}</span><span class="badge">{{ lane.state }}</span></div><h3>{{ lane.name }}</h3><p>{{ lane.summary }}</p></article>
+  {% endfor %}
+</section>
+
+<section class="trace-grid">
+  <article class="panel"><p class="eyebrow">Decision integrity proof / trace</p><h2>Branch-local bindings</h2><p>Values below are displayed as supplied by server-side presenter code; browser JavaScript does not calculate hashes.</p><dl>{% for binding in view.trace_bindings %}<div><dt>{{ binding.label }}</dt><dd><code>{{ binding.value }}</code><small>{{ binding.source }}</small></dd></div>{% endfor %}</dl></article>
+  <article class="panel"><p class="eyebrow">Decision journal</p><h2>Canonical journal unavailable</h2><p>No <code>JOURNAL_EVENT_ENVELOPE_V1</code> records are loaded in this B7-P0 projection. The trace is not presented as a journal event history.</p><ul class="journal-placeholder"><li>Evidence boundary retained</li><li>Research reopen remains separate</li><li>B5/B6 downstream state remains pending</li></ul></article>
+</section>
+
+<section class="pending-strip"><strong>B5/B6-dependent surfaces:</strong> unavailable and intentionally omitted. No option quantity, limit price, premium-at-risk, option symbol, approval payload, or execution payload is projected.</section>
+{% endblock %}

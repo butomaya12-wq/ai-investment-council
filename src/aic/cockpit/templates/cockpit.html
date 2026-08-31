@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Cockpit · Decision Integrity{% endblock %}
+{% block content %}
+<section class="hero-grid">
+  <div>
+    <p class="eyebrow">Primary question</p>
+    <h2>Why was capital released — or why was it denied?</h2>
+    <p class="lead">Every trade must prove it deserves access to capital.</p>
+  </div>
+  <div class="decision-state">
+    <span class="eyebrow">Current projection</span>
+    <strong>CAPITAL RELEASE DENIED</strong>
+    <span>No final decision record; no order path</span>
+  </div>
+</section>
+
+<section class="chain" aria-label="Decision chain">
+  <div class="chain-step"><span>01</span><strong>Evidence</strong><em>DATA INCOMPLETE</em></div>
+  <div class="chain-arrow">→</div>
+  <div class="chain-step"><span>02</span><strong>Bull</strong><em>UNKNOWN</em></div>
+  <div class="chain-arrow">→</div>
+  <div class="chain-step"><span>03</span><strong>Bear</strong><em>UNKNOWN</em></div>
+  <div class="chain-arrow">→</div>
+  <div class="chain-step alert"><span>04</span><strong>Red Team</strong><em>BLOCKING</em></div>
+  <div class="chain-arrow">→</div>
+  <div class="chain-step"><span>05</span><strong>Judge</strong><em>PENDING</em></div>
+  <div class="chain-arrow">→</div>
+  <div class="chain-step pending"><span>06</span><strong>Risk / Human</strong><em>UNAVAILABLE</em></div>
+  <div class="chain-arrow">→</div>
+  <div class="chain-step alert"><span>07</span><strong>Alpaca</strong><em>NO ORDER</em></div>
+</section>
+
+<section class="section-heading">
+  <div><p class="eyebrow">Deliberation roles</p><h2>Separate roles, preserved boundaries</h2></div>
+  <a href="{{ url_for('decision_detail') }}">View decision detail →</a>
+</section>
+<section class="lane-grid">
+  {% for lane in view.lanes %}
+  <article class="lane-card {{ lane.kind }}">
+    <div class="lane-card-top"><span>{{ lane.role }}</span><span class="badge">{{ lane.state }}</span></div>
+    <h3>{{ lane.name }}</h3>
+    <p>{{ lane.summary }}</p>
+  </article>
+  {% endfor %}
+</section>
+
+<section class="two-column">
+  <article class="panel blocking-panel">
+    <p class="eyebrow">Blocking objection</p>
+    <h2>Research reopen is required for every frozen candidate.</h2>
+    <p>The entry boundary lists {{ view.candidates | join(', ') }} as requiring a separate B3 lifecycle. This prevents INVEST persistence and leaves Judge execution unauthorized.</p>
+  </article>
+  <article class="panel">
+    <p class="eyebrow">Known unknowns</p>
+    <ul class="ref-list">
+      {% for unknown in view.unknown_refs %}<li><code>{{ unknown }}</code><span class="badge warning">DATA INCOMPLETE</span></li>{% endfor %}
+    </ul>
+    <p>No canonical conflict record was supplied to this read model.</p>
+  </article>
+</section>
+{% endblock %}

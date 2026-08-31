@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Decision Integrity Cockpit{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/cockpit.css') }}">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <a class="brand" href="{{ url_for('cockpit') }}">AIC <span>CONTROL</span></a>
+        <p class="eyebrow">Decision Integrity Cockpit</p>
+        <nav aria-label="Primary navigation">
+          <a class="nav-link {% if page == 'cockpit' %}active{% endif %}" href="{{ url_for('cockpit') }}">Cockpit</a>
+          <a class="nav-link {% if page in ('decisions', 'decision_detail') %}active{% endif %}" href="{{ url_for('decisions') }}">Decisions</a>
+          <span class="nav-link disabled" aria-disabled="true">Approval Queue <small>pending B6</small></span>
+          <span class="nav-link disabled" aria-disabled="true">Execution <small>no broker path</small></span>
+        </nav>
+        <div class="sidebar-foot">
+          <span class="state-dot"></span> READ-ONLY PROJECTION
+        </div>
+      </aside>
+      <main class="main-content">
+        <header class="topbar">
+          <button class="menu-button" type="button" aria-label="Toggle navigation" aria-controls="sidebar">Menu</button>
+          <div>
+            <p class="eyebrow">Capital access review</p>
+            <h1>{% block heading %}Decision Integrity Cockpit{% endblock %}</h1>
+          </div>
+          <div class="header-status">
+            <span class="badge warning">{{ view.source_status }}</span>
+            <span>Browser is non-authoritative</span>
+          </div>
+        </header>
+        <section class="authority-note" aria-label="Authority boundary">
+          <strong>Authority boundary:</strong> this UI projects existing state only. It cannot create a decision, approve capital, calculate risk, or submit an order.
+        </section>
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <script src="{{ url_for('static', path='/cockpit.js') }}" defer></script>
+  </body>
+</html>
