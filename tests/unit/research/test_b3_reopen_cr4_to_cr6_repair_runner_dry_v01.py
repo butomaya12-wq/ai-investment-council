@@ -105,5 +105,4 @@ def test_runtime_has_no_order_or_live_execution_surface():
     assert '"order", "submit"' not in text
     assert '"order", "cancel"' not in text
     assert '"position", "close"' not in text
-    assert "provider_reads_authorized\": False" not in text  # dictionary syntax, not serialized command surface
     assert '"provider_reads_authorized": False' in text
