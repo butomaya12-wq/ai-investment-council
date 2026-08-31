@@ -33,9 +33,10 @@ it has no path to create decisions, calculate risk, approve capital, or submit
 an Alpaca order.
 
 The supplied projection keeps the event's material research gap visible and
-therefore presents `NO FINAL DECISION`, `DATA INCOMPLETE`, and `NO ORDER` rather
-than manufacturing an `INVEST` lifecycle. B5/B6 data is intentionally pending:
-there is no options sizing, price, symbol, approval, or execution payload.
+therefore presents `NO FINAL DECISION` and B5/B6 authorization as `NOT REACHED`
+rather than manufacturing an `INVEST` lifecycle or a downstream denial. B5/B6
+data is intentionally pending: there is no options sizing, price, symbol,
+approval, or execution payload.
 
 Run locally:
 

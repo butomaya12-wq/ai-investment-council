@@ -1,3 +1,4 @@
+from dataclasses import fields
 from pathlib import Path
 
 from aic.cockpit.app import PACKAGE_ROOT, create_app
@@ -7,6 +8,7 @@ from aic.council.judge_entry_preflight import (
     JUDGE_ENTRY_PREFLIGHT_STATUS,
 )
 from aic.council.judge_production import EXPECTED_REQUIRED_UNKNOWN_REFS
+from aic.research.reopen_s00 import REQUIRED_KNOWN_GAP
 
 
 def test_projection_preserves_branch_local_b4_boundary_without_final_decision() -> None:
@@ -15,15 +17,20 @@ def test_projection_preserves_branch_local_b4_boundary_without_final_decision() 
     assert view.candidates == EXPECTED_CANDIDATE_ORDER
     assert view.source_status == JUDGE_ENTRY_PREFLIGHT_STATUS
     assert view.unknown_refs == EXPECTED_REQUIRED_UNKNOWN_REFS
+    assert view.unknown_refs == (REQUIRED_KNOWN_GAP,)
+    assert view.downstream_authorization_state == "NOT REACHED"
     assert [lane.name for lane in view.lanes] == ["Bull", "Bear", "Red Team", "Judge"]
     assert view.lanes[2].role.endswith("not a third vote")
     assert view.lanes[3].state == "PENDING / NOT AUTHORIZED"
 
 
-def test_projection_never_invents_downstream_execution_or_options_fields() -> None:
+def test_projection_never_invents_downstream_or_global_evidence_semantics() -> None:
     view = build_b4_research_reopen_projection()
     assert all(lane.state != "INVEST" for lane in view.lanes)
     assert view.projection_id != "FINAL_DECISION"
+    assert {field.name for field in fields(type(view))}.isdisjoint(
+        {"final_decision", "approval", "execution", "journal"}
+    )
 
     template_text = "\n".join(
         path.read_text(encoding="utf-8")
@@ -31,6 +38,18 @@ def test_projection_never_invents_downstream_execution_or_options_fields() -> No
     )
     for forbidden in ("USD_NOTIONAL", "MARKET"):
         assert forbidden not in template_text
+    for invalid_assertion in (
+        "CAPITAL RELEASE DENIED",
+        "Capital release denied",
+        "Capital access</span><strong>DENIED",
+        "Capital cannot be released",
+        "STALE/INCOMPLETE",
+    ):
+        assert invalid_assertion not in template_text
+    assert "CAPITAL AUTHORIZATION — {{ view.downstream_authorization_state }}" in template_text
+    assert "B5/B6 authorization: {{ view.downstream_authorization_state }}" in template_text
+    assert "RESEARCH REOPEN REQUIRED" in template_text
+    assert "overall evidence-status verdict" in template_text
     assert "intentionally omitted" in template_text
 
 

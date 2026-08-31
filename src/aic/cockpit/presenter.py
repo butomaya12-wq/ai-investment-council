@@ -42,6 +42,7 @@ class DecisionReadModel:
 
     projection_id: str
     source_status: str
+    downstream_authorization_state: str
     candidates: tuple[str, ...]
     lanes: tuple[DecisionLaneView, ...]
     unknown_refs: tuple[str, ...]
@@ -61,6 +62,7 @@ def build_b4_research_reopen_projection() -> DecisionReadModel:
     return DecisionReadModel(
         projection_id="B4-RESEARCH-REOPEN-BOUNDARY",
         source_status=JUDGE_ENTRY_PREFLIGHT_STATUS,
+        downstream_authorization_state="NOT REACHED",
         candidates=EXPECTED_CANDIDATE_ORDER,
         lanes=(
             DecisionLaneView(

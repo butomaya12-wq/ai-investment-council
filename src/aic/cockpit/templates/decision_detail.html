@@ -4,21 +4,21 @@
 {% block content %}
 <section class="detail-title">
   <div><p class="eyebrow">Read-only B4 boundary projection</p><h2>No final decision is available</h2><p>{{ view.projection_id }} is a presentation identifier, not a canonical decision.</p></div>
-  <div class="decision-state"><span class="eyebrow">Capital access</span><strong>DENIED</strong><span>NO ORDER · broker writes: 0</span></div>
+  <div class="decision-state"><span class="eyebrow">Capital authorization</span><strong>{{ view.downstream_authorization_state }}</strong><span>B5/B6 state unavailable · broker writes: 0</span></div>
 </section>
 
 <section class="detail-grid">
   <article class="panel">
     <p class="eyebrow">Evidence / unknowns / conflicts</p>
-    <h2>Data is incomplete</h2>
+    <h2>Unresolved material unknown</h2>
     {% for unknown in view.unknown_refs %}<p><code>{{ unknown }}</code> is a material unknown kept visible by the B4 entry boundary.</p>{% endfor %}
     <p><strong>Conflict status:</strong> UNKNOWN — no canonical conflict record was loaded.</p>
-    <p><strong>Evidence status:</strong> STALE/INCOMPLETE for decision purposes until the separate research lifecycle resolves the unknown.</p>
+    <p>The B4 boundary projects no overall evidence-status verdict. It preserves this material unknown and the required separate research reopen.</p>
   </article>
   <article class="panel blocking-panel">
     <p class="eyebrow">Blocking objection</p>
-    <h2>Capital cannot be released from this state.</h2>
-    <p>All frozen candidates require research reopen. The UI does not turn this boundary into a risk result, approval, or execution eligibility.</p>
+    <h2>Downstream capital authorization has not been reached.</h2>
+    <p>All frozen candidates require research reopen. The UI does not turn this boundary into a risk result, approval, execution eligibility, or a downstream denial.</p>
   </article>
 </section>
 

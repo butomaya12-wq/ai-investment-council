@@ -5,7 +5,7 @@
 <section class="section-heading"><div><p class="eyebrow">Read-only registry</p><h2>Decision records</h2></div></section>
 <article class="decision-row">
   <div><p class="eyebrow">Projection ID</p><h2>{{ view.projection_id }}</h2><p>Derived from the B4 judge-entry boundary; it is not a canonical final-decision ID.</p></div>
-  <div><span class="badge warning">NO FINAL DECISION</span><p>Capital release denied · NO ORDER</p></div>
+  <div><span class="badge warning">NO FINAL DECISION</span><p>B5/B6 authorization: {{ view.downstream_authorization_state }} · no execution state</p></div>
   <a class="button-link" href="{{ url_for('decision_detail') }}">Inspect integrity proof</a>
 </article>
 <p class="empty-note">No additional canonical decision records have been loaded into B7-P0.</p>
