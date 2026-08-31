@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 import pytest
@@ -92,6 +93,15 @@ def test_artifact_verification_fails_closed_on_tamper() -> None:
     artifact["owner_approval_granted"] = True
     with pytest.raises(runtime.PostResearchReopenInitialRequestCostPreflightError, match="self-hash"):
         runtime.verify_initial_request_cost_preflight(artifact, expected_code_commit_sha="a" * 40)
+
+
+def test_independent_verifier_accepts_sorted_json_key_order_round_trip() -> None:
+    artifact = _artifact()
+    persisted = json.loads(json.dumps(artifact, ensure_ascii=False, sort_keys=True))
+    assert tuple(persisted["model_facing_inputs_by_candidate"]) != runtime.EXPECTED_CANDIDATES
+    assert runtime.verify_initial_request_cost_preflight(
+        persisted, expected_code_commit_sha="a" * 40
+    ) == persisted["artifact_hash"]
 
 
 def test_zero_call_runner_has_no_execution_surface_and_exclusive_output(tmp_path: Path) -> None:

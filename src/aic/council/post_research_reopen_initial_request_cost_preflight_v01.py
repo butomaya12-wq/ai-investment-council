@@ -484,7 +484,10 @@ def verify_initial_request_cost_preflight(
         _need(type(row.get("estimated_input_tokens_upper_bound")) is int, "request token estimate invalid")
         _need(row.get("maximum_output_tokens") == STAGE_MAX_OUTPUT_TOKENS[CouncilModelStage.INITIAL], "request output cap drift")
     inputs = payload.get("model_facing_inputs_by_candidate")
-    _need(isinstance(inputs, Mapping) and tuple(inputs) == EXPECTED_CANDIDATES, "model-facing input surface drift")
+    _need(
+        isinstance(inputs, Mapping) and set(inputs) == set(EXPECTED_CANDIDATES),
+        "model-facing input surface drift",
+    )
     _need(
         payload.get("input_artifact_hash")
         == canonical_sha256({"candidate_order": list(EXPECTED_CANDIDATES), "model_inputs": inputs}),
