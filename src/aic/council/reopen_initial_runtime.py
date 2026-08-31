@@ -680,6 +680,37 @@ def _computed_values(model_input: Mapping[str, Any]) -> dict[str, str]:
     return result
 
 
+def derive_initial_allowed_data_gap_refs_from_frozen_request(
+    request: CouncilRequestEnvelope,
+) -> tuple[str, ...]:
+    """Recover only the gap authority encoded in the exact sent schema."""
+    payload = request.request_payload
+    try:
+        schema = payload["text"]["format"]["schema"]
+        properties = schema["properties"]
+        field = properties["material_unknown_refs"]
+    except (KeyError, TypeError) as exc:
+        raise B4ReopenInitialRuntimeError("frozen Initial gap schema missing") from exc
+    if not isinstance(schema, Mapping) or not isinstance(properties, Mapping) or not isinstance(field, Mapping):
+        raise B4ReopenInitialRuntimeError("frozen Initial gap schema malformed")
+    if field.get("type") != "array":
+        raise B4ReopenInitialRuntimeError("frozen Initial gap schema must be array")
+    items = field.get("items")
+    if isinstance(items, Mapping) and "enum" in items:
+        enum = items["enum"]
+        if not isinstance(enum, list) or not enum or any(not isinstance(value, str) or not value for value in enum) or len(set(enum)) != len(enum):
+            raise B4ReopenInitialRuntimeError("frozen Initial gap enum malformed")
+        maximum = field.get("maxItems")
+        if maximum is not None and (type(maximum) is not int or maximum < len(enum)):
+            raise B4ReopenInitialRuntimeError("frozen Initial gap enum/maxItems conflict")
+        return tuple(enum)
+    if field.get("maxItems") == 0:
+        if items not in (None, {}) and not isinstance(items, Mapping):
+            raise B4ReopenInitialRuntimeError("frozen Initial empty gap schema malformed")
+        return ()
+    raise B4ReopenInitialRuntimeError("frozen Initial gap schema is unbounded or ambiguous")
+
+
 def process_reopen_initial_provider_response(
     item: ReopenInitialRuntimePlanItem,
     *,
@@ -703,7 +734,7 @@ def process_reopen_initial_provider_response(
         expected_lane=item.lane,
         source_claims=_source_claims(item.model_input),
         computed_value_values=_computed_values(item.model_input),
-        allowed_data_gap_refs=(),
+        allowed_data_gap_refs=derive_initial_allowed_data_gap_refs_from_frozen_request(item.request),
         required_data_gap_refs=(),
         frozen_at=frozen_at,
     )
