@@ -278,7 +278,13 @@ def _read_page(
             "reopen Alpaca news response contains future evidence beyond research cutoff"
         )
     next_page_token = payload.get("next_page_token")
-    if next_page_token is not None:
+    if next_page_token == "":
+        # Alpaca CLI serializes the terminal pagination cursor as an empty
+        # string on some successful responses.  Treat that wire-level spelling
+        # as the canonical terminal state, while preserving the original raw
+        # response bytes/hash for provenance.
+        next_page_token = None
+    elif next_page_token is not None:
         next_page_token = _require_string(
             next_page_token, field="next_page_token"
         )
