@@ -1,0 +1,10 @@
+{
+  "artifact_version": "OPENAI_GPT_5_6_TERRA_CONTEXT_CAPABILITY_2026_08_31_v0_1",
+  "model": "gpt-5.6-terra",
+  "context_window_tokens": 1050000,
+  "max_output_tokens": 128000,
+  "source_url": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+  "source_kind": "OPENAI_OFFICIAL_MODEL_DOCUMENTATION",
+  "captured_at_utc": "2026-08-31T00:00:00Z",
+  "capability_hash": "dcaf2bce24066feb9a3c73cd85abf1cce2a49574a2fd767df1311f64961b1a50"
+}
