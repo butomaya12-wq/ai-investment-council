@@ -123,6 +123,49 @@ def test_ambiguous_transport_outcome_persists_unknown_and_never_resends(tmp_path
     assert not (tmp_path / "result.json").exists()
 
 
+def test_raw_response_is_durable_before_local_validation_failure_and_blocks_rerun(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    cost, capability, readiness, approval = _inputs()
+    calls = 0
+    provider_response = {"id": "resp-captured-before-validation", "status": "completed", "usage": {"input_tokens": 1}}
+
+    def transport(_payload):
+        nonlocal calls
+        calls += 1
+        return provider_response
+
+    def fail_processing(*_args, **_kwargs):
+        raise ValueError("synthetic local schema failure")
+
+    monkeypatch.setattr(runtime, "process_reopen_initial_provider_response", fail_processing)
+    ledger_path = tmp_path / "ledger.json"
+    raw_dir = tmp_path / "raw"
+    result_path = tmp_path / "result.json"
+    with pytest.raises(runtime.PostResearchInitialExecutionError, match="captured provider response failed validation"):
+        runtime.execute_paid_initial(execute_paid_initial=True, branch=dispatch.EXPECTED_BRANCH, code_commit_sha=HEAD, worktree_clean=True, cost_preflight=cost, readiness=readiness, approval=approval, context_capability=capability, ledger_path=ledger_path, raw_response_dir=raw_dir, result_path=result_path, transport_factory=lambda: transport)
+
+    assert calls == 1
+    raw_paths = list(raw_dir.glob("*.json"))
+    assert len(raw_paths) == 1
+    capture = json.loads(raw_paths[0].read_text(encoding="utf-8"))
+    assert runtime.verify_raw_response_capture(capture, request_hash=cost["initial_requests"][0]["request_hash"]) == capture["raw_response_hash"]
+    assert capture["raw_response"] == provider_response
+    ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    entry = ledger["entries"][0]
+    assert entry["state"] == dispatch.DISPATCH_STARTED_UNKNOWN
+    assert entry["raw_response_hash"] == capture["raw_response_hash"]
+    assert entry["stop_reason"].startswith("RESPONSE_CAPTURED_BUT_NOT_ACCEPTED:")
+
+    resend_calls = 0
+    def resend_factory():
+        nonlocal resend_calls
+        resend_calls += 1
+        return transport
+    with pytest.raises(runtime.PostResearchInitialExecutionError, match="prior dispatch ledger"):
+        runtime.execute_paid_initial(execute_paid_initial=True, branch=dispatch.EXPECTED_BRANCH, code_commit_sha=HEAD, worktree_clean=True, cost_preflight=cost, readiness=readiness, approval=approval, context_capability=capability, ledger_path=ledger_path, raw_response_dir=raw_dir, result_path=result_path, transport_factory=resend_factory)
+    assert calls == 1
+    assert resend_calls == 0
+
+
 def test_partial_or_existing_result_blocks_blind_restart(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     (tmp_path / "ledger.json").write_text("{}", encoding="utf-8")
     with pytest.raises(runtime.PostResearchInitialExecutionError, match="prior dispatch ledger"):
@@ -145,3 +188,10 @@ def test_historical_v01_readiness_is_not_written_by_new_runner() -> None:
     assert "production_dispatch_zero_call_preflight_v0_1.json" not in paid
     assert "--execute" not in old
     assert "--execute-paid-initial" in paid
+
+
+def test_v03_readiness_runner_preserves_v02_historical_evidence() -> None:
+    script = Path("scripts/b4_post_research_reopen_initial_production_dispatch_zero_call_v03.py").read_text(encoding="utf-8")
+    assert "production_dispatch_zero_call_preflight_v0_2.json" in script
+    assert "68d623c089ab529bb1e0d8a6892f7c67be14d8c4239e6070526d5dbc2bf68578" in script
+    assert "production_dispatch_zero_call_preflight_v0_3.json" in script

@@ -25,8 +25,8 @@ from .request import CouncilRequestEnvelope, CouncilRequestStage
 from .reopen_initial_runtime import ReopenInitialRuntimePlanItem, process_reopen_initial_provider_response
 
 
-READINESS_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_PRODUCTION_DISPATCH_ZERO_CALL_PREFLIGHT_v0_2"
-READINESS_STATUS = "B4_POST_RESEARCH_REOPEN_INITIAL_PRODUCTION_DISPATCH_ZERO_CALL_PREFLIGHT_V02_PASS"
+READINESS_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_PRODUCTION_DISPATCH_ZERO_CALL_PREFLIGHT_v0_3"
+READINESS_STATUS = "B4_POST_RESEARCH_REOPEN_INITIAL_PRODUCTION_DISPATCH_ZERO_CALL_PREFLIGHT_V03_PASS"
 OWNER_APPROVAL_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_OWNER_APPROVAL_v0_2"
 LEDGER_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_PAID_DISPATCH_LEDGER_v0_1"
 RESULT_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_COUNCIL_FREEZE_v0_1"
@@ -235,6 +235,35 @@ def _store_ledger(path: Path, ledger: dict[str, Any], *, exclusive: bool) -> Non
         _replace_durable(path, ledger)
 
 
+def build_raw_response_capture(
+    *, request_hash: str, provider_response: Mapping[str, Any], dispatch_started_at_utc: str, captured_at_utc: str
+) -> dict[str, Any]:
+    """Build evidence that must be durable before local response validation."""
+    _need(isinstance(provider_response, Mapping), "provider response must be object")
+    provider_response_id = provider_response.get("id")
+    _need(provider_response_id is None or isinstance(provider_response_id, str), "provider response id malformed")
+    capture: dict[str, Any] = {
+        "capture_version": "B4_POST_RESEARCH_REOPEN_INITIAL_RAW_PROVIDER_RESPONSE_v0_1",
+        "request_hash": request_hash,
+        "provider_response_id": provider_response_id,
+        "dispatch_started_at_utc": dispatch_started_at_utc,
+        "captured_at_utc": captured_at_utc,
+        "raw_response": dict(provider_response),
+    }
+    capture["raw_response_hash"] = canonical_sha256(capture, exclude_fields=("raw_response_hash",))
+    return capture
+
+
+def verify_raw_response_capture(capture: Mapping[str, Any], *, request_hash: str) -> str:
+    observed = capture.get("raw_response_hash")
+    _need(isinstance(observed, str) and re.fullmatch(r"[0-9a-f]{64}", observed) is not None, "raw response hash missing")
+    _need(observed == canonical_sha256(capture, exclude_fields=("raw_response_hash",)), "raw response hash mismatch")
+    _need(capture.get("capture_version") == "B4_POST_RESEARCH_REOPEN_INITIAL_RAW_PROVIDER_RESPONSE_v0_1", "raw response capture version drift")
+    _need(capture.get("request_hash") == request_hash, "raw response request hash drift")
+    _need(isinstance(capture.get("raw_response"), Mapping), "raw response missing")
+    return observed
+
+
 def _result(*, code_commit_sha: str, approval_hash: str, readiness_hash: str, cost_preflight: Mapping[str, Any], ledger: Mapping[str, Any], records: Sequence[Mapping[str, Any]], raw_response_hashes: Sequence[str], total_cost: Decimal) -> dict[str, Any]:
     artifact: dict[str, Any] = {
         "artifact_version": RESULT_VERSION, "status": RESULT_STATUS, "code_commit_sha": code_commit_sha,
@@ -299,6 +328,21 @@ def execute_paid_initial(*, execute_paid_initial: bool, branch: str, code_commit
             _store_ledger(ledger_path, ledger, exclusive=False)
             raise PostResearchInitialExecutionError("ambiguous provider outcome; dispatch remains unknown") from exc
         _need(isinstance(raw, Mapping), "provider response must be object")
+        capture = build_raw_response_capture(
+            request_hash=item.plan_item.request.request_hash,
+            provider_response=raw,
+            dispatch_started_at_utc=entry["dispatch_started_at_utc"],
+            captured_at_utc=_utc_now(),
+        )
+        raw_path = raw_response_dir / f"{item.index:02d}-{item.plan_item.request.request_hash}.json"
+        _write_exclusive(raw_path, capture)
+        capture_hash = verify_raw_response_capture(capture, request_hash=item.plan_item.request.request_hash)
+        # The persisted capture is linked while state remains unknown.  No later
+        # validation or cost defect may discard a provider response already paid for.
+        entry["raw_response_hash"] = capture_hash
+        entry["raw_response_path"] = str(raw_path)
+        entry["response_captured_at_utc"] = capture["captured_at_utc"]
+        _store_ledger(ledger_path, ledger, exclusive=False)
         latency = max(0, (perf_counter_ns() - started) // 1_000_000)
         try:
             record = process_reopen_initial_provider_response(item.plan_item, raw_response=raw, latency_ms=latency, frozen_at=now(), pricing=pricing)
@@ -307,17 +351,14 @@ def execute_paid_initial(*, execute_paid_initial: bool, branch: str, code_commit
             entry["stop_reason"] = f"RESPONSE_CAPTURED_BUT_NOT_ACCEPTED:{type(exc).__name__}"
             _store_ledger(ledger_path, ledger, exclusive=False)
             raise PostResearchInitialExecutionError("captured provider response failed validation; stop fail-closed") from exc
-        raw_payload = {"request_hash": item.plan_item.request.request_hash, "provider_response_id": raw.get("id"), "dispatch_started_at_utc": entry["dispatch_started_at_utc"], "dispatch_finished_at_utc": _utc_now(), "raw_response": dict(raw), "actual_cost_usd": format(call_cost, "f")}
-        raw_payload["raw_response_hash"] = canonical_sha256(raw_payload, exclude_fields=("raw_response_hash",))
-        _write_exclusive(raw_response_dir / f"{item.index:02d}-{item.plan_item.request.request_hash}.json", raw_payload)
         cumulative += call_cost
         _need(cumulative <= Decimal(dispatch.EXPECTED_MAX_COST_USD), "actual cost exceeds approved ceiling")
         entry["state"] = dispatch.COMPLETED
-        entry["raw_response_hash"] = raw_payload["raw_response_hash"]
         entry["processed_record_hash"] = record["record_hash"]
+        entry["actual_cost_usd"] = format(call_cost, "f")
         _store_ledger(ledger_path, ledger, exclusive=False)
         records.append(record)
-        raw_hashes.append(raw_payload["raw_response_hash"])
+        raw_hashes.append(capture_hash)
     artifact = _result(code_commit_sha=code_commit_sha, approval_hash=approval_hash, readiness_hash=readiness_hash, cost_preflight=cost_preflight, ledger=ledger, records=records, raw_response_hashes=raw_hashes, total_cost=cumulative)
     verify_result(artifact)
     _write_exclusive(result_path, artifact)

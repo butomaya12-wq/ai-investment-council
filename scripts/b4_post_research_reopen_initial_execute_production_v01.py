@@ -26,7 +26,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--execute-paid-initial", action="store_true")
     parser.add_argument("--owner-approval", type=Path)
-    parser.add_argument("--readiness", type=Path, default=Path(".aic-runtime/b4_post_research_reopen_initial_production_dispatch_zero_call_preflight_v0_2.json"))
+    parser.add_argument("--readiness", type=Path, default=Path(".aic-runtime/b4_post_research_reopen_initial_production_dispatch_zero_call_preflight_v0_3.json"))
     parser.add_argument("--cost-preflight", type=Path, default=Path(".aic-runtime/b4_post_research_reopen_initial_request_cost_preflight_zero_call_v0_1.json"))
     parser.add_argument("--ledger", type=Path, default=Path(".aic-runtime/b4_post_research_reopen_initial_paid_dispatch_ledger_v0_1.json"))
     parser.add_argument("--raw-response-dir", type=Path, default=Path(".aic-runtime/b4_post_research_reopen_initial_paid_raw_responses_v0_1"))
