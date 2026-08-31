@@ -11,8 +11,6 @@ from aic.research.reopen_judge_cr4_to_cr6_repair_production_v01 import (
     BLOCKED_STATUS,
     EXPECTED_ALPACA_BINARY_SHA256,
     EXPECTED_CAPABILITY_PROBE_HASH,
-    EXPECTED_DRY_HASH,
-    EXPECTED_PREFLIGHT_HASH,
     EXPECTED_REOPEN_CUTOFF_UTC,
     EXPECTED_REQUEST_MANIFEST_HASH,
     MAX_DISPATCH_ATTEMPTS,
@@ -21,6 +19,7 @@ from aic.research.reopen_judge_cr4_to_cr6_repair_production_v01 import (
     build_authorization,
     execute_once,
     verify_installed_cli,
+    verify_original_result,
     verify_preflight,
     verify_source_dry,
 )
@@ -133,6 +132,7 @@ def main() -> int:
 
         preflight_hash = verify_preflight(preflight)
         dry_hash = verify_source_dry(dry)
+        verify_original_result(original_result)
         cli = verify_installed_cli(preflight)
 
         if args.approve_preflight_hash != preflight_hash:
