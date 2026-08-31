@@ -191,6 +191,17 @@ class DurableJournal:
             os.fsync(handle.fileno())
         return str(row["event_hash"])
 
+    def binding(self, *, bundle_id: str, request_hash: str, binding_payload: Mapping[str, Any]) -> str:
+        return self._append({
+            "event_version": JOURNAL_EVENT_VERSION,
+            "event_type": "DYNAMIC_REQUEST_BINDING",
+            "recorded_at_utc": _utc_now_text(),
+            "authorization_artifact_hash": self.authorization_hash,
+            "bundle_id": bundle_id,
+            "request_hash": request_hash,
+            "binding_payload": dict(binding_payload),
+        })
+
     def dispatch_attempt(self, *, bundle_id: str, request_hash: str, dispatch_index_within_bundle: int) -> str:
         self.attempt_count += 1
         _need(self.attempt_count <= MAX_DISPATCH_ATTEMPTS, "provider dispatch ceiling exceeded")
@@ -311,21 +322,59 @@ def execute_once(*, preflight: Mapping[str, Any], authorization: Mapping[str, An
         except AlpacaNewsReadError as exc:
             raise ResidualExternalReadRuntimeError(f"{bundle_id} news read failed") from exc
         payload = read.model_dump(mode="json")
-        outputs.append({"bundle_id": bundle_id, "status": "PASS" if read.pagination_complete else "PARTIAL_STOP", "provider_dispatch_attempts": read.page_count, "response_artifact": payload, "response_artifact_hash": canonical_sha256(payload)})
+        outputs.append({
+            "bundle_id": bundle_id,
+            "status": "PASS" if read.pagination_complete else "PARTIAL_STOP",
+            "provider_dispatch_attempts": read.page_count,
+            "response_artifact": payload,
+            "response_artifact_hash": canonical_sha256(payload),
+        })
         if not read.pagination_complete:
-            return _blocked_result(authorization_hash=auth_hash, preflight_hash=preflight_hash, journal=journal, outputs=outputs, failed_bundle_id=bundle_id, reason="NEWS_PAGINATION_NOT_TERMINAL_WITHIN_BOUND")
+            return _blocked_result(
+                authorization_hash=auth_hash,
+                preflight_hash=preflight_hash,
+                journal=journal,
+                outputs=outputs,
+                failed_bundle_id=bundle_id,
+                reason="NEWS_PAGINATION_NOT_TERMINAL_WITHIN_BOUND",
+            )
 
-    positions, positions_sha, positions_request_hash = _run_cli_json(bundle_id="ER4_CURRENT_PAPER_POSITIONS", command=["position", "list"], journal=journal)
+    positions, positions_sha, positions_request_hash = _run_cli_json(
+        bundle_id="ER4_CURRENT_PAPER_POSITIONS",
+        command=["position", "list"],
+        journal=journal,
+    )
     position_symbols = _position_symbols(positions)
-    outputs.append({"bundle_id": "ER4_CURRENT_PAPER_POSITIONS", "status": "PASS", "provider_dispatch_attempts": 1, "response_sha256": positions_sha, "request_hash": positions_request_hash, "response_payload": positions, "equity_position_symbols": position_symbols})
+    outputs.append({
+        "bundle_id": "ER4_CURRENT_PAPER_POSITIONS",
+        "status": "PASS",
+        "provider_dispatch_attempts": 1,
+        "response_sha256": positions_sha,
+        "request_hash": positions_request_hash,
+        "response_payload": positions,
+        "equity_position_symbols": position_symbols,
+    })
 
     er5 = rows[4]["resolved_request_contract"]
     portfolio, portfolio_sha, portfolio_request_hash = _run_cli_json(
         bundle_id="ER5_CURRENT_PORTFOLIO_EQUITY",
-        command=["account", "portfolio", "--start", str(er5["start_utc"]), "--end", str(er5["end_utc"]), "--timeframe", str(er5["timeframe"]), "--intraday-reporting", str(er5["intraday_reporting"])],
+        command=[
+            "account", "portfolio",
+            "--start", str(er5["start_utc"]),
+            "--end", str(er5["end_utc"]),
+            "--timeframe", str(er5["timeframe"]),
+            "--intraday-reporting", str(er5["intraday_reporting"]),
+        ],
         journal=journal,
     )
-    outputs.append({"bundle_id": "ER5_CURRENT_PORTFOLIO_EQUITY", "status": "PASS", "provider_dispatch_attempts": 1, "response_sha256": portfolio_sha, "request_hash": portfolio_request_hash, "response_payload": portfolio})
+    outputs.append({
+        "bundle_id": "ER5_CURRENT_PORTFOLIO_EQUITY",
+        "status": "PASS",
+        "provider_dispatch_attempts": 1,
+        "response_sha256": portfolio_sha,
+        "request_hash": portfolio_request_hash,
+        "response_payload": portfolio,
+    })
 
     er6 = rows[5]["resolved_request_contract"]
     symbols = _final_market_symbols(position_symbols)
@@ -339,14 +388,37 @@ def execute_once(*, preflight: Mapping[str, Any], authorization: Mapping[str, An
         "limit": er6["limit"],
     }
     final_er6_request_hash = canonical_sha256(final_er6_request)
+    journal.binding(
+        bundle_id="ER6_DYNAMIC_MARKET_CONTEXT",
+        request_hash=final_er6_request_hash,
+        binding_payload=final_er6_request,
+    )
     market, market_sha, market_request_hash = _run_cli_json(
         bundle_id="ER6_DYNAMIC_MARKET_CONTEXT",
-        command=["data", "multi-bars", "--symbols", ",".join(symbols), "--start", str(er6["start_utc"]), "--end", str(er6["end_utc"]), "--timeframe", str(er6["timeframe"]), "--feed", str(er6["feed"]), "--sort", str(er6["sort"]), "--limit", str(er6["limit"])],
+        command=[
+            "data", "multi-bars",
+            "--symbols", ",".join(symbols),
+            "--start", str(er6["start_utc"]),
+            "--end", str(er6["end_utc"]),
+            "--timeframe", str(er6["timeframe"]),
+            "--feed", str(er6["feed"]),
+            "--sort", str(er6["sort"]),
+            "--limit", str(er6["limit"]),
+        ],
         journal=journal,
     )
     _need(isinstance(market, Mapping), "ER6 response must be object")
     _need(market.get("next_page_token") is None, "ER6 pagination is not terminal within one-page bound")
-    outputs.append({"bundle_id": "ER6_DYNAMIC_MARKET_CONTEXT", "status": "PASS", "provider_dispatch_attempts": 1, "response_sha256": market_sha, "request_hash": market_request_hash, "final_er6_request_hash": final_er6_request_hash, "final_symbols": symbols, "response_payload": market})
+    outputs.append({
+        "bundle_id": "ER6_DYNAMIC_MARKET_CONTEXT",
+        "status": "PASS",
+        "provider_dispatch_attempts": 1,
+        "response_sha256": market_sha,
+        "request_hash": market_request_hash,
+        "final_er6_request_hash": final_er6_request_hash,
+        "final_symbols": symbols,
+        "response_payload": market,
+    })
 
     result = {
         "artifact_version": RESULT_VERSION,
