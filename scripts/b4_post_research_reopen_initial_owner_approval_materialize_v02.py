@@ -15,9 +15,9 @@ def main() -> int:
     parser.add_argument("--owner-approval-granted", action="store_true")
     parser.add_argument("--owner-approval-id")
     parser.add_argument("--owner-approval-at-utc")
-    parser.add_argument("--readiness", type=Path, required=True, help="final v0.3 readiness artifact bound to the final executor HEAD")
+    parser.add_argument("--readiness", type=Path, required=True, help="final v0.4 readiness artifact bound to the final executor HEAD")
     parser.add_argument("--cost-preflight", type=Path, default=Path(".aic-runtime/b4_post_research_reopen_initial_request_cost_preflight_zero_call_v0_1.json"))
-    parser.add_argument("--output", type=Path, default=Path(".aic-runtime/b4_post_research_reopen_initial_owner_approval_v0_2.json"))
+    parser.add_argument("--output", type=Path, default=Path(".aic-runtime/b4_post_research_reopen_initial_owner_approval_v0_3.json"))
     args = parser.parse_args()
     try:
         if not args.owner_approval_granted or not args.owner_approval_id or not args.owner_approval_at_utc:

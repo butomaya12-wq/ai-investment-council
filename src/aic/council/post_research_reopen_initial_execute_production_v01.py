@@ -25,8 +25,8 @@ from .request import CouncilRequestEnvelope, CouncilRequestStage
 from .reopen_initial_runtime import ReopenInitialRuntimePlanItem, process_reopen_initial_provider_response
 
 
-READINESS_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_PRODUCTION_DISPATCH_ZERO_CALL_PREFLIGHT_v0_3"
-READINESS_STATUS = "B4_POST_RESEARCH_REOPEN_INITIAL_PRODUCTION_DISPATCH_ZERO_CALL_PREFLIGHT_V03_PASS"
+READINESS_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_PRODUCTION_DISPATCH_ZERO_CALL_PREFLIGHT_v0_4"
+READINESS_STATUS = "B4_POST_RESEARCH_REOPEN_INITIAL_PRODUCTION_DISPATCH_ZERO_CALL_PREFLIGHT_V04_PASS"
 OWNER_APPROVAL_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_OWNER_APPROVAL_v0_2"
 LEDGER_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_PAID_DISPATCH_LEDGER_v0_1"
 RESULT_VERSION = "B4_POST_RESEARCH_REOPEN_INITIAL_COUNCIL_FREEZE_v0_1"
@@ -175,7 +175,7 @@ def build_owner_approval(*, code_commit_sha: str, readiness_hash: str, cost_pref
 
 
 def verify_owner_approval_v02(approval: Mapping[str, Any], *, code_commit_sha: str, readiness_hash: str, cost_preflight: Mapping[str, Any]) -> str:
-    _self_hash(approval)
+    observed = _self_hash(approval)
     _need(approval.get("artifact_version") == OWNER_APPROVAL_VERSION, "owner approval version drift")
     _need(approval.get("owner_approval_granted") is True, "owner approval is not explicitly granted")
     _need(approval.get("dispatch_readiness_artifact_hash") == readiness_hash, "owner approval readiness hash drift")
@@ -184,9 +184,10 @@ def verify_owner_approval_v02(approval: Mapping[str, Any], *, code_commit_sha: s
     legacy.pop("dispatch_readiness_artifact_hash", None)
     legacy["artifact_hash"] = canonical_sha256(legacy, exclude_fields=("artifact_hash",))
     try:
-        return dispatch.verify_owner_approval(legacy, cost_preflight=cost_preflight, dispatch_code_commit_sha=code_commit_sha)
+        dispatch.verify_owner_approval(legacy, cost_preflight=cost_preflight, dispatch_code_commit_sha=code_commit_sha)
     except dispatch.PostResearchReopenInitialProductionDispatchError as exc:
         raise PostResearchInitialExecutionError(str(exc)) from exc
+    return observed
 
 
 def build_readiness(*, code_commit_sha: str, cost_preflight: Mapping[str, Any], context_capability: Mapping[str, Any]) -> dict[str, Any]:

@@ -48,11 +48,12 @@ def _run(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, approval=None, read
 
 
 def test_context_record_and_readiness_bind_frozen_nine() -> None:
-    cost, capability, readiness, _approval = _inputs()
+    cost, capability, readiness, approval = _inputs()
     items = runtime.frozen_initial_items(cost)
     runtime.verify_context_admissibility(items, capability)
     assert len(items) == 9
     assert runtime.verify_readiness(readiness, code_commit_sha=HEAD, cost_preflight=cost, context_capability=capability) == readiness["artifact_hash"]
+    assert runtime.verify_owner_approval_v02(approval, code_commit_sha=HEAD, readiness_hash=readiness["artifact_hash"], cost_preflight=cost) == approval["artifact_hash"]
     assert readiness["context_admissibility"] == "PASS"
 
 
@@ -173,9 +174,13 @@ def test_partial_or_existing_result_blocks_blind_restart(tmp_path: Path, monkeyp
 
 
 def test_all_nine_fake_success_freezes_only_initial(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    _cost, _capability, _readiness, approval = _inputs()
     result, calls = _run(tmp_path, monkeypatch)
     assert len(calls) == 9
     assert runtime.verify_result(result) == result["artifact_hash"]
+    ledger = json.loads((tmp_path / "ledger.json").read_text(encoding="utf-8"))
+    assert ledger["owner_approval_hash"] == approval["artifact_hash"]
+    assert result["owner_approval_hash"] == approval["artifact_hash"]
     assert result["rebuttal_authorized"] is False
     assert result["judge_authorized"] is False
     assert result["b5_handoff_created"] is False
@@ -195,3 +200,18 @@ def test_v03_readiness_runner_preserves_v02_historical_evidence() -> None:
     assert "production_dispatch_zero_call_preflight_v0_2.json" in script
     assert "68d623c089ab529bb1e0d8a6892f7c67be14d8c4239e6070526d5dbc2bf68578" in script
     assert "production_dispatch_zero_call_preflight_v0_3.json" in script
+
+
+def test_historical_approval_cannot_authorize_changed_code_sha() -> None:
+    cost, _capability, _readiness, _approval = _inputs()
+    historical = json.loads(Path(".aic-runtime/b4_post_research_reopen_initial_owner_approval_v0_2.json").read_text(encoding="utf-8"))
+    assert historical["artifact_hash"] == "191ab582f2c4eefa9b05182adbfcf77ed65002f314d73b86781494c3310205c4"
+    with pytest.raises(runtime.PostResearchInitialExecutionError, match="dispatch code authority"):
+        runtime.verify_owner_approval_v02(historical, code_commit_sha="b" * 40, readiness_hash=historical["dispatch_readiness_artifact_hash"], cost_preflight=cost)
+
+
+def test_v04_readiness_runner_preserves_v03_historical_evidence() -> None:
+    script = Path("scripts/b4_post_research_reopen_initial_production_dispatch_zero_call_v04.py").read_text(encoding="utf-8")
+    assert "production_dispatch_zero_call_preflight_v0_3.json" in script
+    assert "366d02ba6cb3de73b9e2a7376f72d519dfb7630a375937758c2409eec0c0813c" in script
+    assert "production_dispatch_zero_call_preflight_v0_4.json" in script
