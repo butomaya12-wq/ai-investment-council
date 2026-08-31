@@ -28,6 +28,11 @@ from .b5_competition_pipeline_v1 import (
     B5ReadOnlyRiskSnapshot,
     run_b5_competition_options,
 )
+from .b5_competition_run_v1 import (
+    B5CompetitionRunResult,
+    B5RawAlpacaReadBundle,
+    run_b5_from_alpaca_reads,
+)
 from .options_competition_v1 import (
     B5CompetitionOptionsError,
     CompetitionOptionsPolicy,
@@ -53,8 +58,10 @@ __all__ = [
     "B5CompetitionProposal",
     "B5CompetitionProposalArtifact",
     "B5CompetitionRiskResultArtifact",
+    "B5CompetitionRunResult",
     "B5CompetitionSnapshotArtifact",
     "B5NormalizedAlpacaInputs",
+    "B5RawAlpacaReadBundle",
     "B5ReadOnlyRiskSnapshot",
     "CompetitionOptionsPolicy",
     "InvestHandoff",
@@ -70,6 +77,7 @@ __all__ = [
     "materialize_b5_competition_artifacts",
     "normalize_b5_alpaca_inputs",
     "run_b5_competition_options",
+    "run_b5_from_alpaca_reads",
     "select_long_call",
     "size_long_call",
     "validate_b4_invest_handoff",
