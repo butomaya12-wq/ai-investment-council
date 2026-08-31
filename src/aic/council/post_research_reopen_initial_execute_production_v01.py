@@ -8,7 +8,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from decimal import Decimal
+import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -63,7 +65,7 @@ def _read_object(path: Path, label: str) -> dict[str, Any]:
 def _write_exclusive(path: Path, payload: Mapping[str, Any]) -> None:
     _need(not path.exists(), f"exclusive output already exists: {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
-    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False) + "\n"
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
         handle.write(raw)
@@ -73,7 +75,7 @@ def _write_exclusive(path: Path, payload: Mapping[str, Any]) -> None:
 
 def _replace_durable(path: Path, payload: Mapping[str, Any]) -> None:
     _need(path.is_file(), f"durable ledger missing: {path}")
-    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False) + "\n"
     fd = os.open(path, os.O_WRONLY | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
         handle.write(raw)
@@ -236,12 +238,41 @@ def _store_ledger(path: Path, ledger: dict[str, Any], *, exclusive: bool) -> Non
         _replace_durable(path, ledger)
 
 
+def _external_json_value(value: Any) -> Any:
+    """Normalize valid external JSON without applying internal-domain rules."""
+    if value is None or isinstance(value, (str, bool)):
+        return value
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    if isinstance(value, float):
+        _need(math.isfinite(value), "external provider JSON forbids NaN/Infinity")
+        return value
+    if isinstance(value, Mapping):
+        normalized: dict[str, Any] = {}
+        for key, child in value.items():
+            _need(isinstance(key, str), "external provider JSON object key must be string")
+            normalized[key] = _external_json_value(child)
+        return normalized
+    if isinstance(value, (list, tuple)):
+        return [_external_json_value(child) for child in value]
+    raise PostResearchInitialExecutionError(f"external provider JSON value unsupported: {type(value).__name__}")
+
+
+def external_provider_json_sha256(value: Any) -> str:
+    """SHA-256 for external/provider JSON; intentionally distinct from domain canonical_sha256."""
+    normalized = _external_json_value(value)
+    raw = json.dumps(normalized, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
+
+
 def build_raw_response_capture(
     *, request_hash: str, provider_response: Mapping[str, Any], dispatch_started_at_utc: str, captured_at_utc: str
 ) -> dict[str, Any]:
     """Build evidence that must be durable before local response validation."""
     _need(isinstance(provider_response, Mapping), "provider response must be object")
-    provider_response_id = provider_response.get("id")
+    normalized_response = _external_json_value(provider_response)
+    _need(isinstance(normalized_response, Mapping), "provider response normalization drift")
+    provider_response_id = normalized_response.get("id")
     _need(provider_response_id is None or isinstance(provider_response_id, str), "provider response id malformed")
     capture: dict[str, Any] = {
         "capture_version": "B4_POST_RESEARCH_REOPEN_INITIAL_RAW_PROVIDER_RESPONSE_v0_1",
@@ -249,16 +280,18 @@ def build_raw_response_capture(
         "provider_response_id": provider_response_id,
         "dispatch_started_at_utc": dispatch_started_at_utc,
         "captured_at_utc": captured_at_utc,
-        "raw_response": dict(provider_response),
+        "raw_response": dict(normalized_response),
     }
-    capture["raw_response_hash"] = canonical_sha256(capture, exclude_fields=("raw_response_hash",))
+    capture["raw_response_hash"] = external_provider_json_sha256(capture)
     return capture
 
 
 def verify_raw_response_capture(capture: Mapping[str, Any], *, request_hash: str) -> str:
     observed = capture.get("raw_response_hash")
     _need(isinstance(observed, str) and re.fullmatch(r"[0-9a-f]{64}", observed) is not None, "raw response hash missing")
-    _need(observed == canonical_sha256(capture, exclude_fields=("raw_response_hash",)), "raw response hash mismatch")
+    comparable = dict(capture)
+    comparable.pop("raw_response_hash", None)
+    _need(observed == external_provider_json_sha256(comparable), "raw response hash mismatch")
     _need(capture.get("capture_version") == "B4_POST_RESEARCH_REOPEN_INITIAL_RAW_PROVIDER_RESPONSE_v0_1", "raw response capture version drift")
     _need(capture.get("request_hash") == request_hash, "raw response request hash drift")
     _need(isinstance(capture.get("raw_response"), Mapping), "raw response missing")

@@ -10,6 +10,7 @@ import pytest
 from aic.council import post_research_reopen_initial_execute_production_v01 as runtime
 from aic.council import post_research_reopen_initial_production_dispatch_v01 as dispatch
 from aic.domain.canonical import canonical_sha256
+from aic.domain.errors import CanonicalSerializationError
 
 
 HEAD = "a" * 40
@@ -124,10 +125,24 @@ def test_ambiguous_transport_outcome_persists_unknown_and_never_resends(tmp_path
     assert not (tmp_path / "result.json").exists()
 
 
+def test_external_provider_json_hash_accepts_finite_float_without_weakening_domain_canonicalizer() -> None:
+    first = {"provider_metric": 1.25, "nested": {"a": [0.5, True]}}
+    second = {"nested": {"a": [0.5, True]}, "provider_metric": 1.25}
+    assert runtime.external_provider_json_sha256(first) == runtime.external_provider_json_sha256(second)
+    with pytest.raises(CanonicalSerializationError, match="binary float"):
+        canonical_sha256(first)
+
+
+@pytest.mark.parametrize("non_finite", [float("nan"), float("inf"), float("-inf")])
+def test_external_provider_json_hash_rejects_non_finite_floats(non_finite: float) -> None:
+    with pytest.raises(runtime.PostResearchInitialExecutionError, match="NaN/Infinity"):
+        runtime.external_provider_json_sha256({"provider_metric": non_finite})
+
+
 def test_raw_response_is_durable_before_local_validation_failure_and_blocks_rerun(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     cost, capability, readiness, approval = _inputs()
     calls = 0
-    provider_response = {"id": "resp-captured-before-validation", "status": "completed", "usage": {"input_tokens": 1}}
+    provider_response = {"id": "resp-captured-before-validation", "status": "completed", "usage": {"input_tokens": 1}, "provider_metric": 1.25}
 
     def transport(_payload):
         nonlocal calls
