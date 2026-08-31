@@ -8,6 +8,15 @@ from .alpaca_b5_normalization_v1 import (
     B5NormalizedAlpacaInputs,
     normalize_b5_alpaca_inputs,
 )
+from .alpaca_b5_runtime_v1 import (
+    AlpacaReadOnlyCredentials,
+    B5AlpacaReadOnlyRuntimeResult,
+    B5AlpacaRuntimeError,
+    B5ProviderReadReceipt,
+    B5ReadOnlyProductionRunResult,
+    execute_b5_alpaca_read_only_runtime,
+    run_b5_read_only_production_path,
+)
 from .alpaca_options_readonly_v1 import (
     ReadOnlyAlpacaRequest,
     assert_read_only_request_plan,
@@ -49,7 +58,10 @@ from .options_competition_v1 import (
 )
 
 __all__ = [
+    "AlpacaReadOnlyCredentials",
     "B5AlpacaNormalizationError",
+    "B5AlpacaReadOnlyRuntimeResult",
+    "B5AlpacaRuntimeError",
     "B5CompetitionAcceptedProposal",
     "B5CompetitionArtifactBundle",
     "B5CompetitionArtifactError",
@@ -61,7 +73,9 @@ __all__ = [
     "B5CompetitionRunResult",
     "B5CompetitionSnapshotArtifact",
     "B5NormalizedAlpacaInputs",
+    "B5ProviderReadReceipt",
     "B5RawAlpacaReadBundle",
+    "B5ReadOnlyProductionRunResult",
     "B5ReadOnlyRiskSnapshot",
     "CompetitionOptionsPolicy",
     "InvestHandoff",
@@ -73,11 +87,13 @@ __all__ = [
     "assert_read_only_request_plan",
     "build_b5_read_only_request_plan",
     "derive_premium_risk_budgets",
+    "execute_b5_alpaca_read_only_runtime",
     "load_competition_options_policy",
     "materialize_b5_competition_artifacts",
     "normalize_b5_alpaca_inputs",
     "run_b5_competition_options",
     "run_b5_from_alpaca_reads",
+    "run_b5_read_only_production_path",
     "select_long_call",
     "size_long_call",
     "validate_b4_invest_handoff",
