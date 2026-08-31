@@ -15,7 +15,7 @@ HEAD = "a" * 40
 
 def _preflight() -> dict:
     rows = []
-    for index, (bundle_id, template_hash) in enumerate(zip(runtime.BUNDLE_IDS, runtime.EXPECTED_TEMPLATE_HASHES, strict=True), start=1):
+    for bundle_id, template_hash in zip(runtime.BUNDLE_IDS, runtime.EXPECTED_TEMPLATE_HASHES, strict=True):
         rows.append({"bundle_id": bundle_id, "request_template_hash": template_hash})
     payload = {
         "status": runtime.preflight_v01.PASS_STATUS,
@@ -91,6 +91,19 @@ def test_durable_journal_writes_attempt_before_response(tmp_path: Path) -> None:
     assert rows[0]["event_hash"] == attempt_hash
     assert rows[1]["event_hash"] == response_hash
     assert rows[0]["global_dispatch_index"] == 1
+
+
+def test_dynamic_er6_binding_is_durable_before_dispatch(tmp_path: Path) -> None:
+    path = tmp_path / "journal.jsonl"
+    journal = runtime.DurableJournal(path, authorization_hash="b" * 64)
+    final_request = {"symbols": ["MSFT", "META", "AAPL"], "timeframe": "1Hour"}
+    request_hash = canonical_sha256(final_request)
+    journal.binding(bundle_id="ER6_DYNAMIC_MARKET_CONTEXT", request_hash=request_hash, binding_payload=final_request)
+    journal.dispatch_attempt(bundle_id="ER6_DYNAMIC_MARKET_CONTEXT", request_hash="d" * 64, dispatch_index_within_bundle=1)
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    assert [row["event_type"] for row in rows] == ["DYNAMIC_REQUEST_BINDING", "PROVIDER_DISPATCH_ATTEMPT"]
+    assert rows[0]["request_hash"] == request_hash
+    assert rows[0]["binding_payload"] == final_request
 
 
 def test_durable_journal_rejects_tenth_dispatch(tmp_path: Path) -> None:
