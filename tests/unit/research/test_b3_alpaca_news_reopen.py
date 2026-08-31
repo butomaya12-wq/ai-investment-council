@@ -75,6 +75,29 @@ def test_reopen_pagination_follows_token_until_complete() -> None:
     assert len(read.aggregate_payload_hash) == 64
 
 
+def test_reopen_pagination_accepts_empty_string_as_terminal_provider_token() -> None:
+    transport = _PagedTransport(
+        {
+            None: {"news": [_article(2)], "next_page_token": "PAGE2"},
+            "PAGE2": {"news": [_article(1)], "next_page_token": ""},
+        }
+    )
+    read = read_alpaca_news_window_for_reopen(
+        symbol="NVDA",
+        window_start=CUTOFF - timedelta(days=30),
+        window_end=CUTOFF,
+        research_cutoff=CUTOFF,
+        page_size=5,
+        api_key_id="test-key",
+        api_secret_key="test-secret",
+        transport=transport,
+    )
+    assert read.pagination_complete is True
+    assert read.terminal_next_page_token is None
+    assert read.page_count == 2
+    assert tuple(article.article_id for article in read.articles) == (2, 1)
+
+
 def test_reopen_pagination_stays_partial_at_engineering_page_cap() -> None:
     pages: dict[str | None, dict] = {}
     token: str | None = None
