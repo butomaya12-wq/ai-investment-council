@@ -17,9 +17,11 @@ from aic.b5.competition_v1 import (
     B5Blocked,
     TEST_MODE,
     build_option_intent,
+    calculate_premium_risk,
     eligible_contracts,
     load_test_fixture,
     parse_contracts,
+    relative_spread_from_quote,
     select_contract,
 )
 from aic.b6.competition_v1 import (
@@ -79,7 +81,7 @@ def test_selector_is_decimal_deterministic_and_filters_every_invalid_contract() 
     as_of, contracts = parse_contracts(chain)
     assert intent.option_symbol == "AAPL261006C00200000"
     assert intent.dte == 35 and intent.delta == Decimal("0.50")
-    assert intent.relative_spread == Decimal("0.04")
+    assert intent.relative_spread == Decimal("2") / Decimal("49")
     assert [item.option_symbol for item in eligible_contracts(contracts, as_of=as_of)] == [intent.option_symbol]
     assert select_contract(list(reversed(contracts)), as_of=as_of) == select_contract(contracts, as_of=as_of)
     for mutation in (
@@ -87,9 +89,26 @@ def test_selector_is_decimal_deterministic_and_filters_every_invalid_contract() 
         replace(contracts[0], delta=Decimal("0.40")),
         replace(contracts[0], bid=Decimal("2.00"), ask=Decimal("2.50")),
         replace(contracts[0], open_interest=99),
+        replace(contracts[0], quote_age_seconds=61),
+        replace(contracts[0], open_interest_current_for_latest_completed_session=False),
     ):
         with pytest.raises(B5Blocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
             select_contract([mutation], as_of=as_of)
+
+
+def test_midpoint_spread_and_selection_freshness_are_fail_closed() -> None:
+    _, chain, _ = setup_intent()
+    as_of, contracts = parse_contracts(chain)
+    assert relative_spread_from_quote(Decimal("95.10"), Decimal("105")) < Decimal("0.10")
+    assert relative_spread_from_quote(Decimal("94.90"), Decimal("105")) > Decimal("0.10")
+    assert select_contract([replace(contracts[0], bid=Decimal("95.10"), ask=Decimal("105"))], as_of=as_of).option_symbol == contracts[0].option_symbol
+    with pytest.raises(B5Blocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        select_contract([replace(contracts[0], bid=Decimal("94.90"), ask=Decimal("105"))], as_of=as_of)
+    raw = json.loads(json.dumps(chain))
+    raw["contracts"][0].pop("open_interest_current_for_latest_completed_session")
+    _, missing_freshness = parse_contracts(raw)
+    with pytest.raises(B5Blocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        select_contract([missing_freshness[0]], as_of=as_of)
 
 
 def test_sizing_blocks_insufficient_budget_and_cap_excess() -> None:
@@ -125,11 +144,20 @@ def test_approval_exact_binding_and_commit_revalidation_drift_block() -> None:
     with pytest.raises(B6Blocked, match="TEST_OWNER_APPROVAL"):
         create_test_approval(intent, mode="PRODUCTION")
     states = read_json("b6_commit_state_v1.json")
-    assert commit_revalidate(intent, approval, states["clean"], mode=TEST_MODE).state == "READY_FOR_PAPER_SEND"
+    clean = states["clean"]
+    assert commit_revalidate(intent, approval, clean, mode=TEST_MODE).state == "READY_FOR_PAPER_SEND"
+    risk = calculate_premium_risk(clean, intent.premium_per_contract)
+    assert risk.status == "PASS" and risk.quantity == 2
+    one_qty = dict(clean, account_equity="10000", cash_available="6000", risk_status="PASS")
+    zero_qty = dict(clean, account_equity="1000", cash_available="600", risk_status="PASS")
+    assert commit_revalidate(intent, approval, one_qty, mode=TEST_MODE).state == "BLOCK_COMMIT_REVALIDATION"
+    assert commit_revalidate(intent, approval, zero_qty, mode=TEST_MODE).state == "BLOCK_COMMIT_REVALIDATION"
+    assert commit_revalidate(intent, approval, dict(clean, quote_age_seconds=16), mode=TEST_MODE).state == "BLOCK_COMMIT_REVALIDATION"
+    assert commit_revalidate(intent, approval, dict(clean, bid="2.25", ask="2.50"), mode=TEST_MODE).state == "BLOCK_COMMIT_REVALIDATION"
     transport = FakePaperTransport()
     blocked, receipt = send_after_commit(intent, approval, states["drift_block"], transport, mode=TEST_MODE)
     assert blocked.state == "BLOCK_COMMIT_REVALIDATION" and receipt is None and transport.calls == 0
-    ready, receipt = send_after_commit(intent, approval, states["clean"], transport, mode=TEST_MODE)
+    ready, receipt = send_after_commit(intent, approval, clean, transport, mode=TEST_MODE)
     assert ready.state == "READY_FOR_PAPER_SEND" and receipt is not None and transport.calls == 1
     assert receipt["status"] == "WOULD_SUBMIT_PAPER_ORDER"
     assert receipt["broker_writes"] == 0 and receipt["alpaca_orders"] == 0

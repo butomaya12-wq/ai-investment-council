@@ -41,6 +41,19 @@ class OptionContract:
     active: bool
     tradable: bool
     greeks_present: bool
+    quote_age_seconds: int
+    open_interest_current_for_latest_completed_session: bool
+
+
+@dataclass(frozen=True)
+class PremiumRiskResult:
+    status: str
+    reason: str | None
+    quantity: int
+    max_loss_usd: Decimal
+    same_underlying_risk_after: Decimal
+    aggregate_option_risk_after: Decimal
+    cash_reserve_after: Decimal
 
 
 @dataclass(frozen=True)
@@ -185,15 +198,26 @@ def parse_contracts(payload: Mapping[str, Any]) -> tuple[date, list[OptionContra
                 active=raw.get("active") is True,
                 tradable=raw.get("tradable") is True,
                 greeks_present=raw.get("greeks_present") is True,
+                quote_age_seconds=int(raw.get("quote_age_seconds", -1)),
+                open_interest_current_for_latest_completed_session=(
+                    raw.get("open_interest_current_for_latest_completed_session") is True
+                ),
             )
         )
     return as_of, contracts
 
 
-def relative_spread(contract: OptionContract) -> Decimal:
-    if contract.bid <= 0 or contract.ask <= 0 or contract.ask < contract.bid:
+def relative_spread_from_quote(bid: Decimal, ask: Decimal) -> Decimal:
+    if bid <= 0 or ask <= 0 or ask < bid:
         raise B5Blocked("invalid option quote")
-    return (contract.ask - contract.bid) / contract.ask
+    midpoint = (bid + ask) / Decimal("2")
+    if midpoint <= 0:
+        raise B5Blocked("invalid option quote")
+    return (ask - bid) / midpoint
+
+
+def relative_spread(contract: OptionContract) -> Decimal:
+    return relative_spread_from_quote(contract.bid, contract.ask)
 
 
 def eligible_contracts(contracts: Sequence[OptionContract], *, as_of: date) -> list[OptionContract]:
@@ -201,20 +225,27 @@ def eligible_contracts(contracts: Sequence[OptionContract], *, as_of: date) -> l
     delta_min = _decimal(policy["delta_min"], "delta_min")
     delta_max = _decimal(policy["delta_max"], "delta_max")
     spread_max = _decimal(policy["max_relative_spread"], "max_relative_spread")
+    quote_max_age = int(policy["selection_quote_max_age_seconds"])
+    dte_min = int(policy["dte_min_calendar_days"])
+    dte_max = int(policy["dte_max_calendar_days"])
+    min_open_interest = int(policy["min_open_interest"])
     eligible: list[OptionContract] = []
     for contract in contracts:
         dte = (contract.expiration - as_of).days
         if (
-            contract.contract_type != "CALL"
-            or contract.opening_direction != "BUY_TO_OPEN"
-            or contract.multiplier != 100
-            or not 21 <= dte <= 49
+            contract.contract_type != policy["contract_type"]
+            or contract.opening_direction != policy["opening_direction"]
+            or contract.multiplier != int(policy["standard_contract_size"])
+            or not dte_min <= dte <= dte_max
             or contract.delta is None
             or not delta_min <= contract.delta <= delta_max
-            or contract.open_interest < 100
+            or contract.open_interest < min_open_interest
             or not contract.active
             or not contract.tradable
             or not contract.greeks_present
+            or contract.quote_age_seconds < 0
+            or contract.quote_age_seconds > quote_max_age
+            or not contract.open_interest_current_for_latest_completed_session
         ):
             continue
         try:
@@ -230,8 +261,9 @@ def select_contract(contracts: Sequence[OptionContract], *, as_of: date) -> Opti
     eligible = eligible_contracts(contracts, as_of=as_of)
     if not eligible:
         raise B5Blocked("BLOCK_INCOMPLETE_OPTION_MARKET")
-    target_dte = 35
-    target_delta = Decimal("0.50")
+    policy = load_competition_options_policy()["selector"]
+    target_dte = int(policy["dte_target_calendar_days"])
+    target_delta = _decimal(policy["delta_target"], "delta_target")
     return min(
         eligible,
         key=lambda contract: (
@@ -244,25 +276,29 @@ def select_contract(contracts: Sequence[OptionContract], *, as_of: date) -> Opti
     )
 
 
-def _sizing(account: Mapping[str, Any], premium_per_contract: Decimal) -> tuple[int, Decimal, Decimal, Decimal, Decimal]:
+def calculate_premium_risk(account: Mapping[str, Any], premium_per_contract: Decimal) -> PremiumRiskResult:
+    """Pure frozen-policy risk/sizing calculation shared by B5 and B6."""
+    if premium_per_contract <= 0:
+        return PremiumRiskResult("BLOCK", "BLOCK_INVALID_PREMIUM", 0, Decimal("0"), Decimal("0"), Decimal("0"), Decimal("0"))
+    policy = load_competition_options_policy()["risk"]
     equity = _decimal(account["account_equity"], "account_equity")
     cash = _decimal(account["cash_available"], "cash_available")
     same_current = _decimal(account["current_same_underlying_premium_risk"], "same risk")
     aggregate_current = _decimal(account["current_aggregate_option_premium_risk"], "aggregate risk")
     broker_capacity = _decimal(account["broker_capacity"], "broker capacity")
-    new_cap = equity * Decimal("0.03")
-    same_cap = equity * Decimal("0.03")
-    aggregate_cap = equity * Decimal("0.06")
-    reserve = equity * Decimal("0.50")
+    new_cap = equity * _decimal(policy["max_new_position_premium_at_risk_fraction_of_equity"], "new cap")
+    same_cap = equity * _decimal(policy["max_same_underlying_premium_at_risk_fraction_of_equity"], "same cap")
+    aggregate_cap = equity * _decimal(policy["max_aggregate_open_long_option_premium_at_risk_fraction_of_equity"], "aggregate cap")
+    reserve = equity * _decimal(policy["min_post_proposal_equity_safety_reserve_fraction"], "reserve")
     if same_current > same_cap or aggregate_current > aggregate_cap:
-        raise B5Blocked("BLOCK_RISK_CAP_EXCEEDED")
+        return PremiumRiskResult("BLOCK", "BLOCK_RISK_CAP_EXCEEDED", 0, Decimal("0"), same_current, aggregate_current, cash)
     safe_budget = min(new_cap, same_cap - same_current, aggregate_cap - aggregate_current, cash - reserve, broker_capacity)
     quantity = int((safe_budget / premium_per_contract).to_integral_value(rounding=ROUND_FLOOR)) if safe_budget > 0 else 0
-    quantity = min(quantity, 2)
+    quantity = min(quantity, int(policy["max_contracts_per_new_order"]))
     if quantity < 1:
-        raise B5Blocked("BLOCK_INSUFFICIENT_RISK_BUDGET")
+        return PremiumRiskResult("BLOCK", "BLOCK_INSUFFICIENT_RISK_BUDGET", 0, Decimal("0"), same_current, aggregate_current, cash)
     max_loss = premium_per_contract * quantity
-    return quantity, max_loss, same_current + max_loss, aggregate_current + max_loss, cash - max_loss
+    return PremiumRiskResult("PASS", None, quantity, max_loss, same_current + max_loss, aggregate_current + max_loss, cash - max_loss)
 
 
 def build_option_intent(
@@ -283,7 +319,9 @@ def build_option_intent(
     account = option_chain.get("account")
     if not isinstance(account, Mapping):
         raise B5Blocked("account fixture missing")
-    quantity, max_loss, same_after, aggregate_after, reserve_after = _sizing(account, premium)
+    risk = calculate_premium_risk(account, premium)
+    if risk.status != "PASS":
+        raise B5Blocked(risk.reason or "BLOCK_RISK")
     equity = _decimal(account["account_equity"], "account_equity")
     values: dict[str, object] = {
         "decision_id": str(decision["decision_id"]),
@@ -303,14 +341,14 @@ def build_option_intent(
         "open_interest": selected.open_interest,
         "relative_spread": relative_spread(selected),
         "dte": (selected.expiration - as_of).days,
-        "quantity": quantity,
+        "quantity": risk.quantity,
         "premium_per_contract": premium,
-        "max_loss_usd": max_loss,
+        "max_loss_usd": risk.max_loss_usd,
         "account_equity": equity,
-        "premium_risk_after": max_loss,
-        "same_underlying_risk_after": same_after,
-        "aggregate_option_risk_after": aggregate_after,
-        "cash_reserve_after": reserve_after,
+        "premium_risk_after": risk.max_loss_usd,
+        "same_underlying_risk_after": risk.same_underlying_risk_after,
+        "aggregate_option_risk_after": risk.aggregate_option_risk_after,
+        "cash_reserve_after": risk.cash_reserve_after,
         "risk_status": "PASS",
         "environment": "PAPER",
         "order_type": "LIMIT",

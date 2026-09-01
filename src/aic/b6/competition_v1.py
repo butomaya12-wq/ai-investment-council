@@ -6,8 +6,14 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any, Mapping
 
-from aic.b5.competition_v1 import CompetitionV1OptionIntent, TEST_MODE
+from aic.b5.competition_v1 import (
+    CompetitionV1OptionIntent,
+    TEST_MODE,
+    calculate_premium_risk,
+    relative_spread_from_quote,
+)
 from aic.domain.canonical import canonical_sha256
+from aic.research.mandate import load_competition_options_policy
 
 
 APPROVAL_STATE_PATH = (
@@ -112,7 +118,6 @@ def commit_revalidate(
         "options_policy_hash": intent.options_policy_hash,
         "mandate_version": intent.mandate_version,
         "approved_limit_price": str(intent.approved_limit_price),
-        "risk_status": "PASS",
         "no_conflicting_fixture_state": True,
     }
     for key, value in required_exact.items():
@@ -120,14 +125,28 @@ def commit_revalidate(
             return CommitRevalidation("BLOCK_COMMIT_REVALIDATION", f"commit state drift: {key}")
     if state.get("contract_active") is not True or state.get("contract_tradable") is not True:
         return CommitRevalidation("BLOCK_COMMIT_REVALIDATION", "contract is inactive or untradable")
-    if not 21 <= int(state.get("dte", -1)) <= 49:
+    policy = load_competition_options_policy()
+    selector = policy["selector"]
+    commit = policy["commit_revalidation"]
+    if not int(selector["dte_min_calendar_days"]) <= int(state.get("dte", -1)) <= int(selector["dte_max_calendar_days"]):
         return CommitRevalidation("BLOCK_COMMIT_REVALIDATION", "DTE is outside policy")
     bid = Decimal(str(state.get("bid", "0")))
     ask = Decimal(str(state.get("ask", "0")))
-    if bid <= 0 or ask <= 0 or ask < bid or (ask - bid) / ask > Decimal("0.10"):
+    try:
+        spread = relative_spread_from_quote(bid, ask)
+    except Exception:
         return CommitRevalidation("BLOCK_COMMIT_REVALIDATION", "commit quote is invalid")
-    if int(state.get("quote_age_seconds", 16)) > 15:
+    if spread > Decimal(str(commit["max_relative_spread"])):
+        return CommitRevalidation("BLOCK_COMMIT_REVALIDATION", "commit quote is invalid")
+    if int(state.get("quote_age_seconds", int(commit["quote_max_age_seconds"]) + 1)) > int(commit["quote_max_age_seconds"]):
         return CommitRevalidation("BLOCK_COMMIT_REVALIDATION", "commit quote is stale")
+    account = {key: state.get(key) for key in ("account_equity", "cash_available", "current_same_underlying_premium_risk", "current_aggregate_option_premium_risk", "broker_capacity")}
+    try:
+        risk = calculate_premium_risk(account, intent.premium_per_contract)
+    except Exception:
+        return CommitRevalidation("BLOCK_COMMIT_REVALIDATION", "commit risk inputs are invalid")
+    if risk.status != "PASS" or risk.quantity < intent.quantity:
+        return CommitRevalidation("BLOCK_COMMIT_REVALIDATION", "fresh risk does not support approved quantity")
     return CommitRevalidation("READY_FOR_PAPER_SEND", None)
 
 
