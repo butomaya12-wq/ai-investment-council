@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from argparse import Namespace
 from decimal import Decimal
 import importlib.util
 import json
@@ -109,9 +110,7 @@ def test_recovery_script_has_explicit_inputs_and_no_provider_or_execution_import
         MODULE.parse_args([])
 
 
-def test_synthetic_capture_is_validated_without_transport_and_keeps_truthful_lineage(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def _synthetic_inputs(monkeypatch: pytest.MonkeyPatch) -> dict:
     gate = _read("b4_post_research_reopen_current_invest_eligibility_zero_call_v0_4__40d7f5c.json")
     entry = _read("b4_post_research_reopen_current_judge_entry_zero_call_v0_4__40d7f5c.json")
     preflight = _read("b4_post_research_reopen_current_judge_preflight_zero_call_v0_4__40d7f5c.json")
@@ -158,21 +157,43 @@ def test_synthetic_capture_is_validated_without_transport_and_keeps_truthful_lin
     monkeypatch.setattr(
         MODULE, "actual_cost_usd", lambda *_args, **_kwargs: Decimal("0.1433875")
     )
+    return {
+        "source_executor_head": MODULE.SOURCE_EXECUTOR_HEAD,
+        "recovery_code_head": "a" * 40,
+        "gate": gate,
+        "entry": entry,
+        "preflight": preflight,
+        "readiness": readiness,
+        "owner_approval": approval,
+        "ledger": ledger,
+        "raw": synthetic_raw,
+        "expected_raw_hash": synthetic_hash,
+    }
+
+
+def _recover_synthetic(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    **overrides: object,
+) -> tuple[dict, Path, Path]:
+    inputs = _synthetic_inputs(monkeypatch)
+    result_path = tmp_path / "recovered-result.json"
+    receipt_path = tmp_path / "recovery-receipt.json"
     result = MODULE.recover_captured_response(
-        source_executor_head=MODULE.SOURCE_EXECUTOR_HEAD,
-        recovery_code_head="a" * 40,
-        gate=gate,
-        entry=entry,
-        preflight=preflight,
-        readiness=readiness,
-        owner_approval=approval,
-        ledger=ledger,
-        raw=synthetic_raw,
-        recovered_result_path=tmp_path / "recovered-result.json",
-        recovery_receipt_path=tmp_path / "recovery-receipt.json",
-        expected_raw_hash=synthetic_hash,
+        **inputs,
+        recovered_result_path=result_path,
+        recovery_receipt_path=receipt_path,
+        original_result_path=tmp_path / "original-result.json",
+        **overrides,
     )
-    receipt = json.loads((tmp_path / "recovery-receipt.json").read_text(encoding="utf-8"))
+    return result, result_path, receipt_path
+
+
+def test_synthetic_capture_is_validated_without_transport_and_keeps_truthful_lineage(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    result, _, receipt_path = _recover_synthetic(tmp_path, monkeypatch)
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     assert result["repaired_validation"] == "PASS"
     assert result["source_paid_model_calls"] == 1
     assert result["recovery_model_calls"] == result["provider_reads_this_recovery"] == 0
@@ -182,15 +203,138 @@ def test_synthetic_capture_is_validated_without_transport_and_keeps_truthful_lin
     assert receipt["artifact_hash"] == canonical_sha256(receipt, exclude_fields=("artifact_hash",))
 
 
-def test_synthetic_raw_hash_mismatch_stops_before_outputs(tmp_path: Path) -> None:
-    raw = {"raw_response_hash": "0" * 64}
-    existing = tmp_path / "already-exists.json"
-    existing.write_text("reserved", encoding="utf-8")
-    with pytest.raises(MODULE.CapturedResponseRecoveryError, match="recovered result"):
+def test_original_production_result_existing_blocks_before_recovered_outputs(
+    tmp_path: Path,
+) -> None:
+    original = tmp_path / "original-result.json"
+    original.write_text("must remain immutable", encoding="utf-8")
+    with pytest.raises(MODULE.CapturedResponseRecoveryError, match="original production result exists"):
         MODULE.recover_captured_response(
             source_executor_head=MODULE.SOURCE_EXECUTOR_HEAD,
             recovery_code_head="a" * 40,
-            gate={}, entry={}, preflight={}, readiness={}, owner_approval={}, ledger={}, raw=raw,
-            recovered_result_path=existing,
+            gate={}, entry={}, preflight={}, readiness={}, owner_approval={}, ledger={}, raw={},
+            recovered_result_path=tmp_path / "result.json",
             recovery_receipt_path=tmp_path / "receipt.json",
+            original_result_path=original,
         )
+    assert not (tmp_path / "result.json").exists()
+    assert not (tmp_path / "receipt.json").exists()
+
+
+def test_real_source_lineage_hashes_cost_and_single_dispatch_remain_enforced() -> None:
+    gate = _read("b4_post_research_reopen_current_invest_eligibility_zero_call_v0_4__40d7f5c.json")
+    entry = _read("b4_post_research_reopen_current_judge_entry_zero_call_v0_4__40d7f5c.json")
+    preflight = _read("b4_post_research_reopen_current_judge_preflight_zero_call_v0_4__40d7f5c.json")
+    readiness = _read("b4_post_research_reopen_current_judge_readiness_zero_call_v0_4__40d7f5c.json")
+    approval = _read("b4_post_research_reopen_current_judge_owner_approval_v0_4__40d7f5c.json")
+    ledger = _read("b4_post_research_reopen_current_judge_paid_dispatch_ledger_v0_4__40d7f5c.json")
+    raw = _read("b4_post_research_reopen_current_judge_raw_response_v0_4__40d7f5c.json")
+    source, _ = MODULE._verify_original_lineage(
+        source_executor_head=MODULE.SOURCE_EXECUTOR_HEAD,
+        gate=gate,
+        entry=entry,
+        preflight=preflight,
+        readiness=readiness,
+        owner_approval=approval,
+        ledger=ledger,
+        raw=raw,
+    )
+    assert MODULE.actual_cost_usd(
+        raw["raw_response"], model="gpt-5.6-terra", pricing=source["pricing"]
+    ) == MODULE.EXPECTED_ACTUAL_COST_USD
+
+
+@pytest.mark.parametrize("existing", ["result", "receipt"])
+def test_partial_pair_rerun_verifies_existing_and_creates_missing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    existing: str,
+) -> None:
+    result, result_path, receipt_path = _recover_synthetic(tmp_path, monkeypatch)
+    if existing == "result":
+        receipt_path.unlink()
+    else:
+        result_path.unlink()
+    rerun, _, _ = _recover_synthetic(tmp_path, monkeypatch)
+    assert rerun == result
+    assert result_path.exists()
+    assert receipt_path.exists()
+
+
+@pytest.mark.parametrize("different", ["result", "receipt"])
+def test_differing_existing_pair_artifact_stops(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    different: str,
+) -> None:
+    _, result_path, receipt_path = _recover_synthetic(tmp_path, monkeypatch)
+    path = result_path if different == "result" else receipt_path
+    path.write_text('{"different":true}\n', encoding="utf-8")
+    with pytest.raises(MODULE.CapturedResponseRecoveryError, match="existing recovery artifact differs"):
+        _recover_synthetic(tmp_path, monkeypatch)
+
+
+def _args() -> Namespace:
+    return Namespace(
+        source_executor_head=MODULE.SOURCE_EXECUTOR_HEAD,
+        gate="gate.json",
+        entry="entry.json",
+        preflight="preflight.json",
+        readiness="readiness.json",
+        owner_approval="approval.json",
+        ledger="ledger.json",
+        raw="raw.json",
+        recovered_result="result.json",
+        recovery_receipt="receipt.json",
+    )
+
+
+def test_cli_requires_canonical_branch_and_clean_tracked_checkout_before_recovery(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(MODULE, "parse_args", lambda _argv=None: _args())
+    called = False
+
+    def no_recovery(**_kwargs):
+        nonlocal called
+        called = True
+        return {}
+
+    monkeypatch.setattr(MODULE, "recover_captured_response", no_recovery)
+    monkeypatch.setattr(MODULE, "_git", lambda *_args: "wrong-branch")
+    with pytest.raises(MODULE.CapturedResponseRecoveryError, match="canonical branch"):
+        MODULE.main([])
+    assert called is False
+
+    def dirty_git(*args: str) -> str:
+        values = {
+            ("branch", "--show-current"): MODULE.CANONICAL_BRANCH,
+            ("status", "--porcelain=v1", "--untracked-files=no"): " M tracked.py",
+        }
+        return values[args]
+
+    monkeypatch.setattr(MODULE, "_git", dirty_git)
+    with pytest.raises(MODULE.CapturedResponseRecoveryError, match="tracked worktree"):
+        MODULE.main([])
+    assert called is False
+
+
+def test_cli_allows_untracked_runtime_and_binds_clean_canonical_head(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(MODULE, "parse_args", lambda _argv=None: _args())
+    observed: dict[str, object] = {}
+    values = {
+        ("branch", "--show-current"): MODULE.CANONICAL_BRANCH,
+        ("status", "--porcelain=v1", "--untracked-files=no"): "",
+        ("rev-parse", "HEAD"): "b" * 40,
+    }
+    monkeypatch.setattr(MODULE, "_git", lambda *args: values[args])
+    monkeypatch.setattr(MODULE, "_read", lambda _path: {})
+    monkeypatch.setattr(
+        MODULE,
+        "recover_captured_response",
+        lambda **kwargs: observed.update(kwargs) or {"status": "SYNTHETIC"},
+    )
+    assert MODULE.main([]) == 0
+    assert observed["recovery_code_head"] == "b" * 40

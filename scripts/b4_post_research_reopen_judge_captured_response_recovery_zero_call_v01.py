@@ -18,6 +18,8 @@ from aic.domain.canonical import canonical_sha256
 
 
 ROOT = Path(".aic-runtime")
+CANONICAL_BRANCH = "hackathon/alpaca-2026"
+ORIGINAL_RESULT = ROOT / "b4_post_research_reopen_current_judge_council_freeze_v0_4__40d7f5c.json"
 SOURCE_EXECUTOR_HEAD = "40d7f5c72e85e1add0922673f98e5faaebebe5f2"
 SOURCE_REQUEST_HASH = "2312558ae6e3979d6f8816b6b1c64309750e4e420890c4f6447f755ce4423c53"
 SOURCE_APPROVAL_HASH = "72e25a2dc686292093d856b55168645e307fc81ec3e199d5668eb2c21acaabbd"
@@ -60,6 +62,11 @@ def _git(*args: str) -> str:
     ).stdout.strip()
 
 
+def _tracked_worktree_status() -> str:
+    """Ignore intentionally untracked runtime evidence."""
+    return _git("status", "--porcelain=v1", "--untracked-files=no")
+
+
 def _hash(payload: Mapping[str, Any], field: str) -> str:
     value = payload.get(field)
     _need(
@@ -70,11 +77,20 @@ def _hash(payload: Mapping[str, Any], field: str) -> str:
     return value
 
 
-def _write_exclusive(path: Path, value: Mapping[str, Any]) -> None:
+def _persist_or_verify(path: Path, expected: Mapping[str, Any]) -> str:
+    """Create one deterministic artifact or verify the prior identical write."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("x", encoding="utf-8") as handle:
-        json.dump(value, handle, sort_keys=True, indent=2)
-        handle.write("\n")
+    try:
+        with path.open("x", encoding="utf-8") as handle:
+            json.dump(expected, handle, sort_keys=True, indent=2)
+            handle.write("\n")
+    except FileExistsError:
+        _need(
+            _read(path) == dict(expected),
+            f"existing recovery artifact differs: {path}",
+        )
+        return "EXISTING_VERIFIED"
+    return "CREATED"
 
 
 def _reconstruct_source_inputs(source_executor_head: str) -> dict[str, Any]:
@@ -228,6 +244,7 @@ def recover_captured_response(
     raw: Mapping[str, Any],
     recovered_result_path: Path,
     recovery_receipt_path: Path,
+    original_result_path: Path = ORIGINAL_RESULT,
     expected_raw_hash: str = SOURCE_RAW_HASH,
     expected_actual_cost_usd: Decimal = EXPECTED_ACTUAL_COST_USD,
 ) -> dict[str, Any]:
@@ -237,8 +254,10 @@ def recover_captured_response(
         and re.fullmatch(r"[0-9a-f]{40}", recovery_code_head) is not None,
         "recovery code HEAD invalid",
     )
-    _need(not recovered_result_path.exists(), "recovered result already exists")
-    _need(not recovery_receipt_path.exists(), "recovery receipt already exists")
+    _need(
+        not original_result_path.exists(),
+        "original production result exists; captured response recovery forbidden",
+    )
     source, context = _verify_original_lineage(
         source_executor_head=source_executor_head,
         gate=gate,
@@ -291,7 +310,6 @@ def recover_captured_response(
         "live_money": "PROHIBITED",
     }
     result["artifact_hash"] = canonical_sha256(result, exclude_fields=("artifact_hash",))
-    _write_exclusive(recovered_result_path, result)
     receipt: dict[str, Any] = {
         "artifact_version": "B4_POST_RESEARCH_REOPEN_CURRENT_JUDGE_CAPTURED_RESPONSE_RECOVERY_RECEIPT_v0_1",
         "source_executor_head": source_executor_head,
@@ -311,7 +329,9 @@ def recover_captured_response(
         "recovered_result_hash": result["artifact_hash"],
     }
     receipt["artifact_hash"] = canonical_sha256(receipt, exclude_fields=("artifact_hash",))
-    _write_exclusive(recovery_receipt_path, receipt)
+    # Both expected artifacts exist in memory before either persistence action.
+    _persist_or_verify(recovered_result_path, result)
+    _persist_or_verify(recovery_receipt_path, receipt)
     return result
 
 
@@ -335,9 +355,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    branch = _git("branch", "--show-current")
+    _need(branch == CANONICAL_BRANCH, "canonical branch required for recovery")
+    _need(not _tracked_worktree_status(), "tracked worktree must be clean for recovery")
+    recovery_code_head = _git("rev-parse", "HEAD")
     result = recover_captured_response(
         source_executor_head=args.source_executor_head,
-        recovery_code_head=_git("rev-parse", "HEAD"),
+        recovery_code_head=recovery_code_head,
         gate=_read(Path(args.gate)),
         entry=_read(Path(args.entry)),
         preflight=_read(Path(args.preflight)),
