@@ -19,8 +19,11 @@ from aic.b5 import runtime_readonly_v1
 from aic.data.providers.alpaca_options_readonly import (
     AlpacaOptionsReadOnlyAdapter,
     ContractPages,
+    PaginationReport,
     ReadSurface,
+    SnapshotPages,
     derive_long_option_position_risk,
+    normalize_alpaca_integer,
 )
 
 
@@ -207,8 +210,8 @@ def contract(symbol: str = "NVDA261006C00200000", **changes: object) -> dict[str
         "underlying_symbol": "NVDA",
         "type": "call",
         "strike_price": "200",
-        "size": 100,
-        "open_interest": 100,
+        "size": "100",
+        "open_interest": "100",
         "open_interest_date": "2026-08-31",
     }
     result.update(changes)
@@ -320,13 +323,78 @@ def test_raw_alpaca_join_skips_incomplete_contract_but_keeps_complete_second_con
         contract_pages=contract_result,
         snapshot_pages=snapshot_result,
     )
-    assert [item.selector_contract.option_symbol for item in market.contracts] == ["NVDA261006C00210000"]
+    selected_contract = market.contracts[0].selector_contract
+    assert selected_contract.option_symbol == "NVDA261006C00210000"
+    assert selected_contract.multiplier == 100 and selected_contract.open_interest == 100
+    assert select_readonly_b5(entry(), market).status == "B5_READY_FOR_APPROVAL"
     incomplete_contracts = ContractPages((contract(open_interest=None),), contract_result.report)
     with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
         AlpacaOptionsReadOnlyAdapter.normalize_market_read(
             snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC), as_of_date=date(2026, 9, 1), latest_completed_session_date=date(2026, 8, 31),
             account_payload=account_payload(), positions_payload=[], contract_pages=incomplete_contracts, snapshot_pages=snapshot_result,
         )
+
+
+def normalize_one_documented_contract(**changes: object):
+    raw_contract = contract(**changes)
+    report = PaginationReport(1, 1, True)
+    contract_pages = ContractPages((raw_contract,), report)
+    snapshot_pages = SnapshotPages({raw_contract["symbol"]: snapshot()}, report)
+    return AlpacaOptionsReadOnlyAdapter.normalize_market_read(
+        snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC),
+        as_of_date=date(2026, 9, 1),
+        latest_completed_session_date=date(2026, 8, 31),
+        account_payload=account_payload(),
+        positions_payload=[],
+        contract_pages=contract_pages,
+        snapshot_pages=snapshot_pages,
+    )
+
+
+def test_documented_raw_integer_strings_reach_frozen_selection() -> None:
+    market = normalize_one_documented_contract(size="100", open_interest="100")
+    contract_value = market.contracts[0].selector_contract
+    assert contract_value.multiplier == 100
+    assert contract_value.open_interest == 100
+    assert select_readonly_b5(entry(), market).status == "B5_READY_FOR_APPROVAL"
+
+
+@pytest.mark.parametrize("raw_size", ["0", "-1", "100.0", True, None])
+def test_invalid_raw_contract_size_blocks_when_it_is_the_only_contract(raw_size: object) -> None:
+    with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        normalize_one_documented_contract(size=raw_size)
+
+
+@pytest.mark.parametrize(
+    ("raw_open_interest", "expected_status"),
+    [("0", "BLOCK_INCOMPLETE_OPTION_MARKET"), ("99", "BLOCK_INCOMPLETE_OPTION_MARKET"), ("100", "B5_READY_FOR_APPROVAL")],
+)
+def test_raw_open_interest_is_normalized_truthfully_then_frozen_selector_applies(
+    raw_open_interest: str, expected_status: str
+) -> None:
+    market = normalize_one_documented_contract(open_interest=raw_open_interest)
+    assert market.contracts[0].selector_contract.open_interest == int(raw_open_interest)
+    assert select_readonly_b5(entry(), market).status == expected_status
+
+
+@pytest.mark.parametrize("raw_open_interest", ["-1", "100.0", True, None])
+def test_invalid_raw_open_interest_blocks_when_it_is_the_only_contract(raw_open_interest: object) -> None:
+    with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        normalize_one_documented_contract(open_interest=raw_open_interest)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [(0, 0), (100, 100), ("0", 0), ("6168", 6168)],
+)
+def test_strict_alpaca_integer_helper_accepts_only_documented_shapes(value: object, expected: int) -> None:
+    assert normalize_alpaca_integer(value, "field") == expected
+
+
+@pytest.mark.parametrize("value", [True, 1.0, -1, "-1", "100.0", "+100", " 100", "", None])
+def test_strict_alpaca_integer_helper_rejects_ambiguous_shapes(value: object) -> None:
+    with pytest.raises(B5ProductionBlocked):
+        normalize_alpaca_integer(value, "field")
 
 
 def test_runtime_lineage_uses_git_head_not_parent(monkeypatch) -> None:

@@ -34,6 +34,7 @@ PAPER_POSITIONS_PATH = "/v2/positions"
 NVDA_OPTION_CONTRACTS_PATH = "/v2/options/contracts"
 NVDA_OPTION_SNAPSHOTS_PATH = "/v1beta1/options/snapshots/NVDA"
 _OPTION_SYMBOL_RE = re.compile(r"([A-Z]{1,6})\d{6}[CP]\d{8}")
+_RAW_INTEGER_RE = re.compile(r"(?:0|[1-9][0-9]*)")
 
 
 class AlpacaOptionsReadOnlyTransport(Protocol):
@@ -98,6 +99,15 @@ def _decimal(value: object, field: str, *, non_negative: bool = False) -> Decima
     if not result.is_finite() or (non_negative and result < 0):
         raise B5ProductionBlocked(f"{field} must be a non-negative finite decimal")
     return result
+
+
+def normalize_alpaca_integer(value: object, field: str) -> int:
+    """Normalize an exact non-negative integer from a documented Alpaca raw field."""
+    if type(value) is int and value >= 0:
+        return value
+    if isinstance(value, str) and _RAW_INTEGER_RE.fullmatch(value) is not None:
+        return int(value)
+    raise B5ProductionBlocked(f"{field} must be a canonical non-negative integer")
 
 
 def _iso_date(value: object, field: str) -> date:
@@ -293,10 +303,10 @@ class AlpacaOptionsReadOnlyAdapter:
                     continue
                 if _decimal(raw.get("strike_price"), "contract strike_price") <= 0:
                     raise B5ProductionBlocked("contract strike_price must be positive")
-                if type(raw.get("size")) is not int or raw["size"] <= 0:
+                size = normalize_alpaca_integer(raw.get("size"), "contract size")
+                if size <= 0:
                     raise B5ProductionBlocked("contract size must be a positive integer")
-                if type(raw.get("open_interest")) is not int or raw["open_interest"] < 0:
-                    raise B5ProductionBlocked("contract open_interest must be a non-negative integer")
+                open_interest = normalize_alpaca_integer(raw.get("open_interest"), "contract open_interest")
                 if _decimal(quote.get("bp"), "snapshot latestQuote.bp") <= 0:
                     raise B5ProductionBlocked("snapshot latestQuote.bp must be positive")
                 if _decimal(quote.get("ap"), "snapshot latestQuote.ap") <= 0:
@@ -309,11 +319,11 @@ class AlpacaOptionsReadOnlyAdapter:
                         "opening_direction": "BUY_TO_OPEN",
                         "expiration": expiration.isoformat(),
                         "strike": raw.get("strike_price"),
-                        "multiplier": raw.get("size"),
+                        "multiplier": size,
                         "bid": quote.get("bp"),
                         "ask": quote.get("ap"),
                         "delta": greeks.get("delta"),
-                        "open_interest": raw.get("open_interest"),
+                        "open_interest": open_interest,
                         "active": True,
                         "tradable": True,
                         "greeks_present": True,
@@ -327,7 +337,14 @@ class AlpacaOptionsReadOnlyAdapter:
                 continue
         if not complete_contracts:
             raise B5ProductionBlocked("BLOCK_INCOMPLETE_OPTION_MARKET")
-        return normalize_market_input(
+        # The frozen selector correctly treats zero OI as ineligible. Its older
+        # generic DTO requires a positive integer, so preserve known zero OI
+        # after validating every other field through that DTO.
+        normalized_input_contracts = [
+            {**item, "open_interest": 1 if item["open_interest"] == 0 else item["open_interest"]}
+            for item in complete_contracts
+        ]
+        market = normalize_market_input(
             {
                 "snapshot_timestamp": snapshot_timestamp.isoformat().replace("+00:00", "Z"),
                 "as_of_date": as_of_date.isoformat(),
@@ -339,6 +356,15 @@ class AlpacaOptionsReadOnlyAdapter:
                     "current_aggregate_option_premium_risk": account.current_aggregate_option_premium_risk,
                     "broker_capacity": account.broker_capacity,
                 },
-                "option_contracts": complete_contracts,
+                "option_contracts": normalized_input_contracts,
             }
         )
+        if any(item["open_interest"] == 0 for item in complete_contracts):
+            market = replace(
+                market,
+                contracts=tuple(
+                    replace(contract, selector_contract=replace(contract.selector_contract, open_interest=int(raw["open_interest"])))
+                    for contract, raw in zip(market.contracts, complete_contracts, strict=True)
+                ),
+            )
+        return market
