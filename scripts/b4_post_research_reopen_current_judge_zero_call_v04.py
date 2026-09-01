@@ -105,6 +105,12 @@ def main() -> int:
     pricing = _read(Path("config/event/openai_text_pricing_2026_08_30.json"))
     old = rd("b4_reopen_judge_production_request_preflight_v0_2.json")
 
+    selection_hash = v03.verify_selection(
+        selection,
+        eval_artifact=evaluation,
+        receipts=receipts,
+    )
+
     head = _git("rev-parse", "HEAD")
     source_entry = v03.build_entry(
         code_commit_sha=head,
@@ -125,6 +131,13 @@ def main() -> int:
         rebuttal_freeze=rebuttal,
         selection=selection,
     )
+    if (
+        source_context.model_input.get("source_lineage", {}).get(
+            "judge_selection_authority_hash"
+        )
+        != selection_hash
+    ):
+        raise SystemExit("STOP: source context Judge selection lineage drift")
 
     gate = v04.build_gate(
         source_entry=source_entry,
@@ -165,10 +178,6 @@ def main() -> int:
         historical_request_hashes=historical,
     )
 
-    # Preserve existing model-selection/eval evidence as read-only prerequisites.
-    if not evaluation or not receipts:
-        raise SystemExit("STOP: frozen Judge eval/receipt evidence is missing")
-
     _write(args.gate_output, gate)
     _write(args.entry_output, entry)
     _write(args.preflight_output, preflight)
@@ -178,6 +187,7 @@ def main() -> int:
         "policy_version": gate["policy_version"],
         "policy_hash": gate["policy_hash"],
         "evaluation_hash": gate["artifact_hash"],
+        "judge_selection_authority_hash": selection_hash,
         "candidate_results": gate["candidate_results"],
         "invest_eligible_candidates": gate["invest_eligible_candidates"],
         "invest_blocked_candidates": gate["invest_blocked_candidates"],
