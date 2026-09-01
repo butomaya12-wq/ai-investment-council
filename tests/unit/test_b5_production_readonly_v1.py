@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import UTC, date, datetime
 import ast
+import inspect
 import json
 from pathlib import Path
 
@@ -413,7 +414,7 @@ def test_raw_alpaca_join_skips_incomplete_contract_but_keeps_complete_second_con
     market = AlpacaOptionsReadOnlyAdapter.normalize_market_read(
         snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC),
         as_of_date=date(2026, 9, 1),
-        latest_completed_session_date=date(2026, 8, 31),
+        expected_open_interest_date=date(2026, 8, 31),
         account_payload=account_payload(),
         positions_payload=[],
         contract_pages=contract_result,
@@ -426,12 +427,14 @@ def test_raw_alpaca_join_skips_incomplete_contract_but_keeps_complete_second_con
     incomplete_contracts = ContractPages((contract(open_interest=None),), contract_result.report)
     with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
         AlpacaOptionsReadOnlyAdapter.normalize_market_read(
-            snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC), as_of_date=date(2026, 9, 1), latest_completed_session_date=date(2026, 8, 31),
+            snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC), as_of_date=date(2026, 9, 1), expected_open_interest_date=date(2026, 8, 31),
             account_payload=account_payload(), positions_payload=[], contract_pages=incomplete_contracts, snapshot_pages=snapshot_result,
         )
 
 
-def normalize_one_documented_contract(**changes: object):
+def normalize_one_documented_contract(
+    *, expected_open_interest_date: date = date(2026, 8, 31), **changes: object
+):
     raw_contract = contract(**changes)
     report = PaginationReport(1, 1, True)
     contract_pages = ContractPages((raw_contract,), report)
@@ -439,12 +442,35 @@ def normalize_one_documented_contract(**changes: object):
     return AlpacaOptionsReadOnlyAdapter.normalize_market_read(
         snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC),
         as_of_date=date(2026, 9, 1),
-        latest_completed_session_date=date(2026, 8, 31),
+        expected_open_interest_date=expected_open_interest_date,
         account_payload=account_payload(),
         positions_payload=[],
         contract_pages=contract_pages,
         snapshot_pages=snapshot_pages,
     )
+
+
+def test_provider_oi_freshness_date_is_explicit_and_not_equity_session_inferred() -> None:
+    signature = inspect.signature(AlpacaOptionsReadOnlyAdapter.normalize_market_read)
+    parameter = signature.parameters["expected_open_interest_date"]
+    assert parameter.default is inspect.Parameter.empty
+    assert "latest_completed_session_date" not in signature.parameters
+
+    market = normalize_one_documented_contract(
+        open_interest_date="2026-08-28",
+        expected_open_interest_date=date(2026, 8, 28),
+    )
+    assert market.contracts[0].selector_contract.open_interest == 100
+    assert select_readonly_b5(entry(), market).status == "B5_READY_FOR_APPROVAL"
+
+
+@pytest.mark.parametrize("oi_date", ["2026-08-27", "2026-08-31", None])
+def test_provider_oi_date_must_match_explicit_published_date(oi_date: object) -> None:
+    with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        normalize_one_documented_contract(
+            open_interest_date=oi_date,
+            expected_open_interest_date=date(2026, 8, 28),
+        )
 
 
 def test_documented_raw_integer_strings_reach_frozen_selection() -> None:
