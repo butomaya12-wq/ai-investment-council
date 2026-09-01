@@ -54,6 +54,11 @@ def _git(*args: str) -> str:
     ).stdout.strip()
 
 
+def _tracked_worktree_status() -> str:
+    """Return tracked-file status only; .aic-runtime evidence is intentionally untracked."""
+    return _git("status", "--porcelain=v1", "--untracked-files=no")
+
+
 def _verify_checkout_guard(
     *,
     branch: str,
@@ -61,9 +66,9 @@ def _verify_checkout_guard(
     feature_remote_head: str,
     status: str,
 ) -> None:
-    """Fail closed unless checkout identity is an allowed branch or exact feature detached HEAD."""
+    """Fail closed unless tracked files are clean and checkout identity is allowed."""
     if status:
-        raise SystemExit("STOP: clean worktree required for v0.4 zero-call evaluation")
+        raise SystemExit("STOP: tracked worktree must be clean for v0.4 zero-call evaluation")
     if branch in ALLOWED_BRANCHES:
         return
     if branch == "" and head == feature_remote_head:
@@ -109,7 +114,7 @@ def main() -> int:
     branch = _git("branch", "--show-current")
     head = _git("rev-parse", "HEAD")
     feature_remote_head = _git("rev-parse", FEATURE_REMOTE_REF)
-    status = _git("status", "--porcelain")
+    status = _tracked_worktree_status()
     _verify_checkout_guard(
         branch=branch,
         head=head,
