@@ -10,12 +10,14 @@ import pytest
 
 from aic.b5.production_readonly_v1 import (
     B5ProductionBlocked,
+    RecoveredB4Decision,
     create_b5_entry,
     load_recovered_b4_artifact,
     normalize_market_input,
+    parse_recovered_b4_artifact,
     select_readonly_b5,
 )
-from aic.b5 import runtime_readonly_v1
+from aic.b5 import production_readonly_v1, runtime_readonly_v1
 from aic.data.providers.alpaca_options_readonly import (
     AlpacaOptionsReadOnlyAdapter,
     ContractPages,
@@ -25,11 +27,48 @@ from aic.data.providers.alpaca_options_readonly import (
     derive_long_option_position_risk,
     normalize_alpaca_integer,
 )
+from aic.domain.canonical import canonical_sha256
 
 
 ROOT = Path(__file__).resolve().parents[2]
 B4_ARTIFACT = ROOT / ".aic-runtime" / "b4_post_research_reopen_current_judge_captured_response_recovery_v0_1__442e8d7.json"
-COMMIT = "442e8d7becaef3402d42d1cedb43d4ab8607a708"
+COMMIT = "2c968edb3251159ccafcc46632dbcd37d448c181"
+REAL_ARTIFACT_HASH = "f9a9e08a30b58ebf6fcb358c2b35a82717682ddef3ac5fd58c912d518d3fadf0"
+REAL_RECORD_HASH = "e632f31b7439c3835bba20ac57af1a69b027a317a46691e285ad5c3fca915031"
+REAL_JUDGE_PROPOSAL_HASH = "6cd5970a6cb56178429e4b8f148cab1ff35f6ce120784ebb5ed4e38ebf162be5"
+SYNTHETIC_B4_DECISION = RecoveredB4Decision(
+    REAL_ARTIFACT_HASH, REAL_RECORD_HASH, REAL_JUDGE_PROPOSAL_HASH, "NVDA"
+)
+
+
+def synthetic_recovered_b4_payload() -> dict[str, object]:
+    payload: dict[str, object] = {
+        "artifact_version": "B4_POST_RESEARCH_REOPEN_CURRENT_JUDGE_CAPTURED_RESPONSE_RECOVERY_v0_1",
+        "artifact_hash": "",
+        "status": "B4_CAPTURED_RESPONSE_RECOVERED_ZERO_CALL",
+        "repaired_validation": "PASS",
+        "recovery_model_calls": 0,
+        "broker_writes": 0,
+        "alpaca_orders": 0,
+        "processed_record": {
+            "outcome": "INVEST",
+            "next_directive": "PROMOTE_FINAL_DECISION",
+            "record_hash": REAL_RECORD_HASH,
+            "frozen_judge_proposal": {
+                "judge_proposal_hash": REAL_JUDGE_PROPOSAL_HASH,
+                "draft": {
+                    "outcome": "INVEST",
+                    "next_directive": "PROMOTE_FINAL_DECISION",
+                    "primary_candidate_id": "NVDA",
+                    "research_reopen_required": False,
+                    "blocking_reason_codes": [],
+                    "execution_authority": False,
+                },
+            },
+        },
+    }
+    payload["artifact_hash"] = canonical_sha256(payload, exclude_fields=("artifact_hash",))
+    return payload
 
 
 def valid_market() -> dict[str, object]:
@@ -68,29 +107,48 @@ def valid_market() -> dict[str, object]:
 
 
 def entry():
-    return create_b5_entry(load_recovered_b4_artifact(B4_ARTIFACT), b5_code_commit_sha=COMMIT)
+    return create_b5_entry(SYNTHETIC_B4_DECISION, b5_code_commit_sha=COMMIT)
 
 
 @pytest.mark.parametrize(
-    "mutate",
+    ("mutate", "recompute_hash"),
     [
-        lambda value: value.__setitem__("artifact_hash", "0" * 64),
-        lambda value: value["processed_record"].__setitem__("outcome", "WATCH"),
-        lambda value: value["processed_record"].__setitem__("outcome", "ABSTAIN"),
-        lambda value: value["processed_record"]["frozen_judge_proposal"]["draft"].__setitem__("primary_candidate_id", "AAPL"),
-        lambda value: value["processed_record"]["frozen_judge_proposal"]["draft"].__setitem__("research_reopen_required", True),
-        lambda value: value["processed_record"]["frozen_judge_proposal"]["draft"].__setitem__("blocking_reason_codes", ["BLOCKED"]),
-        lambda value: value["processed_record"]["frozen_judge_proposal"]["draft"].__setitem__("execution_authority", True),
-        lambda value: value.__setitem__("recovery_model_calls", 1),
+        (lambda value: value.__setitem__("artifact_hash", "0" * 64), False),
+        (lambda value: value["processed_record"].__setitem__("outcome", "WATCH"), True),
+        (lambda value: value["processed_record"].__setitem__("outcome", "ABSTAIN"), True),
+        (lambda value: value["processed_record"]["frozen_judge_proposal"]["draft"].__setitem__("primary_candidate_id", "AAPL"), True),
+        (lambda value: value["processed_record"]["frozen_judge_proposal"]["draft"].__setitem__("research_reopen_required", True), True),
+        (lambda value: value["processed_record"]["frozen_judge_proposal"]["draft"].__setitem__("blocking_reason_codes", ["BLOCKED"]), True),
+        (lambda value: value["processed_record"]["frozen_judge_proposal"]["draft"].__setitem__("execution_authority", True), True),
+        (lambda value: value.__setitem__("recovery_model_calls", 1), True),
     ],
 )
-def test_b4_authority_mutations_block(tmp_path: Path, mutate) -> None:
-    payload = json.loads(B4_ARTIFACT.read_text(encoding="utf-8"))
+def test_b4_authority_mutations_block(tmp_path: Path, monkeypatch, mutate, recompute_hash: bool) -> None:
+    payload = synthetic_recovered_b4_payload()
     mutate(payload)
+    if recompute_hash:
+        payload["artifact_hash"] = canonical_sha256(payload, exclude_fields=("artifact_hash",))
+    monkeypatch.setattr(production_readonly_v1, "RECOVERED_B4_ARTIFACT_HASH", payload["artifact_hash"])
     path = tmp_path / "mutated.json"
     path.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(B5ProductionBlocked):
         load_recovered_b4_artifact(path)
+
+
+def test_synthetic_recovered_b4_payload_exercises_parser_without_event_runtime(monkeypatch) -> None:
+    payload = synthetic_recovered_b4_payload()
+    monkeypatch.setattr(production_readonly_v1, "RECOVERED_B4_ARTIFACT_HASH", payload["artifact_hash"])
+    assert parse_recovered_b4_artifact(payload) == RecoveredB4Decision(
+        payload["artifact_hash"], REAL_RECORD_HASH, REAL_JUDGE_PROPOSAL_HASH, "NVDA"
+    )
+
+
+def test_event_bound_recovered_b4_authority_when_artifact_is_available() -> None:
+    if not B4_ARTIFACT.is_file():
+        pytest.skip("event-bound recovered B4 artifact absent in clean checkout")
+    decision = load_recovered_b4_artifact(B4_ARTIFACT)
+    assert decision.artifact_hash == REAL_ARTIFACT_HASH
+    assert decision.primary_candidate_id == "NVDA"
 
 
 def test_b4_entry_is_deterministic_and_never_grants_authority() -> None:
@@ -398,15 +456,38 @@ def test_strict_alpaca_integer_helper_rejects_ambiguous_shapes(value: object) ->
 
 
 def test_runtime_lineage_uses_git_head_not_parent(monkeypatch) -> None:
+    feature_head = "2c968edb3251159ccafcc46632dbcd37d448c181"
+    parent_head = "809a75f53b95b55acec3f942d16d502c2e480e17"
+    monkeypatch.setattr(runtime_readonly_v1, "load_recovered_b4_artifact", lambda _path: SYNTHETIC_B4_DECISION)
+
+    def fake_git_dirty(_repository: Path, *args: str) -> str:
+        return " M tests/unit/test_b5_production_readonly_v1.py\n" if args[0] == "status" else feature_head + "\n"
+
+    monkeypatch.setattr(runtime_readonly_v1, "_git", fake_git_dirty)
+    with pytest.raises(B5ProductionBlocked, match="tracked-clean"):
+        runtime_readonly_v1.create_entry_at_clean_expected_head(
+            repository=ROOT, recovered_b4_artifact=B4_ARTIFACT, expected_commit_sha=feature_head
+        )
+
     calls: list[tuple[str, ...]] = []
 
-    def fake_git(_repository: Path, *args: str) -> str:
+    def fake_git_clean(_repository: Path, *args: str) -> str:
         calls.append(args)
-        return "" if args[0] == "status" else "d377d98de08c296ddab2b2d26962c7729a0efccd\n"
+        return "" if args[0] == "status" else feature_head + "\n"
 
-    monkeypatch.setattr(runtime_readonly_v1, "_git", fake_git)
+    monkeypatch.setattr(runtime_readonly_v1, "_git", fake_git_clean)
+    with pytest.raises(B5ProductionBlocked, match="does not match"):
+        runtime_readonly_v1.create_entry_at_clean_expected_head(
+            repository=ROOT, recovered_b4_artifact=B4_ARTIFACT, expected_commit_sha=parent_head
+        )
     result = runtime_readonly_v1.create_entry_at_clean_expected_head(
-        repository=ROOT, recovered_b4_artifact=B4_ARTIFACT, expected_commit_sha="d377d98de08c296ddab2b2d26962c7729a0efccd"
+        repository=ROOT, recovered_b4_artifact=B4_ARTIFACT, expected_commit_sha=feature_head
     )
-    assert result.b5_code_commit_sha == "d377d98de08c296ddab2b2d26962c7729a0efccd"
-    assert calls == [("status", "--porcelain=v1", "--untracked-files=no"), ("rev-parse", "HEAD")]
+    assert result.b5_code_commit_sha == feature_head
+    assert parent_head != result.b5_code_commit_sha
+    assert calls == [
+        ("status", "--porcelain=v1", "--untracked-files=no"),
+        ("rev-parse", "HEAD"),
+        ("status", "--porcelain=v1", "--untracked-files=no"),
+        ("rev-parse", "HEAD"),
+    ]
