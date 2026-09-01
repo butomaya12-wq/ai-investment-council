@@ -597,12 +597,14 @@ def validate_proposal(
             ),
             "INVEST basis is not a gate-approved supported canonical basis",
         )
+        # The positive gate is the single deterministic authority for whether
+        # the selected primary has a blocking conflict, uncertainty, research,
+        # or integrity state.  The Judge is allowed to keep canonical,
+        # non-blocking decision context visible (including context belonging to
+        # other candidates); every reference is still constrained above.
         _need(
-            not proposal.unresolved_dispute_refs
-            and not proposal.material_conflict_refs
-            and not proposal.material_unknown_refs
-            and not proposal.blocking_reason_codes,
-            "INVEST cannot carry blocking disputes/conflicts/unknowns/reasons",
+            not proposal.blocking_reason_codes,
+            "INVEST cannot carry blocking reasons",
         )
         _need(
             proposal.evidence_status != JudgeEvidenceStatus.INSUFFICIENT,

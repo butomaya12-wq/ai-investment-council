@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import inspect
+
 import pytest
 
 from aic.council import post_research_reopen_judge_current_v03 as v03
@@ -47,7 +49,12 @@ def source_entry() -> dict:
     return value
 
 
-def source_context(*, conflict_a: bool = False, insufficient_all: bool = False):
+def source_context(
+    *,
+    conflict_a: bool = False,
+    insufficient_all: bool = False,
+    uncertainties: list[dict] | None = None,
+):
     claims = []
     for candidate in CANDIDATES:
         support = "INSUFFICIENT" if insufficient_all else "SUPPORTED"
@@ -81,7 +88,7 @@ def source_context(*, conflict_a: bool = False, insufficient_all: bool = False):
             }
             for x in CANDIDATES
         ],
-        "decision_context_uncertainties": [],
+        "decision_context_uncertainties": list(uncertainties or []),
         "material_conflict_refs": ["NVDA_CONFLICT"] if conflict_a else [],
         "unresolved_dispute_refs": [],
         "event_outcome_constraints": {
@@ -90,6 +97,11 @@ def source_context(*, conflict_a: bool = False, insufficient_all: bool = False):
         },
         "source_lineage": {},
     }
+    uncertainty_refs = tuple(
+        row["uncertainty_ref"] for row in base["decision_context_uncertainties"]
+    )
+    for row in base["decision_context_uncertainties"]:
+        row.setdefault("decision_context_condition_ids", [])
     judge_hash = canonical_sha256(base)
     model_input = {**base, "judge_input_hash": judge_hash}
     return v03.JudgeContext(
@@ -101,15 +113,19 @@ def source_context(*, conflict_a: bool = False, insufficient_all: bool = False):
         allowed_claim_ids=tuple(row["claim_id"] for row in claims),
         allowed_dispute_refs=(),
         allowed_conflict_refs=("NVDA_CONFLICT",) if conflict_a else (),
-        allowed_unknown_refs=(),
-        allowed_condition_refs=tuple(row["claim_id"] for row in claims),
+        allowed_unknown_refs=uncertainty_refs,
+        allowed_condition_refs=tuple(
+            [row["claim_id"] for row in claims] + list(uncertainty_refs)
+        ),
     )
 
 
-def build(*, conflict_a=False, insufficient_all=False):
+def build(*, conflict_a=False, insufficient_all=False, uncertainties=None):
     src_entry = source_entry()
     src_context = source_context(
-        conflict_a=conflict_a, insufficient_all=insufficient_all
+        conflict_a=conflict_a,
+        insufficient_all=insufficient_all,
+        uncertainties=uncertainties,
     )
     gate = judge.build_gate(
         source_entry=src_entry,
@@ -221,6 +237,68 @@ def test_invest_accepts_only_gate_eligible_primary_and_gate_approved_basis():
         judge.validate_proposal(wrong_basis, context=context, gate=gate)
 
 
+def test_invest_accepts_visible_closed_primary_uncertainty_and_schema_validator_parity():
+    uncertainty = {
+        "candidate_id": "NVDA",
+        "uncertainty_ref": "NVDA:CLOSED_CONTEXT",
+        "raw_reason_or_ref": "CLOSED_CONTEXT",
+        "global_reason_closed": True,
+        "may_independently_force_new_research_reopen": False,
+    }
+    _, _, gate, _, context = build(uncertainties=[uncertainty])
+    assert gate["candidate_results"][0]["status"] == "INVEST_ELIGIBLE"
+    captured = proposal(
+        outcome=JudgeOutcome.INVEST,
+        context=context,
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
+    ).model_copy(update={"material_unknown_refs": ("NVDA:CLOSED_CONTEXT",)})
+    # DTO construction is the schema contract; validator acceptance prevents
+    # paid calls from discovering a schema-to-validator mismatch.
+    assert captured.material_unknown_refs == ("NVDA:CLOSED_CONTEXT",)
+    judge.validate_proposal(captured, context=context, gate=gate)
+
+
+def test_invest_accepts_visible_uncertainty_for_another_candidate():
+    uncertainty = {
+        "candidate_id": "MSFT",
+        "uncertainty_ref": "MSFT:CLOSED_CONTEXT",
+        "raw_reason_or_ref": "CLOSED_CONTEXT",
+        "global_reason_closed": True,
+        "may_independently_force_new_research_reopen": False,
+    }
+    _, _, gate, _, context = build(uncertainties=[uncertainty])
+    captured = proposal(
+        outcome=JudgeOutcome.INVEST,
+        context=context,
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
+    ).model_copy(update={"material_unknown_refs": ("MSFT:CLOSED_CONTEXT",)})
+    judge.validate_proposal(captured, context=context, gate=gate)
+
+
+def test_invest_keeps_blocking_reason_and_canonical_reference_guards():
+    _, _, gate, _, context = build()
+    good = proposal(
+        outcome=JudgeOutcome.INVEST,
+        context=context,
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
+    )
+    with pytest.raises(Exception, match="blocking reasons"):
+        judge.validate_proposal(
+            good.model_copy(update={"blocking_reason_codes": ("BLOCKING",)}),
+            context=context,
+            gate=gate,
+        )
+    with pytest.raises(Exception, match="outside canonical graph"):
+        judge.validate_proposal(
+            good.model_copy(update={"material_unknown_refs": ("OUTSIDE",)}),
+            context=context,
+            gate=gate,
+        )
+
+
 def test_blocked_candidate_cannot_be_selected_even_if_other_candidates_are_eligible():
     _, _, gate, _, context = build(conflict_a=True)
     assert gate["invest_eligible_candidates"] == ["MSFT", "META"]
@@ -232,6 +310,28 @@ def test_blocked_candidate_cannot_be_selected_even_if_other_candidates_are_eligi
     )
     with pytest.raises(Exception, match="not gate-eligible"):
         judge.validate_proposal(bad, context=context, gate=gate)
+
+
+def test_open_primary_unknown_blocks_invest_through_the_positive_gate():
+    uncertainty = {
+        "candidate_id": "NVDA",
+        "uncertainty_ref": "NVDA:OPEN_CONTEXT",
+        "raw_reason_or_ref": "OPEN_CONTEXT",
+        "global_reason_closed": False,
+        "may_independently_force_new_research_reopen": True,
+    }
+    _, _, gate, _, context = build(uncertainties=[uncertainty])
+    assert gate["candidate_results"][0]["block_reason_codes"] == [
+        "BLOCKING_OPEN_MATERIAL_UNKNOWN"
+    ]
+    blocked = proposal(
+        outcome=JudgeOutcome.INVEST,
+        context=context,
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
+    )
+    with pytest.raises(Exception, match="not gate-eligible"):
+        judge.validate_proposal(blocked, context=context, gate=gate)
 
 
 def test_no_eligible_candidates_removes_invest_from_judge_surface():
@@ -278,3 +378,10 @@ def test_historical_v03_module_still_rejects_invest():
     invest = invest.model_copy(update={"model_run_ref": v03.MODEL_RUN_REF})
     with pytest.raises(Exception, match="rejects INVEST"):
         v03._validate_proposal(invest, context=src_context)
+
+
+def test_v04_validator_has_no_candidate_or_symbol_tuning():
+    implementation = inspect.getsource(judge.validate_proposal)
+    assert "NVDA" not in implementation
+    assert "MSFT" not in implementation
+    assert "META" not in implementation
