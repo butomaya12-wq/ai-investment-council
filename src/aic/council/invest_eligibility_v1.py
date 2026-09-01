@@ -50,7 +50,7 @@ def build_policy_artifact() -> dict[str, Any]:
         "policy_version": POLICY_VERSION,
         "status": POLICY_STATUS,
         "purpose": "DETERMINE_IF_CANDIDATE_MAY_BE_PRESENTED_TO_JUDGE_AS_INVEST_ELIGIBLE",
-        "decision_rule": "ALL_HARD_GATES_PASS_AND_AT_LEAST_ONE_SUPPORTED_CANONICAL_DECISION_BASIS",
+        "decision_rule": "ALL_CURRENT_HARD_GATES_PASS_AND_AT_LEAST_ONE_SUPPORTED_CANONICAL_MATERIAL_BASIS",
         "supported_basis_rule": {
             "materiality": "MATERIAL",
             "support_status": "SUPPORTED",
@@ -60,12 +60,12 @@ def build_policy_artifact() -> dict[str, Any]:
         "hard_gates": [
             "B3_CANONICAL_RESEARCH_LIFECYCLE_CLOSED",
             "NO_ADDITIONAL_PROVIDER_READ_REQUIRED",
-            "NO_CANDIDATE_RESEARCH_REOPEN_REQUIRED",
+            "NO_ACTIVE_CANONICAL_CANDIDATE_RESEARCH_REOPEN_REQUIRED",
             "NO_BLOCKING_MATERIAL_CONFLICT",
             "NO_BLOCKING_OPEN_MATERIAL_UNKNOWN",
             "NO_UNRESOLVED_BLOCKING_INTEGRITY_FINDING",
             "CANDIDATE_LINEAGE_PRESENT",
-            "SUPPORTED_CANONICAL_DECISION_BASIS_PRESENT",
+            "SUPPORTED_CANONICAL_MATERIAL_BASIS_PRESENT",
         ],
         "non_rules": [
             "NO_CANDIDATE_NAME_OR_SYMBOL_TUNING",
@@ -82,6 +82,7 @@ def build_policy_artifact() -> dict[str, Any]:
             "judge_retains_relative_merit_and_terminal_outcome_authority": True,
             "supported_but_unattractive_candidates_may_still_be_abstained_by_judge": True,
             "closed_decision_context_uncertainty_remains_visible_but_is_not_a_reopen_blocker": True,
+            "historical_model_reopen_flags_do_not_override_closed_canonical_research_lifecycle": True,
             "any_unattributed_open_material_unknown_fails_closed_globally": True,
             "any_unattributed_material_conflict_fails_closed_globally": True,
             "any_unattributed_unresolved_dispute_fails_closed_globally": True,
@@ -110,7 +111,10 @@ def verify_policy_artifact(payload: Mapping[str, Any]) -> str:
 
 def _as_rows(value: Any, *, field: str) -> list[Mapping[str, Any]]:
     _need(isinstance(value, list), f"{field} must be a list")
-    _need(all(isinstance(row, Mapping) for row in value), f"{field} rows must be objects")
+    _need(
+        all(isinstance(row, Mapping) for row in value),
+        f"{field} rows must be objects",
+    )
     return list(value)
 
 
@@ -155,7 +159,9 @@ def _candidate_conflict_refs(
             continue
         conflict_ids = claim.get("conflict_ids", [])
         if isinstance(conflict_ids, list):
-            refs.extend(str(ref) for ref in conflict_ids if isinstance(ref, str) and ref)
+            refs.extend(
+                str(ref) for ref in conflict_ids if isinstance(ref, str) and ref
+            )
         if claim.get("support_status") == "CONFLICTED":
             claim_id = claim.get("claim_id")
             if isinstance(claim_id, str) and claim_id:
@@ -184,8 +190,25 @@ def _candidate_unresolved_disputes(
             continue
         opposing = item.get("opposing_finding_ids", [])
         if isinstance(opposing, list):
-            refs.extend(str(ref) for ref in opposing if isinstance(ref, str) and ref)
+            refs.extend(
+                str(ref) for ref in opposing if isinstance(ref, str) and ref
+            )
     return list(dict.fromkeys(refs))
+
+
+def _uncertainty_rows(
+    model_input: Mapping[str, Any],
+    *,
+    candidate_id: str,
+) -> list[Mapping[str, Any]]:
+    rows = model_input.get("decision_context_uncertainties", [])
+    if rows is None:
+        rows = []
+    return [
+        row
+        for row in _as_rows(rows, field="decision_context_uncertainties")
+        if row.get("candidate_id") == candidate_id
+    ]
 
 
 def _candidate_open_unknowns(
@@ -193,20 +216,57 @@ def _candidate_open_unknowns(
     *,
     candidate_id: str,
 ) -> list[str]:
-    rows = model_input.get("decision_context_uncertainties", [])
-    if rows is None:
-        rows = []
-    rows = _as_rows(rows, field="decision_context_uncertainties")
     result: list[str] = []
-    for row in rows:
-        if row.get("candidate_id") != candidate_id:
-            continue
+    for row in _uncertainty_rows(model_input, candidate_id=candidate_id):
         if row.get("global_reason_closed") is True:
             continue
         ref = row.get("uncertainty_ref") or row.get("raw_reason_or_ref")
         if isinstance(ref, str) and ref:
             result.append(ref)
     return list(dict.fromkeys(result))
+
+
+def _candidate_closed_reopen_reason_codes(
+    model_input: Mapping[str, Any],
+    *,
+    candidate_id: str,
+) -> set[str]:
+    """Return model-authored reopen reasons closed by current canonical authority."""
+    result: set[str] = set()
+    for row in _uncertainty_rows(model_input, candidate_id=candidate_id):
+        raw_reason = row.get("raw_reason_or_ref")
+        if not isinstance(raw_reason, str) or not raw_reason:
+            continue
+        if (
+            row.get("global_reason_closed") is True
+            and row.get("may_independently_force_new_research_reopen") is False
+        ):
+            result.add(raw_reason)
+    return result
+
+
+def _candidate_active_reopen_reason_codes(
+    model_input: Mapping[str, Any],
+    rebuttal: Mapping[str, Any] | None,
+    *,
+    candidate_id: str,
+) -> list[str]:
+    if rebuttal is None:
+        return []
+    raw_codes = rebuttal.get("research_reopen_reason_codes", [])
+    _need(
+        isinstance(raw_codes, list),
+        f"research_reopen_reason_codes must be a list for {candidate_id}",
+    )
+    raw_codes = [str(code) for code in raw_codes if isinstance(code, str) and code]
+    closed = _candidate_closed_reopen_reason_codes(
+        model_input,
+        candidate_id=candidate_id,
+    )
+    active = [code for code in raw_codes if code not in closed]
+    if rebuttal.get("research_reopen_required") is True and not raw_codes:
+        active.append("UNSPECIFIED_ACTIVE_RESEARCH_REOPEN")
+    return list(dict.fromkeys(active))
 
 
 def evaluate_positive_invest_eligibility(
@@ -228,7 +288,9 @@ def evaluate_positive_invest_eligibility(
     )
     candidates = tuple(candidate_order)
 
-    packets = _as_rows(model_input.get("candidate_packets", []), field="candidate_packets")
+    packets = _as_rows(
+        model_input.get("candidate_packets", []), field="candidate_packets"
+    )
     packet_ids = [row.get("candidate_id") for row in packets]
     _need(
         len(packet_ids) == len(candidates) and set(packet_ids) == set(candidates),
@@ -248,19 +310,27 @@ def evaluate_positive_invest_eligibility(
         "material claim candidate lineage outside candidate_order",
     )
 
-    rebuttals = _as_rows(model_input.get("rebuttal_bundles", []), field="rebuttal_bundles")
+    rebuttals = _as_rows(
+        model_input.get("rebuttal_bundles", []), field="rebuttal_bundles"
+    )
     if rebuttals:
         _need(
-            set(row.get("candidate_id") for row in rebuttals).issubset(set(candidates)),
+            set(row.get("candidate_id") for row in rebuttals).issubset(
+                set(candidates)
+            ),
             "rebuttal candidate outside candidate_order",
         )
 
+    constraints = model_input.get("event_outcome_constraints", {})
+    _need(isinstance(constraints, Mapping), "event_outcome_constraints must be object")
     global_research_closed = (
         source_entry.get("canonical_open_research_requirements_after_b3") == []
         and source_entry.get("candidate_aware_reopen_provenance") == "PASS"
-        and model_input.get("event_outcome_constraints", {}).get("canonical_b3_reopen_closed") is True
+        and constraints.get("canonical_b3_reopen_closed") is True
     )
-    additional_provider_read_required = source_entry.get("additional_provider_read_required")
+    additional_provider_read_required = source_entry.get(
+        "additional_provider_read_required"
+    )
     _need(
         additional_provider_read_required in {True, False},
         "additional_provider_read_required must be boolean",
@@ -273,7 +343,10 @@ def evaluate_positive_invest_eligibility(
         if isinstance(ref, str) and ref
     }
     global_conflict_refs = model_input.get("material_conflict_refs", [])
-    _need(isinstance(global_conflict_refs, list), "material_conflict_refs must be a list")
+    _need(
+        isinstance(global_conflict_refs, list),
+        "material_conflict_refs must be a list",
+    )
     unattributed_global_conflicts = [
         str(ref)
         for ref in global_conflict_refs
@@ -288,7 +361,10 @@ def evaluate_positive_invest_eligibility(
         )
     }
     global_disputes = model_input.get("unresolved_dispute_refs", [])
-    _need(isinstance(global_disputes, list), "unresolved_dispute_refs must be a list")
+    _need(
+        isinstance(global_disputes, list),
+        "unresolved_dispute_refs must be a list",
+    )
     unattributed_global_disputes = [
         str(ref)
         for ref in global_disputes
@@ -298,7 +374,10 @@ def evaluate_positive_invest_eligibility(
     top_level_unknowns = model_input.get("material_unknown_refs", [])
     if top_level_unknowns is None:
         top_level_unknowns = []
-    _need(isinstance(top_level_unknowns, list), "material_unknown_refs must be a list")
+    _need(
+        isinstance(top_level_unknowns, list),
+        "material_unknown_refs must be a list",
+    )
     global_open_unknowns = [
         str(ref) for ref in top_level_unknowns if isinstance(ref, str) and ref
     ]
@@ -317,15 +396,14 @@ def evaluate_positive_invest_eligibility(
         rebuttal = _candidate_rebuttal(rebuttals, candidate_id=candidate_id)
         if rebuttal is None and rebuttals:
             blockers.append(BLOCK_LINEAGE)
-        if rebuttal is not None:
-            reason_codes = rebuttal.get("research_reopen_reason_codes", [])
-            reopen = rebuttal.get("research_reopen_required")
-            if reopen is True or (isinstance(reason_codes, list) and reason_codes):
-                blockers.append(BLOCK_RESEARCH_REOPEN)
-                if isinstance(reason_codes, list):
-                    blocker_refs[BLOCK_RESEARCH_REOPEN] = [
-                        str(x) for x in reason_codes if isinstance(x, str) and x
-                    ]
+        active_reopen = _candidate_active_reopen_reason_codes(
+            model_input,
+            rebuttal,
+            candidate_id=candidate_id,
+        )
+        if active_reopen:
+            blockers.append(BLOCK_RESEARCH_REOPEN)
+            blocker_refs[BLOCK_RESEARCH_REOPEN] = active_reopen
 
         conflicts = _candidate_conflict_refs(claims, candidate_id=candidate_id)
         conflicts.extend(unattributed_global_conflicts)
@@ -334,7 +412,10 @@ def evaluate_positive_invest_eligibility(
             blockers.append(BLOCK_MATERIAL_CONFLICT)
             blocker_refs[BLOCK_MATERIAL_CONFLICT] = conflicts
 
-        open_unknowns = _candidate_open_unknowns(model_input, candidate_id=candidate_id)
+        open_unknowns = _candidate_open_unknowns(
+            model_input,
+            candidate_id=candidate_id,
+        )
         open_unknowns.extend(global_open_unknowns)
         open_unknowns = list(dict.fromkeys(open_unknowns))
         if open_unknowns:
@@ -363,10 +444,14 @@ def evaluate_positive_invest_eligibility(
         )
 
     eligible = [
-        row["candidate_id"] for row in candidate_results if row["status"] == INVEST_ELIGIBLE
+        row["candidate_id"]
+        for row in candidate_results
+        if row["status"] == INVEST_ELIGIBLE
     ]
     blocked = [
-        row["candidate_id"] for row in candidate_results if row["status"] == INVEST_BLOCKED
+        row["candidate_id"]
+        for row in candidate_results
+        if row["status"] == INVEST_BLOCKED
     ]
     allowed = (
         list(ALLOWED_OUTCOMES_WITH_INVEST)
