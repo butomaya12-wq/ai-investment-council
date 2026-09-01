@@ -275,7 +275,7 @@ class AlpacaOptionsReadOnlyAdapter:
         *,
         snapshot_timestamp: datetime,
         as_of_date: date,
-        latest_completed_session_date: date,
+        expected_open_interest_date: date,
         account_payload: object,
         positions_payload: object,
         contract_pages: ContractPages,
@@ -311,7 +311,7 @@ class AlpacaOptionsReadOnlyAdapter:
                 quote = _mapping(snapshot.get("latestQuote"), "snapshot latestQuote")
                 greeks = _mapping(snapshot.get("greeks"), "snapshot greeks")
                 oi_date = _iso_date(raw.get("open_interest_date"), "contract open_interest_date")
-                if oi_date != latest_completed_session_date:
+                if oi_date != expected_open_interest_date:
                     continue
                 if _decimal(raw.get("strike_price"), "contract strike_price") <= 0:
                     raise B5ProductionBlocked("contract strike_price must be positive")
@@ -341,6 +341,9 @@ class AlpacaOptionsReadOnlyAdapter:
                         "greeks_present": True,
                         "quote_timestamp": _rfc3339(quote.get("t"), "snapshot latestQuote.t"),
                         "open_interest_as_of_date": oi_date.isoformat(),
+                        # This frozen selector DTO boolean means provider OI freshness
+                        # was explicitly verified against expected_open_interest_date;
+                        # it does not claim OI is from the latest equity session.
                         "open_interest_current_for_latest_completed_session": True,
                     }
                 )
