@@ -15,6 +15,7 @@ from aic.council import post_research_reopen_judge_current_v04 as v04
 
 
 ROOT = Path(".aic-runtime")
+FEATURE_REMOTE_REF = "origin/hackathon/b4-positive-invest-gate"
 ALLOWED_BRANCHES = {
     "hackathon/alpaca-2026",
     "hackathon/b4-positive-invest-gate",
@@ -53,6 +54,25 @@ def _git(*args: str) -> str:
     ).stdout.strip()
 
 
+def _verify_checkout_guard(
+    *,
+    branch: str,
+    head: str,
+    feature_remote_head: str,
+    status: str,
+) -> None:
+    """Fail closed unless checkout identity is an allowed branch or exact feature detached HEAD."""
+    if status:
+        raise SystemExit("STOP: clean worktree required for v0.4 zero-call evaluation")
+    if branch in ALLOWED_BRANCHES:
+        return
+    if branch == "" and head == feature_remote_head:
+        return
+    raise SystemExit(
+        "STOP: checkout must be an allowed hackathon branch or detached at exact feature remote HEAD"
+    )
+
+
 def _write(path: Path, value: dict) -> None:
     if path.exists():
         raise SystemExit(f"STOP: exclusive output exists: {path}")
@@ -87,10 +107,15 @@ def main() -> int:
     args = parser.parse_args()
 
     branch = _git("branch", "--show-current")
-    if branch not in ALLOWED_BRANCHES or _git("status", "--porcelain"):
-        raise SystemExit(
-            "STOP: exact clean hackathon branch checkout required for v0.4 zero-call evaluation"
-        )
+    head = _git("rev-parse", "HEAD")
+    feature_remote_head = _git("rev-parse", FEATURE_REMOTE_REF)
+    status = _git("status", "--porcelain")
+    _verify_checkout_guard(
+        branch=branch,
+        head=head,
+        feature_remote_head=feature_remote_head,
+        status=status,
+    )
 
     rd = lambda name: _read(ROOT / name)
     closure = rd("b3_research_reopen_final_competition_closure_zero_call_v0_1.json")
@@ -111,7 +136,6 @@ def main() -> int:
         receipts=receipts,
     )
 
-    head = _git("rev-parse", "HEAD")
     source_entry = v03.build_entry(
         code_commit_sha=head,
         closure=closure,
