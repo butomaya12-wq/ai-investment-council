@@ -1,0 +1,25 @@
+{
+  "snapshot_version": "COMPETITION_WATCH_SNAPSHOT_V1",
+  "snapshot_kind": "SUBMISSION_DEMO_DERIVED_SNAPSHOT",
+  "canonical_trading_authority": false,
+  "candidate_ids": ["NVDA", "MSFT", "META"],
+  "initial_opinion_count": 9,
+  "rebuttal_bundle_count": 3,
+  "judge_context_counts": {"candidate_packets": 3, "initial_views": 9, "rebuttal_bundles": 3, "canonical_claims": 105, "computed_values": 15},
+  "final_outcome": "WATCH",
+  "next_directive": "MONITOR",
+  "b5_handoff_eligible": false,
+  "broker_writes": 0,
+  "alpaca_orders": 0,
+  "automatic_retries": 0,
+  "live_money": "PROHIBITED",
+  "known_actual_b4_cost_usd": "3.089588",
+  "source_hashes": {
+    "b3_closure_hash": "ad1f477df9094e40c26186a045c6ca5794cc1cf4c415929bb1453cd09b1e4149",
+    "initial_freeze_hash": "9138746e122b494e3a2eb84695b98870299145d5d806d2aa9da62ecb010cd394",
+    "rebuttal_freeze_hash": "18b854261c9b49c1fcd2addfd66af52fda54e71b0949416f7dc1cdfed3e8fd9e",
+    "judge_freeze_hash": "e3eac844b71bea54b22b5a4f14825f2bffd756cae16d3fd0cd5f66704d7bed49",
+    "judge_proposal_hash": "aec665384f62604b3981e09c93dfbf3627119a0a019423ad5dca4ee75586ae0a"
+  },
+  "canonical_final_decision_promotion_status": "BLOCKED_MISSING_DECISION_DRAFT_B4_v0_4.created_at"
+}
