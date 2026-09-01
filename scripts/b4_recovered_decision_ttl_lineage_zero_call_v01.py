@@ -111,6 +111,12 @@ def validate_recovered_binding(recovered: Mapping[str, Any], *, raw_hash: str, p
 def validate_policy(policy: Mapping[str, Any]) -> None:
     _need(policy.get("version") == POLICY_VERSION, "BLOCK_POLICY_VERSION")
     _need(policy.get("policy_hash") == POLICY_HASH, "BLOCK_POLICY_HASH")
+    _need(
+        canonical_sha256(policy, exclude_fields=("policy_hash",)) == POLICY_HASH,
+        "BLOCK_POLICY_CANONICAL_SELF_HASH",
+    )
+    _need(policy.get("active") is True, "BLOCK_POLICY_ACTIVE")
+    _need(policy.get("next_review_trigger_mode") == "TTL_EXPIRY", "BLOCK_POLICY_TRIGGER_MODE")
     _need(policy.get("decision_ttl_seconds") == TTL_SECONDS, "BLOCK_POLICY_TTL")
     _need(policy.get("ttl_anchor") == TTL_ANCHOR, "BLOCK_POLICY_ANCHOR")
 
@@ -141,17 +147,24 @@ def recover_lineage(*, raw: Mapping[str, Any], recovered: Mapping[str, Any], pol
     return Lineage(raw_hash, provider_id, recovered_hash, captured_at)
 
 
-def evaluate_ttl(lineage: Lineage, evaluation_time_utc: datetime) -> tuple[int, str, datetime]:
+def _exact_seconds(delta: timedelta) -> str:
+    whole_seconds = delta.days * 86_400 + delta.seconds
+    if delta.microseconds == 0:
+        return str(whole_seconds)
+    return f"{whole_seconds}.{delta.microseconds:06d}".rstrip("0")
+
+
+def evaluate_ttl(lineage: Lineage, evaluation_time_utc: datetime) -> tuple[str, str, datetime]:
     _need(
         evaluation_time_utc.tzinfo is not None and evaluation_time_utc.utcoffset() is not None,
         "BLOCK_EVALUATION_TIME_UTC",
     )
     evaluation = evaluation_time_utc.astimezone(UTC)
-    age = int((evaluation - lineage.decision_created_at_utc).total_seconds())
-    if age < 0:
+    delta = evaluation - lineage.decision_created_at_utc
+    if delta < timedelta(0):
         raise LineageBlocked("BLOCK_EVALUATION_PRECEDES_DECISION")
     expires = lineage.decision_created_at_utc + timedelta(seconds=TTL_SECONDS)
-    return age, "TTL_VALID" if age <= TTL_SECONDS else "TTL_EXPIRED", expires
+    return _exact_seconds(delta), "TTL_VALID" if delta <= timedelta(seconds=TTL_SECONDS) else "TTL_EXPIRED", expires
 
 
 def build_receipt(lineage: Lineage) -> dict[str, object]:
@@ -203,7 +216,7 @@ def parse_evaluation_time(value: str) -> datetime:
     return _utc_timestamp(value, "EVALUATION_TIME_UTC")
 
 
-def run(*, repository: Path, evaluation_time_utc: datetime, receipt_path: Path) -> tuple[Lineage, int, str, datetime, dict[str, object]]:
+def run(*, repository: Path, evaluation_time_utc: datetime, receipt_path: Path) -> tuple[Lineage, str, str, datetime, dict[str, object]]:
     lineage = recover_lineage(
         raw=load_json(repository / RAW_CAPTURE_RELATIVE_PATH, "RAW_CAPTURE"),
         recovered=load_json(repository / RECOVERED_RELATIVE_PATH, "RECOVERED_B4"),

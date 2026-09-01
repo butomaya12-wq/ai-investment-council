@@ -148,20 +148,55 @@ def test_policy_requires_correct_frozen_lifecycle_authority() -> None:
     MODULE.validate_policy(policy)
     assert policy["version"] == MODULE.POLICY_VERSION
     assert policy["policy_hash"] == MODULE.POLICY_HASH
+    assert canonical_sha256(policy, exclude_fields=("policy_hash",)) == MODULE.POLICY_HASH
+    assert policy["active"] is True
+    assert policy["next_review_trigger_mode"] == "TTL_EXPIRY"
     assert policy["decision_ttl_seconds"] == 7200
     assert policy["ttl_anchor"] == MODULE.TTL_ANCHOR
+
+
+@pytest.mark.parametrize(
+    "mutate, expected",
+    [
+        (lambda policy: policy.__setitem__("decision_ttl_seconds", 7199), "BLOCK_POLICY_CANONICAL_SELF_HASH"),
+        (lambda policy: policy.__setitem__("active", False), "BLOCK_POLICY_CANONICAL_SELF_HASH"),
+        (lambda policy: policy.__setitem__("next_review_trigger_mode", "MANUAL"), "BLOCK_POLICY_CANONICAL_SELF_HASH"),
+    ],
+)
+def test_policy_mutation_with_retained_frozen_hash_blocks(mutate, expected: str) -> None:
+    _, _, policy = _event_inputs()
+    policy = deepcopy(policy)
+    mutate(policy)
+    with pytest.raises(MODULE.LineageBlocked, match=expected):
+        MODULE.validate_policy(policy)
 
 
 def test_ttl_arithmetic_is_deterministic_and_truthfully_expired() -> None:
     raw, recovered, policy = _event_inputs()
     lineage = MODULE.recover_lineage(raw=raw, recovered=recovered, policy=policy)
     age, status, expires = MODULE.evaluate_ttl(lineage, datetime(2026, 9, 1, 19, 45, 35, tzinfo=UTC))
-    assert age == 39123
+    assert age == "39123"
     assert status == "TTL_EXPIRED"
     assert expires == datetime(2026, 9, 1, 10, 53, 32, tzinfo=UTC)
     assert MODULE.evaluate_ttl(lineage, lineage.decision_created_at_utc)[1] == "TTL_VALID"
     assert MODULE.evaluate_ttl(lineage, lineage.decision_created_at_utc + timedelta(seconds=7200))[1] == "TTL_VALID"
     assert MODULE.evaluate_ttl(lineage, lineage.decision_created_at_utc + timedelta(seconds=7201))[1] == "TTL_EXPIRED"
+
+
+@pytest.mark.parametrize(
+    "offset, expected",
+    [
+        (timedelta(seconds=7200, microseconds=1), "TTL_EXPIRED"),
+        (timedelta(seconds=7200, microseconds=500_000), "TTL_EXPIRED"),
+        (timedelta(seconds=7201), "TTL_EXPIRED"),
+    ],
+)
+def test_ttl_expiry_does_not_truncate_subseconds(offset: timedelta, expected: str) -> None:
+    raw, recovered, policy = _event_inputs()
+    lineage = MODULE.recover_lineage(raw=raw, recovered=recovered, policy=policy)
+    age, status, _ = MODULE.evaluate_ttl(lineage, lineage.decision_created_at_utc + offset)
+    assert status == expected
+    assert age == {1: "7200.000001", 500_000: "7200.5", 0: "7201"}[offset.microseconds]
 
 
 def test_ttl_rejects_naive_or_predecision_evaluation_time() -> None:
@@ -171,6 +206,10 @@ def test_ttl_rejects_naive_or_predecision_evaluation_time() -> None:
         MODULE.evaluate_ttl(lineage, datetime(2026, 9, 1, 19, 45, 35))
     with pytest.raises(MODULE.LineageBlocked, match="BLOCK_EVALUATION_PRECEDES_DECISION"):
         MODULE.evaluate_ttl(lineage, lineage.decision_created_at_utc - timedelta(seconds=1))
+    with pytest.raises(MODULE.LineageBlocked, match="BLOCK_EVALUATION_PRECEDES_DECISION"):
+        MODULE.evaluate_ttl(lineage, lineage.decision_created_at_utc - timedelta(microseconds=1))
+    with pytest.raises(MODULE.LineageBlocked, match="BLOCK_EVALUATION_PRECEDES_DECISION"):
+        MODULE.evaluate_ttl(lineage, lineage.decision_created_at_utc - timedelta(microseconds=500_000))
     with pytest.raises(MODULE.LineageBlocked, match="BLOCK_EVALUATION_TIME_UTC"):
         MODULE.parse_evaluation_time("2026-09-01T19:45:35")
 
