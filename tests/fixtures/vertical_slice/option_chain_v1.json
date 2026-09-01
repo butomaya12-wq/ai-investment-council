@@ -1,0 +1,14 @@
+{
+  "fixture_type": "STATIC_OPTION_CHAIN_TEST_FIXTURE_V1",
+  "mode": "TEST_FIXTURE",
+  "as_of_date": "2026-09-01",
+  "underlying_symbol": "AAPL",
+  "contracts": [
+    {"option_symbol": "AAPL261006C00200000", "contract_type": "CALL", "opening_direction": "BUY_TO_OPEN", "expiration": "2026-10-06", "strike": "200", "multiplier": 100, "bid": "2.40", "ask": "2.50", "delta": "0.50", "open_interest": 500, "active": true, "tradable": true, "greeks_present": true},
+    {"option_symbol": "AAPL260920C00200000", "contract_type": "CALL", "opening_direction": "BUY_TO_OPEN", "expiration": "2026-09-20", "strike": "200", "multiplier": 100, "bid": "2.40", "ask": "2.50", "delta": "0.50", "open_interest": 500, "active": true, "tradable": true, "greeks_present": true},
+    {"option_symbol": "AAPL261006C00210000", "contract_type": "CALL", "opening_direction": "BUY_TO_OPEN", "expiration": "2026-10-06", "strike": "210", "multiplier": 100, "bid": "2.40", "ask": "2.50", "delta": "0.40", "open_interest": 500, "active": true, "tradable": true, "greeks_present": true},
+    {"option_symbol": "AAPL261006C00220000", "contract_type": "CALL", "opening_direction": "BUY_TO_OPEN", "expiration": "2026-10-06", "strike": "220", "multiplier": 100, "bid": "2.00", "ask": "2.50", "delta": "0.50", "open_interest": 500, "active": true, "tradable": true, "greeks_present": true},
+    {"option_symbol": "AAPL261006C00230000", "contract_type": "CALL", "opening_direction": "BUY_TO_OPEN", "expiration": "2026-10-06", "strike": "230", "multiplier": 100, "bid": "2.40", "ask": "2.50", "delta": "0.50", "open_interest": 99, "active": true, "tradable": true, "greeks_present": true}
+  ],
+  "account": {"account_equity": "20000", "cash_available": "12000", "current_same_underlying_premium_risk": "0", "current_aggregate_option_premium_risk": "0", "broker_capacity": "10000"}
+}
