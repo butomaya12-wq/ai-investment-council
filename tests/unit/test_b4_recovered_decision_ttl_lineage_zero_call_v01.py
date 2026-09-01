@@ -38,6 +38,19 @@ def _event_inputs() -> tuple[dict, dict, dict]:
     )
 
 
+def _synthetic_lineage() -> MODULE.Lineage:
+    return MODULE.Lineage(
+        raw_response_hash=MODULE.EXPECTED_RAW_HASH,
+        provider_response_id=MODULE.EXPECTED_RESPONSE_ID,
+        recovered_artifact_hash=MODULE.EXPECTED_RECOVERED_HASH,
+        decision_created_at_utc=datetime(2026, 9, 1, 8, 53, 32, tzinfo=UTC),
+    )
+
+
+def _tracked_policy() -> dict:
+    return json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+
+
 def _rehash_raw(raw: dict) -> None:
     raw["raw_response_hash"] = judge.external_provider_json_sha256(
         {key: value for key, value in raw.items() if key != "raw_response_hash"}
@@ -144,7 +157,7 @@ def test_altered_recovered_self_hash_blocks() -> None:
 
 
 def test_policy_requires_correct_frozen_lifecycle_authority() -> None:
-    _, _, policy = _event_inputs()
+    policy = _tracked_policy()
     MODULE.validate_policy(policy)
     assert policy["version"] == MODULE.POLICY_VERSION
     assert policy["policy_hash"] == MODULE.POLICY_HASH
@@ -164,16 +177,14 @@ def test_policy_requires_correct_frozen_lifecycle_authority() -> None:
     ],
 )
 def test_policy_mutation_with_retained_frozen_hash_blocks(mutate, expected: str) -> None:
-    _, _, policy = _event_inputs()
-    policy = deepcopy(policy)
+    policy = deepcopy(_tracked_policy())
     mutate(policy)
     with pytest.raises(MODULE.LineageBlocked, match=expected):
         MODULE.validate_policy(policy)
 
 
 def test_ttl_arithmetic_is_deterministic_and_truthfully_expired() -> None:
-    raw, recovered, policy = _event_inputs()
-    lineage = MODULE.recover_lineage(raw=raw, recovered=recovered, policy=policy)
+    lineage = _synthetic_lineage()
     age, status, expires = MODULE.evaluate_ttl(lineage, datetime(2026, 9, 1, 19, 45, 35, tzinfo=UTC))
     assert age == "39123"
     assert status == "TTL_EXPIRED"
@@ -192,16 +203,14 @@ def test_ttl_arithmetic_is_deterministic_and_truthfully_expired() -> None:
     ],
 )
 def test_ttl_expiry_does_not_truncate_subseconds(offset: timedelta, expected: str) -> None:
-    raw, recovered, policy = _event_inputs()
-    lineage = MODULE.recover_lineage(raw=raw, recovered=recovered, policy=policy)
+    lineage = _synthetic_lineage()
     age, status, _ = MODULE.evaluate_ttl(lineage, lineage.decision_created_at_utc + offset)
     assert status == expected
     assert age == {1: "7200.000001", 500_000: "7200.5", 0: "7201"}[offset.microseconds]
 
 
 def test_ttl_rejects_naive_or_predecision_evaluation_time() -> None:
-    raw, recovered, policy = _event_inputs()
-    lineage = MODULE.recover_lineage(raw=raw, recovered=recovered, policy=policy)
+    lineage = _synthetic_lineage()
     with pytest.raises(MODULE.LineageBlocked, match="BLOCK_EVALUATION_TIME_UTC"):
         MODULE.evaluate_ttl(lineage, datetime(2026, 9, 1, 19, 45, 35))
     with pytest.raises(MODULE.LineageBlocked, match="BLOCK_EVALUATION_PRECEDES_DECISION"):
@@ -215,8 +224,7 @@ def test_ttl_rejects_naive_or_predecision_evaluation_time() -> None:
 
 
 def test_receipt_is_metadata_only_self_hashed_and_exclusive(tmp_path: Path) -> None:
-    raw, recovered, policy = _event_inputs()
-    lineage = MODULE.recover_lineage(raw=raw, recovered=recovered, policy=policy)
+    lineage = _synthetic_lineage()
     receipt = MODULE.build_receipt(lineage)
     assert receipt["artifact_hash"] == canonical_sha256(receipt, exclude_fields=("artifact_hash",))
     assert receipt["timestamp_derivation"] == "RAW_CAPTURE_CAPTURED_AT_UTC"
@@ -231,9 +239,13 @@ def test_receipt_is_metadata_only_self_hashed_and_exclusive(tmp_path: Path) -> N
         MODULE.write_receipt_exclusive(destination, receipt)
 
 
-def test_cli_requires_explicit_evaluation_time_and_emits_ttl_receipt(tmp_path: Path) -> None:
+def test_cli_requires_explicit_evaluation_time_and_emits_ttl_receipt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     with pytest.raises(SystemExit):
         MODULE.main([])
+    monkeypatch.setattr(MODULE, "load_json", lambda *_args, **_kwargs: {})
+    monkeypatch.setattr(MODULE, "recover_lineage", lambda **_kwargs: _synthetic_lineage())
     output = io.StringIO()
     receipt_path = tmp_path / "lineage-receipt.json"
     assert MODULE.main(
