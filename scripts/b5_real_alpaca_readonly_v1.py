@@ -274,6 +274,17 @@ def _capture_path(repository: Path, expected_head: str, now: datetime) -> Path:
     return repository / ".aic-runtime" / f"b5_real_alpaca_readonly_v1__{expected_head[:7]}__{stamp}.jsonl"
 
 
+def _validate_execute_dates(inputs: ExecuteInputs, preflight_timestamp: datetime) -> datetime:
+    if preflight_timestamp.tzinfo is None or preflight_timestamp.utcoffset() is None:
+        raise RunnerBlocked("BLOCK_NAIVE_UTC_NOW")
+    current_utc = preflight_timestamp.astimezone(UTC)
+    if inputs.as_of_date != current_utc.date():
+        raise RunnerBlocked("BLOCK_AS_OF_DATE_NOT_CURRENT_UTC")
+    if inputs.expected_open_interest_date > inputs.as_of_date:
+        raise RunnerBlocked("BLOCK_EXPECTED_OI_DATE_FUTURE")
+    return current_utc
+
+
 def _synthetic_account() -> dict[str, str]:
     return {"equity": "100000", "cash": "80000", "options_buying_power": "50000"}
 
@@ -445,15 +456,17 @@ def run_execute(
     }
     capture: CaptureWriter | None = None
     transport: BoundedGetOnlyTransport | None = None
+    candidate_exists = False
     try:
         entry = _preflight(repository, inputs)
         values["B5_ENTRY_STATUS"] = entry.status
         values["B5_ENTRY_HASH"] = entry.entry_hash
+        preflight_timestamp = _validate_execute_dates(inputs, now())
         key_id = environment.get("APCA_API_KEY_ID", "")
         secret_key = environment.get("APCA_API_SECRET_KEY", "")
         if not key_id or not secret_key:
             raise RunnerBlocked("BLOCK_CREDENTIALS")
-        capture_path = _capture_path(repository, inputs.expected_head, now())
+        capture_path = _capture_path(repository, inputs.expected_head, preflight_timestamp)
         values["LOCAL_CAPTURE_PATH"] = capture_path
         capture = CaptureWriter(capture_path)
         transport = BoundedGetOnlyTransport(
@@ -490,6 +503,7 @@ def run_execute(
             "B5_BLOCK_REASON": result.reason or "NOT_APPLICABLE",
         })
         if result.candidate is not None:
+            candidate_exists = True
             values.update(_candidate_fields(result.candidate))
     except RunnerBlocked as exc:
         values["B5_BLOCK_REASON"] = str(exc)
@@ -512,7 +526,11 @@ def run_execute(
         except RunnerBlocked:
             values["TRACKED_WORKTREE_CLEAN"] = "NO"
         _emit_summary(output, values)
-    return 0 if values["B5_BLOCK_REASON"] == "NOT_APPLICABLE" or values["B5_STATUS"] != "NOT_RUN" else 1
+    return 0 if (
+        values["B5_STATUS"] == "B5_READY_FOR_APPROVAL"
+        and candidate_exists
+        and values["B5_BLOCK_REASON"] == "NOT_APPLICABLE"
+    ) else 1
 
 
 def _inputs_from_namespace(namespace: argparse.Namespace) -> ExecuteInputs:

@@ -26,8 +26,10 @@ def entry():
     )
 
 
-def inputs() -> object:
-    return runner.ExecuteInputs("a" * 40, date(2026, 9, 1), date(2026, 8, 28))
+def inputs(
+    *, as_of_date: date = date(2026, 9, 1), expected_open_interest_date: date = date(2026, 8, 28)
+) -> object:
+    return runner.ExecuteInputs("a" * 40, as_of_date, expected_open_interest_date)
 
 
 class Response:
@@ -222,15 +224,121 @@ def test_snapshot_scope_and_quote_freshness_remain_enforced(monkeypatch: pytest.
     monkeypatch.setattr(runner, "_capture_path", lambda *_args: tmp_path / "capture.jsonl")
     calls: list[dict[str, object]] = []
     output = io.StringIO()
-    runner.run_execute(
+    assert runner.run_execute(
         inputs(), repository=tmp_path, environment={"APCA_API_KEY_ID": "id", "APCA_API_SECRET_KEY": "secret"}, output=output,
         now=lambda: datetime(2026, 9, 1, 15, 2, tzinfo=UTC), connection_factory=queued_factory(valid_payloads(quote_time="2026-09-01T15:00:00Z"), calls),
-    )
+    ) == 1
     snapshot_query = parse_qs(urlsplit(str(calls[-1]["target"])).query)
     assert snapshot_query == {
         "limit": ["1000"], "type": ["call"], "expiration_date_gte": ["2026-09-22"], "expiration_date_lte": ["2026-10-20"],
     }
     assert "BLOCK_B5_NORMALIZATION" in output.getvalue()
+
+
+def test_selector_block_is_nonzero_without_converting_telemetry(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(runner, "_preflight", lambda *_args: entry())
+    monkeypatch.setattr(runner, "_capture_path", lambda *_args: tmp_path / "capture.jsonl")
+    payloads = valid_payloads()
+    payloads[2]["option_contracts"][0]["open_interest"] = "99"
+    output = io.StringIO()
+    assert runner.run_execute(
+        inputs(), repository=tmp_path, environment={"APCA_API_KEY_ID": "id", "APCA_API_SECRET_KEY": "secret"}, output=output,
+        now=lambda: datetime(2026, 9, 1, 15, 0, tzinfo=UTC), connection_factory=queued_factory(payloads, []),
+    ) == 1
+    assert "B5_STATUS=BLOCK_INCOMPLETE_OPTION_MARKET" in output.getvalue()
+
+
+@pytest.mark.parametrize(
+    ("response", "expected"),
+    [(Response(503, b"down"), "BLOCK_HTTP_STATUS"), (Response(200, b"not-json"), "BLOCK_RESPONSE_JSON")],
+)
+def test_http_failures_have_nonzero_execute_exit(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, response: Response, expected: str) -> None:
+    monkeypatch.setattr(runner, "_preflight", lambda *_args: entry())
+    monkeypatch.setattr(runner, "_capture_path", lambda *_args: tmp_path / "capture.jsonl")
+    attempts: list[dict[str, object]] = []
+    output = io.StringIO()
+    assert runner.run_execute(
+        inputs(), repository=tmp_path, environment={"APCA_API_KEY_ID": "id", "APCA_API_SECRET_KEY": "secret"}, output=output,
+        now=lambda: datetime(2026, 9, 1, 15, 0, tzinfo=UTC),
+        connection_factory=lambda host, *, timeout: Connection(host, response, attempts),
+    ) == 1
+    assert expected in output.getvalue() and len(attempts) == 1
+
+
+def test_timeout_has_nonzero_execute_exit_and_one_attempt(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(runner, "_preflight", lambda *_args: entry())
+    monkeypatch.setattr(runner, "_capture_path", lambda *_args: tmp_path / "capture.jsonl")
+    attempts = 0
+
+    def factory(*_args, **_kwargs):
+        nonlocal attempts
+        attempts += 1
+        raise TimeoutError()
+
+    output = io.StringIO()
+    assert runner.run_execute(
+        inputs(), repository=tmp_path, environment={"APCA_API_KEY_ID": "id", "APCA_API_SECRET_KEY": "secret"}, output=output,
+        now=lambda: datetime(2026, 9, 1, 15, 0, tzinfo=UTC), connection_factory=factory,
+    ) == 1
+    assert "BLOCK_TRANSPORT" in output.getvalue() and attempts == 1
+
+
+@pytest.mark.parametrize("as_of_date", [date(2026, 8, 31), date(2026, 9, 2)])
+def test_non_current_as_of_date_blocks_before_capture_or_transport(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, as_of_date: date
+) -> None:
+    monkeypatch.setattr(runner, "_preflight", lambda *_args: entry())
+    monkeypatch.setattr(runner, "CaptureWriter", lambda *_args: (_ for _ in ()).throw(AssertionError("capture must not be created")))
+    constructed = False
+
+    def factory(*_args, **_kwargs):
+        nonlocal constructed
+        constructed = True
+        raise AssertionError
+
+    output = io.StringIO()
+    assert runner.run_execute(
+        inputs(as_of_date=as_of_date), repository=tmp_path, environment={"APCA_API_KEY_ID": "id", "APCA_API_SECRET_KEY": "secret"}, output=output,
+        now=lambda: datetime(2026, 9, 1, 15, 0, tzinfo=UTC), connection_factory=factory,
+    ) == 1
+    assert "BLOCK_AS_OF_DATE_NOT_CURRENT_UTC" in output.getvalue() and constructed is False
+
+
+def test_future_expected_oi_and_naive_now_block_before_provider(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(runner, "_preflight", lambda *_args: entry())
+    constructed = False
+
+    def factory(*_args, **_kwargs):
+        nonlocal constructed
+        constructed = True
+        raise AssertionError
+
+    for candidate_inputs, now_value, expected in (
+        (inputs(expected_open_interest_date=date(2026, 9, 2)), datetime(2026, 9, 1, 15, 0, tzinfo=UTC), "BLOCK_EXPECTED_OI_DATE_FUTURE"),
+        (inputs(), datetime(2026, 9, 1, 15, 0), "BLOCK_NAIVE_UTC_NOW"),
+    ):
+        output = io.StringIO()
+        assert runner.run_execute(
+            candidate_inputs, repository=tmp_path, environment={"APCA_API_KEY_ID": "id", "APCA_API_SECRET_KEY": "secret"}, output=output,
+            now=lambda: now_value, connection_factory=factory,
+        ) == 1
+        assert expected in output.getvalue()
+    assert constructed is False
+
+
+@pytest.mark.parametrize("expected_oi_date", [date(2026, 9, 1), date(2026, 8, 28)])
+def test_current_or_past_expected_oi_date_passes_zero_call_date_gate(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, expected_oi_date: date
+) -> None:
+    monkeypatch.setattr(runner, "_preflight", lambda *_args: entry())
+    monkeypatch.setattr(runner, "_capture_path", lambda *_args: tmp_path / f"capture-{expected_oi_date}.jsonl")
+    calls: list[dict[str, object]] = []
+    runner.run_execute(
+        inputs(expected_open_interest_date=expected_oi_date), repository=tmp_path,
+        environment={"APCA_API_KEY_ID": "id", "APCA_API_SECRET_KEY": "secret"}, output=io.StringIO(),
+        now=lambda: datetime(2026, 9, 1, 15, 0, tzinfo=UTC), connection_factory=queued_factory(valid_payloads(), calls),
+    )
+    assert calls
 
 
 def test_runner_source_has_only_get_request_literal_and_no_write_capability() -> None:
