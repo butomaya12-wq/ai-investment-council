@@ -16,7 +16,7 @@ from aic.domain.canonical import canonical_sha256
 
 
 CODE = "a" * 40
-CANDIDATES = ["A", "B", "C"]
+CANDIDATES = ["NVDA", "MSFT", "META"]
 
 
 def claim(candidate: str, *, support: str = "SUPPORTED", conflicts=None) -> dict:
@@ -51,7 +51,7 @@ def source_context(*, conflict_a: bool = False, insufficient_all: bool = False):
     claims = []
     for candidate in CANDIDATES:
         support = "INSUFFICIENT" if insufficient_all else "SUPPORTED"
-        conflicts = ["A_CONFLICT"] if conflict_a and candidate == "A" else []
+        conflicts = ["NVDA_CONFLICT"] if conflict_a and candidate == "NVDA" else []
         if conflicts:
             support = "CONFLICTED"
         claims.append(claim(candidate, support=support, conflicts=conflicts))
@@ -82,7 +82,7 @@ def source_context(*, conflict_a: bool = False, insufficient_all: bool = False):
             for x in CANDIDATES
         ],
         "decision_context_uncertainties": [],
-        "material_conflict_refs": ["A_CONFLICT"] if conflict_a else [],
+        "material_conflict_refs": ["NVDA_CONFLICT"] if conflict_a else [],
         "unresolved_dispute_refs": [],
         "event_outcome_constraints": {
             "canonical_b3_reopen_closed": True,
@@ -100,7 +100,7 @@ def source_context(*, conflict_a: bool = False, insufficient_all: bool = False):
         deep_comparison_id=base["deep_comparison_id"],
         allowed_claim_ids=tuple(row["claim_id"] for row in claims),
         allowed_dispute_refs=(),
-        allowed_conflict_refs=("A_CONFLICT",) if conflict_a else (),
+        allowed_conflict_refs=("NVDA_CONFLICT",) if conflict_a else (),
         allowed_unknown_refs=(),
         allowed_condition_refs=tuple(row["claim_id"] for row in claims),
     )
@@ -151,7 +151,7 @@ def proposal(
             DecisionChangeConditionDraft(
                 condition_id="COND1",
                 condition_text="Material evidence changes.",
-                source_or_claim_refs=("A_BASIS",),
+                source_or_claim_refs=("NVDA_BASIS",),
             ),
         )
         if outcome == JudgeOutcome.WATCH
@@ -206,16 +206,16 @@ def test_invest_accepts_only_gate_eligible_primary_and_gate_approved_basis():
     good = proposal(
         outcome=JudgeOutcome.INVEST,
         context=context,
-        primary="A",
-        basis=("A_BASIS",),
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
     )
     judge.validate_proposal(good, context=context, gate=gate)
 
     wrong_basis = proposal(
         outcome=JudgeOutcome.INVEST,
         context=context,
-        primary="A",
-        basis=("B_BASIS",),
+        primary="NVDA",
+        basis=("MSFT_BASIS",),
     )
     with pytest.raises(Exception, match="gate-approved"):
         judge.validate_proposal(wrong_basis, context=context, gate=gate)
@@ -223,12 +223,12 @@ def test_invest_accepts_only_gate_eligible_primary_and_gate_approved_basis():
 
 def test_blocked_candidate_cannot_be_selected_even_if_other_candidates_are_eligible():
     _, _, gate, _, context = build(conflict_a=True)
-    assert gate["invest_eligible_candidates"] == ["B", "C"]
+    assert gate["invest_eligible_candidates"] == ["MSFT", "META"]
     bad = proposal(
         outcome=JudgeOutcome.INVEST,
         context=context,
-        primary="A",
-        basis=("A_BASIS",),
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
     )
     with pytest.raises(Exception, match="not gate-eligible"):
         judge.validate_proposal(bad, context=context, gate=gate)
@@ -241,8 +241,8 @@ def test_no_eligible_candidates_removes_invest_from_judge_surface():
     bad = proposal(
         outcome=JudgeOutcome.INVEST,
         context=context,
-        primary="A",
-        basis=("A_BASIS",),
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
     )
     with pytest.raises(Exception, match="outside v0.4 allowed surface"):
         judge.validate_proposal(bad, context=context, gate=gate)
@@ -253,8 +253,8 @@ def test_watch_and_abstain_remain_valid_even_when_invest_is_available():
     watch = proposal(
         outcome=JudgeOutcome.WATCH,
         context=context,
-        primary="A",
-        basis=("A_BASIS",),
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
     )
     judge.validate_proposal(watch, context=context, gate=gate)
 
@@ -272,8 +272,8 @@ def test_historical_v03_module_still_rejects_invest():
     invest = proposal(
         outcome=JudgeOutcome.INVEST,
         context=src_context,
-        primary="A",
-        basis=("A_BASIS",),
+        primary="NVDA",
+        basis=("NVDA_BASIS",),
     )
     invest = invest.model_copy(update={"model_run_ref": v03.MODEL_RUN_REF})
     with pytest.raises(Exception, match="rejects INVEST"):
