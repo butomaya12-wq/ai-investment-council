@@ -13,6 +13,18 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
+def test_tracked_status_explicitly_ignores_untracked_runtime_evidence(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[tuple[str, ...]] = []
+
+    def fake_git(*args: str) -> str:
+        calls.append(args)
+        return ""
+
+    monkeypatch.setattr(MODULE, "_git", fake_git)
+    assert MODULE._tracked_worktree_status() == ""
+    assert calls == [("status", "--porcelain=v1", "--untracked-files=no")]
+
+
 def test_verified_detached_feature_head_is_allowed() -> None:
     head = "a" * 40
     MODULE._verify_checkout_guard(
@@ -33,9 +45,9 @@ def test_detached_head_mismatch_fails_closed() -> None:
         )
 
 
-def test_dirty_worktree_fails_even_on_verified_detached_head() -> None:
+def test_tracked_dirty_worktree_fails_even_on_verified_detached_head() -> None:
     head = "a" * 40
-    with pytest.raises(SystemExit, match="clean worktree required"):
+    with pytest.raises(SystemExit, match="tracked worktree must be clean"):
         MODULE._verify_checkout_guard(
             branch="",
             head=head,
@@ -44,7 +56,7 @@ def test_dirty_worktree_fails_even_on_verified_detached_head() -> None:
         )
 
 
-def test_named_feature_branch_remains_allowed_when_clean() -> None:
+def test_named_feature_branch_remains_allowed_when_tracked_clean() -> None:
     MODULE._verify_checkout_guard(
         branch="hackathon/b4-positive-invest-gate",
         head="a" * 40,
