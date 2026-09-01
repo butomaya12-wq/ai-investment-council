@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 import ast
 import json
 from pathlib import Path
@@ -15,7 +15,13 @@ from aic.b5.production_readonly_v1 import (
     normalize_market_input,
     select_readonly_b5,
 )
-from aic.data.providers.alpaca_options_readonly import AlpacaOptionsReadOnlyAdapter
+from aic.b5 import runtime_readonly_v1
+from aic.data.providers.alpaca_options_readonly import (
+    AlpacaOptionsReadOnlyAdapter,
+    ContractPages,
+    ReadSurface,
+    derive_long_option_position_risk,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -166,22 +172,18 @@ def test_fake_transport_reads_only_and_no_write_capability_is_imported() -> None
         def __init__(self) -> None:
             self.calls: list[tuple[str, dict[str, str]]] = []
 
-        def get(self, *, path: str, query: dict[str, str]):
-            self.calls.append((path, query))
+        def get(self, *, surface: ReadSurface, path: str, query: dict[str, str]):
+            self.calls.append((surface, path, query))
             return {"fake": True}
 
     fake = FakeTransport()
     adapter = AlpacaOptionsReadOnlyAdapter(fake)
     adapter.read_paper_account()
-    adapter.read_nvda_option_contract_metadata()
-    adapter.read_nvda_option_snapshots()
-    assert [path for path, _ in fake.calls] == ["/v2/account", "/v2/options/contracts", "/v1beta1/options/snapshots/NVDA"]
-    adapter.normalize(
-        snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC),
-        as_of_date="2026-09-01",
-        account=valid_market()["account"],
-        option_contracts=valid_market()["option_contracts"],
-    )
+    adapter.read_paper_positions()
+    assert [(surface, path) for surface, path, _ in fake.calls] == [
+        (ReadSurface.PAPER_TRADING_API, "/v2/account"),
+        (ReadSurface.PAPER_TRADING_API, "/v2/positions"),
+    ]
     source = (ROOT / "src" / "aic" / "data" / "providers" / "alpaca_options_readonly.py").read_text(encoding="utf-8")
     imports = set()
     for node in ast.walk(ast.parse(source)):
@@ -190,3 +192,153 @@ def test_fake_transport_reads_only_and_no_write_capability_is_imported() -> None
         if isinstance(node, ast.ImportFrom) and node.module:
             imports.add(node.module.split(".")[0])
     assert not {"alpaca", "requests", "httpx", "urllib"} & imports
+
+
+def account_payload() -> dict[str, str]:
+    return {"equity": "100000", "cash": "80000", "options_buying_power": "50000"}
+
+
+def contract(symbol: str = "NVDA261006C00200000", **changes: object) -> dict[str, object]:
+    result: dict[str, object] = {
+        "symbol": symbol,
+        "status": "active",
+        "tradable": True,
+        "expiration_date": "2026-10-06",
+        "underlying_symbol": "NVDA",
+        "type": "call",
+        "strike_price": "200",
+        "size": 100,
+        "open_interest": 100,
+        "open_interest_date": "2026-08-31",
+    }
+    result.update(changes)
+    return result
+
+
+def snapshot(**changes: object) -> dict[str, object]:
+    result: dict[str, object] = {
+        "latestQuote": {"bp": "2.40", "ap": "2.50", "t": "2026-09-01T14:59:00Z"},
+        "greeks": {"delta": "0.50"},
+    }
+    result.update(changes)
+    return result
+
+
+class QueuedFakeTransport:
+    def __init__(self, responses: dict[tuple[ReadSurface, str], list[object]]) -> None:
+        self.responses = responses
+        self.calls: list[tuple[ReadSurface, str, dict[str, str]]] = []
+
+    def get(self, *, surface: ReadSurface, path: str, query: dict[str, str]) -> object:
+        self.calls.append((surface, path, dict(query)))
+        return self.responses[(surface, path)].pop(0)
+
+
+def test_contract_queries_are_explicitly_bounded_and_paginated() -> None:
+    transport = QueuedFakeTransport(
+        {(ReadSurface.PAPER_TRADING_API, "/v2/options/contracts"): [
+            {"option_contracts": [contract()], "next_page_token": "next"},
+            {"option_contracts": [contract("NVDA261006C00210000", strike_price="210")], "next_page_token": None},
+        ]}
+    )
+    pages = AlpacaOptionsReadOnlyAdapter(transport).read_nvda_option_contract_metadata(as_of_date=date(2026, 9, 1))
+    assert pages.report.pages_read == 2 and pages.report.contracts_seen == 2 and pages.report.pagination_complete is True
+    first, second = transport.calls
+    assert first == (
+        ReadSurface.PAPER_TRADING_API,
+        "/v2/options/contracts",
+        {"underlying_symbols": "NVDA", "type": "call", "status": "active", "expiration_date_gte": "2026-09-22", "expiration_date_lte": "2026-10-20", "limit": "1000"},
+    )
+    assert second[2]["page_token"] == "next"
+
+
+def test_contract_and_snapshot_pagination_never_accept_incomplete_universe() -> None:
+    contracts = QueuedFakeTransport(
+        {(ReadSurface.PAPER_TRADING_API, "/v2/options/contracts"): [{"option_contracts": [contract()], "next_page_token": "next"}]}
+    )
+    with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        AlpacaOptionsReadOnlyAdapter(contracts).read_nvda_option_contract_metadata(as_of_date=date(2026, 9, 1), max_pages=1)
+    snapshots = QueuedFakeTransport(
+        {(ReadSurface.MARKET_DATA_API, "/v1beta1/options/snapshots/NVDA"): [{"snapshots": {"NVDA261006C00200000": snapshot()}, "next_page_token": "next"}]}
+    )
+    with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        AlpacaOptionsReadOnlyAdapter(snapshots).read_nvda_option_snapshots(max_pages=1)
+
+
+def test_snapshot_pagination_uses_market_surface_and_records_completion() -> None:
+    transport = QueuedFakeTransport(
+        {(ReadSurface.MARKET_DATA_API, "/v1beta1/options/snapshots/NVDA"): [
+            {"snapshots": {"NVDA261006C00200000": snapshot()}, "next_page_token": "next"},
+            {"snapshots": {"NVDA261006C00210000": snapshot()}, "next_page_token": None},
+        ]}
+    )
+    pages = AlpacaOptionsReadOnlyAdapter(transport).read_nvda_option_snapshots()
+    assert pages.report.pages_read == 2 and pages.report.contracts_seen == 2 and pages.report.pagination_complete is True
+    assert all(surface is ReadSurface.MARKET_DATA_API for surface, _, _ in transport.calls)
+    assert transport.calls[0][2] == {"limit": "1000"} and transport.calls[1][2]["page_token"] == "next"
+
+
+def test_positions_risk_is_truthful_and_fails_closed() -> None:
+    assert derive_long_option_position_risk([]).current_aggregate_option_premium_risk == 0
+    risk = derive_long_option_position_risk([
+        {"asset_class": "us_option", "symbol": "NVDA261006C00200000", "side": "long", "qty": "1", "cost_basis": "250"},
+        {"asset_class": "us_option", "symbol": "AAPL261006C00200000", "side": "long", "qty": "2", "cost_basis": "300"},
+    ])
+    assert risk.current_same_underlying_premium_risk == 250
+    assert risk.current_aggregate_option_premium_risk == 550
+    for position in (
+        {"asset_class": "us_option", "symbol": "bad", "side": "long", "qty": "1", "cost_basis": "1"},
+        {"asset_class": "us_option", "symbol": "NVDA261006C00200000", "side": "short", "qty": "1", "cost_basis": "1"},
+        {"asset_class": "us_option", "symbol": "NVDA261006C00200000", "side": "long", "qty": "1", "cost_basis": "-1"},
+    ):
+        with pytest.raises(B5ProductionBlocked):
+            derive_long_option_position_risk([position])
+
+
+def test_raw_alpaca_join_skips_incomplete_contract_but_keeps_complete_second_contract() -> None:
+    contract_pages = QueuedFakeTransport(
+        {(ReadSurface.PAPER_TRADING_API, "/v2/options/contracts"): [{
+            "option_contracts": [contract(), contract("NVDA261006C00210000", strike_price="210")], "next_page_token": None
+        }]}
+    )
+    snapshot_pages = QueuedFakeTransport(
+        {(ReadSurface.MARKET_DATA_API, "/v1beta1/options/snapshots/NVDA"): [{
+            "snapshots": {
+                "NVDA261006C00200000": snapshot(greeks={}),
+                "NVDA261006C00210000": snapshot(),
+            }, "next_page_token": None
+        }]}
+    )
+    contract_result = AlpacaOptionsReadOnlyAdapter(contract_pages).read_nvda_option_contract_metadata(as_of_date=date(2026, 9, 1))
+    snapshot_result = AlpacaOptionsReadOnlyAdapter(snapshot_pages).read_nvda_option_snapshots()
+    market = AlpacaOptionsReadOnlyAdapter.normalize_market_read(
+        snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC),
+        as_of_date=date(2026, 9, 1),
+        latest_completed_session_date=date(2026, 8, 31),
+        account_payload=account_payload(),
+        positions_payload=[],
+        contract_pages=contract_result,
+        snapshot_pages=snapshot_result,
+    )
+    assert [item.selector_contract.option_symbol for item in market.contracts] == ["NVDA261006C00210000"]
+    incomplete_contracts = ContractPages((contract(open_interest=None),), contract_result.report)
+    with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        AlpacaOptionsReadOnlyAdapter.normalize_market_read(
+            snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC), as_of_date=date(2026, 9, 1), latest_completed_session_date=date(2026, 8, 31),
+            account_payload=account_payload(), positions_payload=[], contract_pages=incomplete_contracts, snapshot_pages=snapshot_result,
+        )
+
+
+def test_runtime_lineage_uses_git_head_not_parent(monkeypatch) -> None:
+    calls: list[tuple[str, ...]] = []
+
+    def fake_git(_repository: Path, *args: str) -> str:
+        calls.append(args)
+        return "" if args[0] == "status" else "d377d98de08c296ddab2b2d26962c7729a0efccd\n"
+
+    monkeypatch.setattr(runtime_readonly_v1, "_git", fake_git)
+    result = runtime_readonly_v1.create_entry_at_clean_expected_head(
+        repository=ROOT, recovered_b4_artifact=B4_ARTIFACT, expected_commit_sha="d377d98de08c296ddab2b2d26962c7729a0efccd"
+    )
+    assert result.b5_code_commit_sha == "d377d98de08c296ddab2b2d26962c7729a0efccd"
+    assert calls == [("status", "--porcelain=v1", "--untracked-files=no"), ("rev-parse", "HEAD")]
