@@ -194,6 +194,19 @@ def _contract_query(as_of_date: date, page_token: str | None = None) -> dict[str
     return query
 
 
+def _snapshot_query(as_of_date: date, page_token: str | None = None) -> dict[str, str]:
+    """Bound snapshot reads to the same frozen selector expiry universe."""
+    query = {
+        "limit": "1000",
+        "type": "call",
+        "expiration_date_gte": (as_of_date + timedelta(days=21)).isoformat(),
+        "expiration_date_lte": (as_of_date + timedelta(days=49)).isoformat(),
+    }
+    if page_token is not None:
+        query["page_token"] = page_token
+    return query
+
+
 class AlpacaOptionsReadOnlyAdapter:
     """Fixed-surface, GET-only requests plus pure B5 market normalization."""
 
@@ -229,20 +242,19 @@ class AlpacaOptionsReadOnlyAdapter:
                 return ContractPages(tuple(items), PaginationReport(page_index + 1, len(items), True))
         raise B5ProductionBlocked("BLOCK_INCOMPLETE_OPTION_MARKET")
 
-    def read_nvda_option_snapshots(self, *, max_pages: int = 10, max_contracts: int = 10_000) -> SnapshotPages:
+    def read_nvda_option_snapshots(
+        self, *, as_of_date: date, max_pages: int = 10, max_contracts: int = 10_000
+    ) -> SnapshotPages:
         if max_pages < 1 or max_contracts < 1:
             raise B5ProductionBlocked("snapshot pagination bounds must be positive")
         snapshots: dict[str, Mapping[str, Any]] = {}
         page_token: str | None = None
         for page_index in range(max_pages):
-            query = {"limit": "1000"}
-            if page_token is not None:
-                query["page_token"] = page_token
             payload = _mapping(
                 self._transport.get(
                     surface=ReadSurface.MARKET_DATA_API,
                     path=NVDA_OPTION_SNAPSHOTS_PATH,
-                    query=query,
+                    query=_snapshot_query(as_of_date, page_token),
                 ),
                 "option snapshots response",
             )
