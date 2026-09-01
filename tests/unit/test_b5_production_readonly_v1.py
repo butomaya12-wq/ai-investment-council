@@ -323,7 +323,7 @@ def test_contract_and_snapshot_pagination_never_accept_incomplete_universe() -> 
         {(ReadSurface.MARKET_DATA_API, "/v1beta1/options/snapshots/NVDA"): [{"snapshots": {"NVDA261006C00200000": snapshot()}, "next_page_token": "next"}]}
     )
     with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
-        AlpacaOptionsReadOnlyAdapter(snapshots).read_nvda_option_snapshots(max_pages=1)
+        AlpacaOptionsReadOnlyAdapter(snapshots).read_nvda_option_snapshots(as_of_date=date(2026, 9, 1), max_pages=1)
 
 
 def test_snapshot_pagination_uses_market_surface_and_records_completion() -> None:
@@ -333,10 +333,48 @@ def test_snapshot_pagination_uses_market_surface_and_records_completion() -> Non
             {"snapshots": {"NVDA261006C00210000": snapshot()}, "next_page_token": None},
         ]}
     )
-    pages = AlpacaOptionsReadOnlyAdapter(transport).read_nvda_option_snapshots()
+    pages = AlpacaOptionsReadOnlyAdapter(transport).read_nvda_option_snapshots(as_of_date=date(2026, 9, 1))
     assert pages.report.pages_read == 2 and pages.report.contracts_seen == 2 and pages.report.pagination_complete is True
     assert all(surface is ReadSurface.MARKET_DATA_API for surface, _, _ in transport.calls)
-    assert transport.calls[0][2] == {"limit": "1000"} and transport.calls[1][2]["page_token"] == "next"
+    assert transport.calls[0][2] == {
+        "limit": "1000",
+        "type": "call",
+        "expiration_date_gte": "2026-09-22",
+        "expiration_date_lte": "2026-10-20",
+    }
+    assert transport.calls[1][2] == {
+        "limit": "1000",
+        "type": "call",
+        "expiration_date_gte": "2026-09-22",
+        "expiration_date_lte": "2026-10-20",
+        "page_token": "next",
+    }
+
+
+def test_snapshot_pagination_preserves_filters_and_enforces_contract_ceiling() -> None:
+    transport = QueuedFakeTransport(
+        {(ReadSurface.MARKET_DATA_API, "/v1beta1/options/snapshots/NVDA"): [{
+            "snapshots": {
+                "NVDA260922C00200000": snapshot(),
+                "NVDA261020C00200000": snapshot(),
+            },
+            "next_page_token": None,
+        }]}
+    )
+    with pytest.raises(B5ProductionBlocked, match="BLOCK_INCOMPLETE_OPTION_MARKET"):
+        AlpacaOptionsReadOnlyAdapter(transport).read_nvda_option_snapshots(
+            as_of_date=date(2026, 9, 1), max_contracts=1
+        )
+    assert transport.calls == [(
+        ReadSurface.MARKET_DATA_API,
+        "/v1beta1/options/snapshots/NVDA",
+        {
+            "limit": "1000",
+            "type": "call",
+            "expiration_date_gte": "2026-09-22",
+            "expiration_date_lte": "2026-10-20",
+        },
+    )]
 
 
 def test_positions_risk_is_truthful_and_fails_closed() -> None:
@@ -371,7 +409,7 @@ def test_raw_alpaca_join_skips_incomplete_contract_but_keeps_complete_second_con
         }]}
     )
     contract_result = AlpacaOptionsReadOnlyAdapter(contract_pages).read_nvda_option_contract_metadata(as_of_date=date(2026, 9, 1))
-    snapshot_result = AlpacaOptionsReadOnlyAdapter(snapshot_pages).read_nvda_option_snapshots()
+    snapshot_result = AlpacaOptionsReadOnlyAdapter(snapshot_pages).read_nvda_option_snapshots(as_of_date=date(2026, 9, 1))
     market = AlpacaOptionsReadOnlyAdapter.normalize_market_read(
         snapshot_timestamp=datetime(2026, 9, 1, 15, 0, tzinfo=UTC),
         as_of_date=date(2026, 9, 1),
