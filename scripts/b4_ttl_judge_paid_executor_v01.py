@@ -156,6 +156,62 @@ def _source_matches_committed_head(repository: Path, head: str) -> bool:
     )
 
 
+def remote_canonical_head(
+    repository: Path,
+) -> str:
+    completed = subprocess.run(
+        [
+            "git",
+            "-c",
+            "http.version=HTTP/1.1",
+            "-C",
+            str(repository),
+            "ls-remote",
+            "origin",
+            f"refs/heads/{CANONICAL_BRANCH}",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    _need(
+        completed.returncode == 0,
+        "BLOCK_REMOTE_CANONICAL_READ",
+    )
+
+    rows = [
+        line.split()
+        for line in completed.stdout.splitlines()
+        if line.strip()
+    ]
+
+    _need(
+        len(rows) == 1
+        and len(rows[0]) == 2,
+        "BLOCK_REMOTE_CANONICAL_FORMAT",
+    )
+
+    observed, ref = rows[0]
+
+    _need(
+        ref
+        == f"refs/heads/{CANONICAL_BRANCH}",
+        "BLOCK_REMOTE_CANONICAL_REF",
+    )
+
+    _need(
+        re.fullmatch(
+            r"[0-9a-f]{40}",
+            observed,
+        )
+        is not None,
+        "BLOCK_REMOTE_CANONICAL_SHA",
+    )
+
+    return observed
+
+
 def _utc_now() -> str:
     return (
         datetime.now(UTC)
@@ -260,6 +316,15 @@ def _prepare(
     _need(
         _source_matches_committed_head(repository, head),
         "BLOCK_EXECUTOR_SOURCE_NOT_COMMITTED",
+    )
+
+    remote_head = remote_canonical_head(
+        repository
+    )
+
+    _need(
+        remote_head == head,
+        "BLOCK_REMOTE_CANONICAL_HEAD",
     )
 
     expected_outputs = canonical_output_paths(

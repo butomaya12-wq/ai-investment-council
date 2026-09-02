@@ -233,6 +233,26 @@ def test_static_contract_has_ttl_authority_and_no_b5_b6_broker_imports(
     )
 
     assert (
+        "remote_canonical_head"
+        in source
+    )
+
+    assert (
+        "BLOCK_REMOTE_CANONICAL_HEAD"
+        in source
+    )
+
+    assert (
+        "http.version=HTTP/1.1"
+        in source
+    )
+
+    assert (
+        "\"ls-remote\""
+        in source
+    )
+
+    assert (
         source.index(
             "prepared = _prepare"
         )
@@ -303,6 +323,102 @@ def test_canonical_output_paths_are_globally_bound_to_full_request_hash(
         )
 
 
+def test_remote_canonical_head_rejects_wrong_ref(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    completed = SimpleNamespace(
+        returncode=0,
+        stdout=(
+            ("a" * 40)
+            + "\trefs/heads/not-canonical\n"
+        ),
+        stderr="",
+    )
+
+    monkeypatch.setattr(
+        MODULE.subprocess,
+        "run",
+        lambda *args, **kwargs: completed,
+    )
+
+    with pytest.raises(
+        MODULE.PaidJudgeExecutionBlocked,
+        match="BLOCK_REMOTE_CANONICAL_REF",
+    ):
+        MODULE.remote_canonical_head(
+            ROOT
+        )
+
+
+def test_remote_canonical_head_mismatch_blocks_before_authority_loading(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    args = _args(tmp_path)
+
+    head = "a" * 40
+    remote_head = "b" * 40
+
+    def fake_git(
+        repository: Path,
+        *values: str,
+    ) -> str:
+        if values == (
+            "branch",
+            "--show-current",
+        ):
+            return (
+                MODULE.CANONICAL_BRANCH
+            )
+
+        if values == (
+            "rev-parse",
+            "HEAD",
+        ):
+            return head
+
+        raise AssertionError(values)
+
+    monkeypatch.setattr(
+        MODULE,
+        "_git",
+        fake_git,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "_tracked_worktree_clean",
+        lambda _: True,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "_source_matches_committed_head",
+        lambda *_: True,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "remote_canonical_head",
+        lambda _: remote_head,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "_load_script",
+        pytest.fail,
+    )
+
+    with pytest.raises(
+        MODULE.PaidJudgeExecutionBlocked,
+        match="BLOCK_REMOTE_CANONICAL_HEAD",
+    ):
+        MODULE._prepare(
+            args,
+            repository=ROOT,
+        )
+
+
 def test_noncanonical_output_path_blocks_before_authority_loading(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -346,6 +462,12 @@ def test_noncanonical_output_path_blocks_before_authority_loading(
         MODULE,
         "_source_matches_committed_head",
         lambda *_: True,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "remote_canonical_head",
+        lambda _: head,
     )
 
     monkeypatch.setattr(
