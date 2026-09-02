@@ -130,7 +130,14 @@ def test_missing_credentials_and_invalid_cli_block_before_transport(monkeypatch:
         raise AssertionError
 
     output = io.StringIO()
-    assert runner.run_execute(inputs(), repository=tmp_path, environment={}, output=output, connection_factory=factory) == 1
+    assert runner.run_execute(
+        inputs(),
+        repository=tmp_path,
+        environment={},
+        output=output,
+        now=lambda: datetime(2026, 9, 1, 15, 0, tzinfo=UTC),
+        connection_factory=factory,
+    ) == 1
     assert "BLOCK_CREDENTIALS" in output.getvalue() and constructed is False
     output = io.StringIO()
     assert runner.main(["--execute-read", "--expected-head", "bad", "--as-of-date", "not-a-date", "--expected-open-interest-date", "2026-08-28"], output=output, connection_factory=factory) == 1
