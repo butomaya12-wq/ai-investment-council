@@ -163,24 +163,24 @@ def verify_production_authority_inventory(repository: Path) -> dict[str, str]:
 def reuse_matrix() -> dict[str, dict[str, str]]:
     return {
         "b3_evidence_research_closure": {
-            "classification": "REUSABLE_IF_REVALIDATED_ZERO_CALL",
-            "authority_invariant": "post_research_reopen_judge_current_v04.py: closed-B3 context only; embedded research reopen forbidden",
+            "classification": "REUSABLE_AS_IMMUTABLE_LINEAGE",
+            "authority_invariant": "post_research_reopen_judge_current_v04.py: closed-B3 context is historical lineage only; no TTL-expiry stage-skip authority exists",
         },
         "b4_initial_opinions": {
-            "classification": "REUSABLE_IF_REVALIDATED_ZERO_CALL",
-            "authority_invariant": "post_research_reopen_judge_current_v04.py: builds and verifies current Judge context from frozen source context",
+            "classification": "REUSABLE_AS_IMMUTABLE_LINEAGE",
+            "authority_invariant": "post_research_reopen_judge_current_v04.py: frozen source context is not TTL-expiry Initial-stage-skip authority",
         },
         "b4_rebuttal_opinions": {
-            "classification": "REUSABLE_IF_REVALIDATED_ZERO_CALL",
-            "authority_invariant": "post_research_reopen_judge_current_v04.py: builds and verifies current Judge context from frozen source context",
+            "classification": "REUSABLE_AS_IMMUTABLE_LINEAGE",
+            "authority_invariant": "post_research_reopen_judge_current_v04.py: frozen source context is not TTL-expiry Rebuttal-stage-skip authority",
         },
         "b4_judge_output": {
-            "classification": "FRESH_MODEL_DECISION_REQUIRED",
-            "authority_invariant": "post_research_reopen_judge_current_v04.py: Judge retains terminal outcome authority; historical Judge request reuse rejected",
+            "classification": "REUSABLE_AS_IMMUTABLE_LINEAGE",
+            "authority_invariant": "post_research_reopen_judge_current_v04.py: historical Judge request reuse is rejected; technical Judge capability is not TTL-expiry reactivation authority",
         },
         "b4_invest_eligibility_gate": {
-            "classification": "REUSABLE_IF_REVALIDATED_ZERO_CALL",
-            "authority_invariant": "post_research_reopen_judge_current_v04.py: build_gate/verify_gate are deterministic and model_calls=0",
+            "classification": "REUSABLE_AS_IMMUTABLE_LINEAGE",
+            "authority_invariant": "post_research_reopen_judge_current_v04.py: deterministic gate verification does not specify post-TTL new-decision stage scope",
         },
         "b4_recovered_decision_artifact": {
             "classification": "REUSABLE_AS_IMMUTABLE_LINEAGE",
@@ -269,6 +269,13 @@ def build_preflight(
         "new_decision_required": True,
         "old_decision_can_be_made_valid_zero_call": False,
         "new_final_decision_by_timestamp_refresh_allowed": False,
+        "reuse_classification_authorizes_stage_skip": False,
+        "immutable_lineage_reuse_satisfies_new_decision_requirement": False,
+        "historical_judge_can_be_reactivated": False,
+        "historical_decision_ttl_can_be_refreshed": False,
+        "fresh_semantic_decision_required": True,
+        "stage_scope_authority_status": "UNDERSPECIFIED",
+        "provider_refresh_authority_status": "UNDERSPECIFIED",
         "b6_ready_for_paper_send": False,
         "schema_semantics": contracts,
         "frozen_authorities": frozen,
@@ -332,6 +339,10 @@ def main(argv: Sequence[str] | None = None, *, output: TextIO | None = None) -> 
     print(f"TTL_STATUS={artifact['ttl_status']}", file=destination)
     print(f"REVIEW_TRIGGER_REQUIRED={artifact['review_trigger_required']}", file=destination)
     print(f"NEW_DECISION_REQUIRED={artifact['new_decision_required']}", file=destination)
+    print(f"B3_REUSE={artifact['reuse_matrix']['b3_evidence_research_closure']['classification']}", file=destination)
+    print(f"INITIAL_REUSE={artifact['reuse_matrix']['b4_initial_opinions']['classification']}", file=destination)
+    print(f"REBUTTAL_REUSE={artifact['reuse_matrix']['b4_rebuttal_opinions']['classification']}", file=destination)
+    print(f"JUDGE_REUSE={artifact['reuse_matrix']['b4_judge_output']['classification']}", file=destination)
     print(f"PROVIDER_REFRESH_REQUIRED_BEFORE_MODEL={artifact['provider_refresh_required_before_model']}", file=destination)
     print(f"MODEL_STAGE_SCOPE_REQUIRED={artifact['model_stage_scope_required']}", file=destination)
     print(f"PREFLIGHT_OUTCOME={artifact['preflight_outcome']}", file=destination)

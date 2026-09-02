@@ -95,14 +95,32 @@ def test_authority_gap_fails_closed_as_underspecified(tmp_path: Path) -> None:
     assert artifact["preflight_outcome"] == "TTL_REVIEW_SCOPE_UNDERSPECIFIED"
 
 
-def test_reuse_matrix_is_complete_and_deterministic() -> None:
+def test_reuse_matrix_is_immutable_lineage_only_and_never_authorizes_stage_skip(tmp_path: Path) -> None:
     matrix = MODULE.reuse_matrix()
     assert len(matrix) == 15
-    assert matrix["b4_judge_output"]["classification"] == "FRESH_MODEL_DECISION_REQUIRED"
+    for key in ("b3_evidence_research_closure", "b4_initial_opinions", "b4_rebuttal_opinions", "b4_judge_output"):
+        assert matrix[key]["classification"] == "REUSABLE_AS_IMMUTABLE_LINEAGE"
     assert matrix["b4_recovered_decision_artifact"]["classification"] == "REUSABLE_AS_IMMUTABLE_LINEAGE"
     assert matrix["b5_option_quote_snapshots"]["classification"] == "FRESH_PROVIDER_READ_REQUIRED"
     assert matrix["human_approval"]["classification"] == "NOT_APPLICABLE"
     assert all("authority_invariant" in item for item in matrix.values())
+    artifact = _artifact(tmp_path)
+    assert artifact["reuse_classification_authorizes_stage_skip"] is False
+    assert artifact["immutable_lineage_reuse_satisfies_new_decision_requirement"] is False
+    assert artifact["fresh_semantic_decision_required"] is True
+    assert artifact["new_decision_required"] is True
+
+
+def test_historical_judge_and_ttl_cannot_be_reactivated_or_refreshed(tmp_path: Path) -> None:
+    artifact = _artifact(tmp_path)
+    assert artifact["historical_judge_can_be_reactivated"] is False
+    assert artifact["historical_decision_ttl_can_be_refreshed"] is False
+    assert artifact["old_decision_can_be_made_valid_zero_call"] is False
+    assert artifact["new_final_decision_by_timestamp_refresh_allowed"] is False
+    assert artifact["model_stage_scope_required"] == "UNDERSPECIFIED"
+    assert artifact["provider_refresh_required_before_model"] == "UNDERSPECIFIED"
+    assert artifact["stage_scope_authority_status"] == "UNDERSPECIFIED"
+    assert artifact["provider_refresh_authority_status"] == "UNDERSPECIFIED"
 
 
 def test_artifact_has_canonical_self_hash_and_zero_capabilities(tmp_path: Path) -> None:
