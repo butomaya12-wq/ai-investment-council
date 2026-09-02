@@ -190,6 +190,7 @@ def _gate(
     branch: str,
     head: str = "a" * 40,
     clean: bool = True,
+    source_matches: bool = True,
 ) -> dict[str, object]:
     monkeypatch.setattr(
         MODULE,
@@ -203,6 +204,24 @@ def _gate(
         MODULE,
         "tracked_worktree_clean",
         lambda repository: clean,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "current_head",
+        lambda repository: head,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "current_branch",
+        lambda repository: branch,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "source_matches_committed_head",
+        lambda repository, observed_head: source_matches,
     )
 
     return MODULE.build_gate(
@@ -350,6 +369,11 @@ def test_feature_branch_gate_is_exact_and_not_approval_eligible(
     assert gate["max_call_count"] == 1
     assert gate["automatic_retries"] == 0
 
+    assert (
+        gate["gate_source_matches_committed_head"]
+        is True
+    )
+
     assert gate["approval_eligible"] is False
 
     assert gate["activation_status"] == "NOT_GRANTED"
@@ -405,6 +429,38 @@ def test_canonical_gate_requires_clean_tracked_worktree(
 
     assert clean["approval_eligible"] is True
     assert dirty["approval_eligible"] is False
+
+
+def test_canonical_gate_requires_committed_gate_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    committed = _gate(
+        monkeypatch,
+        branch=MODULE.REQUIRED_EXECUTION_BRANCH,
+        clean=True,
+        source_matches=True,
+    )
+
+    mismatched = _gate(
+        monkeypatch,
+        branch=MODULE.REQUIRED_EXECUTION_BRANCH,
+        clean=True,
+        source_matches=False,
+    )
+
+    assert (
+        committed["gate_source_matches_committed_head"]
+        is True
+    )
+
+    assert committed["approval_eligible"] is True
+
+    assert (
+        mismatched["gate_source_matches_committed_head"]
+        is False
+    )
+
+    assert mismatched["approval_eligible"] is False
 
 
 @pytest.mark.parametrize(
@@ -527,6 +583,190 @@ def test_valid_distinct_approval_pair_authorizes_only_one_model_call(
         authority["broker_write_authority"]
         is False
     )
+
+
+def test_authority_pair_rejects_actual_head_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    head = "2" * 40
+
+    gate = _gate(
+        monkeypatch,
+        branch=MODULE.REQUIRED_EXECUTION_BRANCH,
+        head=head,
+        clean=True,
+        source_matches=True,
+    )
+
+    activation = _activation(
+        gate,
+        head,
+    )
+
+    paid = _paid(
+        gate,
+        activation,
+        head,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "current_head",
+        lambda repository: "3" * 40,
+    )
+
+    with pytest.raises(
+        MODULE.ProductionGateBlocked,
+        match="BLOCK_ACTUAL_EXECUTION_HEAD",
+    ):
+        MODULE.verify_authority_pair(
+            repository=ROOT,
+            evaluation_time_utc=EVALUATION,
+            gate=gate,
+            activation_approval=activation,
+            paid_approval=paid,
+            execution_branch=
+                MODULE.REQUIRED_EXECUTION_BRANCH,
+            execution_head=head,
+        )
+
+
+def test_authority_pair_rejects_actual_branch_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    head = "4" * 40
+
+    gate = _gate(
+        monkeypatch,
+        branch=MODULE.REQUIRED_EXECUTION_BRANCH,
+        head=head,
+        clean=True,
+        source_matches=True,
+    )
+
+    activation = _activation(
+        gate,
+        head,
+    )
+
+    paid = _paid(
+        gate,
+        activation,
+        head,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "current_branch",
+        lambda repository: MODULE.FEATURE_BRANCH,
+    )
+
+    with pytest.raises(
+        MODULE.ProductionGateBlocked,
+        match="BLOCK_ACTUAL_EXECUTION_BRANCH",
+    ):
+        MODULE.verify_authority_pair(
+            repository=ROOT,
+            evaluation_time_utc=EVALUATION,
+            gate=gate,
+            activation_approval=activation,
+            paid_approval=paid,
+            execution_branch=
+                MODULE.REQUIRED_EXECUTION_BRANCH,
+            execution_head=head,
+        )
+
+
+def test_authority_pair_rejects_dirty_actual_worktree(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    head = "5" * 40
+
+    gate = _gate(
+        monkeypatch,
+        branch=MODULE.REQUIRED_EXECUTION_BRANCH,
+        head=head,
+        clean=True,
+        source_matches=True,
+    )
+
+    activation = _activation(
+        gate,
+        head,
+    )
+
+    paid = _paid(
+        gate,
+        activation,
+        head,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "tracked_worktree_clean",
+        lambda repository: False,
+    )
+
+    with pytest.raises(
+        MODULE.ProductionGateBlocked,
+        match="BLOCK_EXECUTION_WORKTREE_DIRTY",
+    ):
+        MODULE.verify_authority_pair(
+            repository=ROOT,
+            evaluation_time_utc=EVALUATION,
+            gate=gate,
+            activation_approval=activation,
+            paid_approval=paid,
+            execution_branch=
+                MODULE.REQUIRED_EXECUTION_BRANCH,
+            execution_head=head,
+        )
+
+
+def test_authority_pair_rejects_uncommitted_gate_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    head = "6" * 40
+
+    gate = _gate(
+        monkeypatch,
+        branch=MODULE.REQUIRED_EXECUTION_BRANCH,
+        head=head,
+        clean=True,
+        source_matches=True,
+    )
+
+    activation = _activation(
+        gate,
+        head,
+    )
+
+    paid = _paid(
+        gate,
+        activation,
+        head,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "source_matches_committed_head",
+        lambda repository, observed_head: False,
+    )
+
+    with pytest.raises(
+        MODULE.ProductionGateBlocked,
+        match="BLOCK_GATE_SOURCE_NOT_COMMITTED",
+    ):
+        MODULE.verify_authority_pair(
+            repository=ROOT,
+            evaluation_time_utc=EVALUATION,
+            gate=gate,
+            activation_approval=activation,
+            paid_approval=paid,
+            execution_branch=
+                MODULE.REQUIRED_EXECUTION_BRANCH,
+            execution_head=head,
+        )
 
 
 def test_feature_branch_cannot_be_activated_even_with_approval_shaped_inputs(

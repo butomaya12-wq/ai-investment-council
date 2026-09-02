@@ -64,6 +64,10 @@ DEFAULT_EVALUATION_TIME_UTC = "2026-09-01T19:45:35Z"
 
 READINESS_SCRIPT = "b4_ttl_judge_activation_readiness_zero_call_v01.py"
 
+SELF_RELATIVE_PATH = (
+    "scripts/b4_ttl_judge_production_gate_zero_call_v01.py"
+)
+
 ACTIVATION_APPROVAL_VERSION = "B4_TTL_JUDGE_ACTIVATION_APPROVAL_v0_1"
 PAID_APPROVAL_VERSION = "B4_TTL_JUDGE_PAID_CALL_APPROVAL_v0_1"
 
@@ -241,6 +245,47 @@ def tracked_worktree_clean(repository: Path) -> bool:
         "status",
         "--porcelain=v1",
         "--untracked-files=no",
+    )
+
+
+def source_matches_committed_head(
+    repository: Path,
+    head: str,
+) -> bool:
+    local = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository),
+            "hash-object",
+            SELF_RELATIVE_PATH,
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    committed = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository),
+            "rev-parse",
+            f"{head}:{SELF_RELATIVE_PATH}",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    local_hash = local.stdout.strip()
+    committed_hash = committed.stdout.strip()
+
+    return (
+        local.returncode == 0
+        and committed.returncode == 0
+        and bool(local_hash)
+        and local_hash == committed_hash
     )
 
 
@@ -424,6 +469,11 @@ def build_gate(
 
     clean = tracked_worktree_clean(repository)
 
+    source_matches = source_matches_committed_head(
+        repository,
+        gate_repository_head,
+    )
+
     blocked = [
         SUPERSEDED_PROSPECTIVE_REQUEST_HASH,
         HISTORICAL_JUDGE_REQUEST_HASH,
@@ -446,6 +496,9 @@ def build_gate(
             gate_branch,
         "tracked_worktree_clean":
             clean,
+
+        "gate_source_matches_committed_head":
+            source_matches,
 
         "readiness_merged_base_head":
             READINESS_MERGED_BASE_HEAD,
@@ -504,7 +557,8 @@ def build_gate(
 
         "approval_eligible":
             gate_branch == REQUIRED_EXECUTION_BRANCH
-            and clean,
+            and clean
+            and source_matches,
 
         "approval_eligible_only_on_required_execution_branch":
             True,
@@ -811,6 +865,37 @@ def verify_authority_pair(
     execution_branch: str,
     execution_head: str,
 ) -> dict[str, Any]:
+    actual_branch = current_branch(repository)
+    actual_head = current_head(repository)
+
+    _need(
+        actual_branch == execution_branch,
+        "BLOCK_ACTUAL_EXECUTION_BRANCH",
+    )
+
+    _need(
+        actual_branch == REQUIRED_EXECUTION_BRANCH,
+        "BLOCK_EXECUTION_BRANCH",
+    )
+
+    _need(
+        actual_head == execution_head,
+        "BLOCK_ACTUAL_EXECUTION_HEAD",
+    )
+
+    _need(
+        tracked_worktree_clean(repository),
+        "BLOCK_EXECUTION_WORKTREE_DIRTY",
+    )
+
+    _need(
+        source_matches_committed_head(
+            repository,
+            actual_head,
+        ),
+        "BLOCK_GATE_SOURCE_NOT_COMMITTED",
+    )
+
     verify_gate(
         gate,
         repository=repository,
@@ -1031,6 +1116,7 @@ def main(
         "gate_repository_head",
         "gate_branch",
         "tracked_worktree_clean",
+        "gate_source_matches_committed_head",
         "approval_eligible",
         "prospective_request_hash",
         "prospective_judge_input_hash",
