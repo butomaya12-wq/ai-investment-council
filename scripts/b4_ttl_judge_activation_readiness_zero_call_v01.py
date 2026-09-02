@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 from datetime import UTC, datetime
+import hashlib
 import importlib.util
 import json
 import os
@@ -25,7 +26,10 @@ from typing import Any, Mapping, Sequence, TextIO
 from aic.council import post_research_reopen_judge_current_v03 as v03
 from aic.council import post_research_reopen_judge_current_v04 as v04
 from aic.council.bounded_request import assert_bounded_request_invariants, build_bounded_judge_request
-from aic.council.initial_runtime_cost_v02 import runtime_cost_upper_bound_usd
+from aic.council.initial_runtime_cost_v02 import (
+    load_initial_runtime_pricing,
+    runtime_cost_upper_bound_usd,
+)
 from aic.domain.canonical import canonical_sha256
 
 
@@ -43,6 +47,19 @@ HISTORICAL_PROVIDER_RESPONSE_ID = "resp_071e5625bc07e951016a96927b756087d28fc9b9
 RECOVERED_B4_ARTIFACT_HASH = "f9a9e08a30b58ebf6fcb358c2b35a82717682ddef3ac5fd58c912d518d3fadf0"
 PROPOSAL_POLICY_HASH = "0b9128d8b19505daa19ef556b50ae7c1435ad02d04db34cff7730e8235eb3c7a"
 DEFAULT_EVALUATION_TIME_UTC = "2026-09-01T19:45:35Z"
+FROZEN_JUDGE_SOURCE_COMMIT_SHA = "814895777015cfbf47a1be03c028b65030cab2df"
+EXPECTED_PRICING_HASH = "13b67bf92f56b2962694f463850e0a0e289fc08f0c4a3d3cafe8eb928d0ee336"
+EXPECTED_PRICING_VERSION = "OPENAI_TEXT_PRICING_2026_08_30_CACHE_WRITE_AWARE"
+FROZEN_JUDGE_SOURCE_FILE_SHA256 = {
+    "src/aic/council/post_research_reopen_judge_current_v03.py": "d44d51fafdf678b3ec88d82f6a54663f9ce736c6d889a57a4c14a45287abeee3",
+    "src/aic/council/post_research_reopen_judge_current_v04.py": "e6f9a4212870138ca4091002c0e218f41e8a68df24e67c71e0a5bf7ec45ef10d",
+    "src/aic/council/bounded_request.py": "244928d3b5c1647ad097fff5984e9c39775708c10b1d1bc5c223307b862a0e6c",
+    "src/aic/council/request.py": "7b715314f402869419fa9919f7e51758e524de3e1b7f133a109828c5f6e3402e",
+    "src/aic/council/model_policy.py": "3f6d7ac2973946e42488a7ad2c3360b5a732424149fcc3d153787e9846abb8e2",
+    "src/aic/council/proposal.py": "291fcf686ddf34fc0d49f17446045622538867f51d9e3dd1b1f649e2870bebcd",
+    "src/aic/council/initial_runtime_cost_v02.py": "d0e537e75801d5ac4805586c7c3aa583fc41d1ddfdb8403729004d871e037ca2",
+    "src/aic/domain/canonical.py": "468db71ab49ff37925d077d84d40a16751ccd364059e42bef53e4e07cbeed3b6",
+}
 
 
 class ReadinessBlocked(ValueError):
@@ -104,10 +121,23 @@ def current_head(repository: Path) -> str:
         capture_output=True,
         text=True,
     )
-    _need(completed.returncode == 0, "BLOCK_CANONICAL_HEAD")
+    _need(completed.returncode == 0, "BLOCK_READINESS_REPOSITORY_HEAD")
     head = completed.stdout.strip()
-    _need(re.fullmatch(r"[0-9a-f]{40}", head) is not None, "BLOCK_CANONICAL_HEAD")
+    _need(re.fullmatch(r"[0-9a-f]{40}", head) is not None, "BLOCK_READINESS_REPOSITORY_HEAD")
     return head
+
+
+def verify_frozen_judge_source_files(repository: Path) -> dict[str, str]:
+    """Fail closed if the request semantics differ from the frozen base snapshot."""
+    observed: dict[str, str] = {}
+    for relative_path, expected in FROZEN_JUDGE_SOURCE_FILE_SHA256.items():
+        try:
+            digest = hashlib.sha256((repository / relative_path).read_bytes()).hexdigest()
+        except OSError as exc:
+            raise ReadinessBlocked("BLOCK_FROZEN_JUDGE_SOURCE_DRIFT") from exc
+        _need(digest == expected, "BLOCK_FROZEN_JUDGE_SOURCE_DRIFT")
+        observed[relative_path] = digest
+    return observed
 
 
 def verify_inactive_proposal(repository: Path) -> str:
@@ -173,7 +203,7 @@ def verify_canonical_ttl_preflight(repository: Path) -> str:
     return str(payload["artifact_hash"])
 
 
-def _source_inputs(repository: Path, *, code_commit_sha: str) -> tuple[Mapping[str, Any], v03.JudgeContext, Mapping[str, Any], v03.JudgeContext, Mapping[str, Any]]:
+def _source_inputs(repository: Path) -> tuple[Mapping[str, Any], v03.JudgeContext, Mapping[str, Any], v03.JudgeContext, Mapping[str, Any]]:
     runtime = repository / ".aic-runtime"
     read = lambda name: _load_json(runtime / name, "BLOCK_SOURCE_INPUT")
     closure = read("b3_research_reopen_final_competition_closure_zero_call_v0_1.json")
@@ -189,7 +219,7 @@ def _source_inputs(repository: Path, *, code_commit_sha: str) -> tuple[Mapping[s
     try:
         selection_hash = v03.verify_selection(selection, eval_artifact=evaluation, receipts=receipts)
         source_entry = v03.build_entry(
-            code_commit_sha=code_commit_sha,
+            code_commit_sha=FROZEN_JUDGE_SOURCE_COMMIT_SHA,
             closure=closure,
             residual_plan=residual,
             remaining_gaps_closure=gaps,
@@ -213,7 +243,7 @@ def _source_inputs(repository: Path, *, code_commit_sha: str) -> tuple[Mapping[s
         )
         gate = v04.build_gate(source_entry=source_entry, source_context=source_context)
         entry = v04.build_entry(
-            code_commit_sha=code_commit_sha,
+            code_commit_sha=FROZEN_JUDGE_SOURCE_COMMIT_SHA,
             source_entry=source_entry,
             source_context=source_context,
             gate=gate,
@@ -306,13 +336,17 @@ def build_prospective_request(*, entry: Mapping[str, Any], context: v03.JudgeCon
 
 
 def build_readiness(
-    *, repository: Path, evaluation_time_utc: datetime, canonical_head: str
+    *, repository: Path, evaluation_time_utc: datetime, readiness_repository_head: str
 ) -> dict[str, object]:
-    _need(re.fullmatch(r"[0-9a-f]{40}", canonical_head) is not None, "BLOCK_CANONICAL_HEAD")
+    _need(
+        re.fullmatch(r"[0-9a-f]{40}", readiness_repository_head) is not None,
+        "BLOCK_READINESS_REPOSITORY_HEAD",
+    )
     policy_hash = verify_inactive_proposal(repository)
     lineage, receipt, expires = verify_expired_ttl_lineage(repository, evaluation_time_utc=evaluation_time_utc)
     ttl_preflight_hash = verify_canonical_ttl_preflight(repository)
-    source_entry, source_context, entry, context, gate = _source_inputs(repository, code_commit_sha=canonical_head)
+    frozen_source_files = verify_frozen_judge_source_files(repository)
+    source_entry, source_context, entry, context, gate = _source_inputs(repository)
     prospective_context = build_prospective_judge_context(
         source_entry=source_entry,
         source_context=source_context,
@@ -323,9 +357,15 @@ def build_readiness(
     )
     request = build_prospective_request(entry=entry, context=prospective_context)
     request_bytes = len(json.dumps(request.request_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode())
-    pricing = _load_json(repository / PRICING_PATH, "BLOCK_PRICING")
     try:
-        pricing_hash = v03._hash(pricing, "pricing_hash")
+        pricing = load_initial_runtime_pricing(repository / PRICING_PATH)
+        pricing_hash = str(pricing["pricing_hash"])
+        _need(pricing_hash == EXPECTED_PRICING_HASH, "BLOCK_PRICING_HASH")
+        _need(pricing.get("pricing_version") == EXPECTED_PRICING_VERSION, "BLOCK_PRICING_VERSION")
+        long_context = _mapping(pricing.get("long_context"), "BLOCK_LONG_CONTEXT_PRICING")
+        threshold = long_context.get("threshold_input_tokens_exclusive")
+        _need(type(threshold) is int and threshold > 0, "BLOCK_LONG_CONTEXT_PRICING")
+        long_context_multiplier_applied = request_bytes > threshold
         cost = runtime_cost_upper_bound_usd(
             model="gpt-5.6-terra",
             input_tokens_upper_bound=request_bytes,
@@ -339,7 +379,12 @@ def build_readiness(
     artifact: dict[str, object] = {
         "artifact_version": ARTIFACT_VERSION,
         "status": STATUS,
-        "canonical_head": canonical_head,
+        "readiness_repository_head": readiness_repository_head,
+        "canonical_base_head": FROZEN_JUDGE_SOURCE_COMMIT_SHA,
+        "source_judge_code_commit_sha": FROZEN_JUDGE_SOURCE_COMMIT_SHA,
+        "request_identity_independent_of_readiness_repository_head": True,
+        "frozen_judge_source_verified": True,
+        "frozen_judge_source_file_sha256": frozen_source_files,
         "ttl_status": "TTL_EXPIRED",
         "trigger": "TTL_EXPIRY",
         "historical_decision_reactivated": False,
@@ -369,6 +414,9 @@ def build_readiness(
         "source_v04_entry_hash": entry["artifact_hash"],
         "source_v04_gate_hash": gate["artifact_hash"],
         "pricing_hash": pricing_hash,
+        "pricing_version": EXPECTED_PRICING_VERSION,
+        "input_token_upper_bound_method": "CONSERVATIVE_ONE_UTF8_BYTE_PER_INPUT_TOKEN_ALL_INPUT_CACHE_WRITE",
+        "long_context_multiplier_applied": long_context_multiplier_applied,
         "request_body_utf8_bytes": request_bytes,
         "input_tokens_upper_bound": request_bytes,
         "max_output_tokens": 8192,
@@ -424,8 +472,8 @@ def write_artifact_exclusive(path: Path, artifact: Mapping[str, object]) -> None
         os.fsync(stream.fileno())
 
 
-def default_artifact_path(repository: Path, canonical_head: str) -> Path:
-    return repository / ".aic-runtime" / f"b4_ttl_judge_activation_readiness_zero_call_v0_1__{canonical_head[:7]}.json"
+def default_artifact_path(repository: Path, readiness_repository_head: str) -> Path:
+    return repository / ".aic-runtime" / f"b4_ttl_judge_activation_readiness_zero_call_v0_1__{readiness_repository_head[:7]}.json"
 
 
 def main(argv: Sequence[str] | None = None, *, output: TextIO | None = None) -> int:
@@ -440,9 +488,11 @@ def main(argv: Sequence[str] | None = None, *, output: TextIO | None = None) -> 
         artifact = build_readiness(
             repository=repository,
             evaluation_time_utc=_utc(arguments.evaluation_time_utc),
-            canonical_head=current_head(repository),
+            readiness_repository_head=current_head(repository),
         )
-        path = arguments.artifact_path or default_artifact_path(repository, str(artifact["canonical_head"]))
+        path = arguments.artifact_path or default_artifact_path(
+            repository, str(artifact["readiness_repository_head"])
+        )
         write_artifact_exclusive(path, artifact)
     except ReadinessBlocked as exc:
         print(f"TTL_JUDGE_ACTIVATION_READINESS_STATUS={exc}", file=destination)
