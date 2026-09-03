@@ -1,0 +1,4010 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>{{ title }} — Market Jury</title>
+
+<style>
+:root {
+  --bg:#070a0d;
+  --panel:#0d1217;
+  --panel2:#10171d;
+  --panel3:#090e12;
+  --line:#1e2932;
+  --line2:#2c3a45;
+  --text:#f0f4f7;
+  --soft:#b7c2ca;
+  --muted:#71808d;
+
+  --green:#61e3a6;
+  --green-bg:rgba(97,227,166,.09);
+
+  --red:#ff7471;
+  --red-bg:rgba(255,116,113,.09);
+
+  --amber:#efc463;
+  --amber-bg:rgba(239,196,99,.09);
+
+  --blue:#79afff;
+  --blue-bg:rgba(121,175,255,.09);
+
+  --violet:#bba7ff;
+  --violet-bg:rgba(187,167,255,.09);
+
+  --teal:#71d7c1;
+  --teal-bg:rgba(113,215,193,.08);
+}
+
+* {
+  box-sizing:border-box;
+}
+
+html,
+body {
+  margin:0;
+  min-height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+}
+
+a {
+  color:inherit;
+}
+
+.topbar {
+  height:68px;
+  display:flex;
+  align-items:center;
+  gap:34px;
+  padding:0 27px;
+  border-bottom:1px solid var(--line);
+  background:#080c10;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  min-width:195px;
+}
+
+.jury-mark {
+  width:38px;
+  height:38px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  padding:8px;
+  border:1px solid var(--line2);
+  border-radius:10px;
+  background:#0b1116;
+}
+
+.jury-dot {
+  display:block;
+  border-radius:50%;
+}
+
+.jury-bull { background:var(--green); }
+.jury-bear { background:var(--red); }
+.jury-red { background:var(--violet); }
+.jury-judge { background:var(--amber); }
+
+.brand strong,
+.brand span {
+  display:block;
+}
+
+.brand strong {
+  font-size:11px;
+  letter-spacing:.04em;
+}
+
+.brand span {
+  margin-top:3px;
+  color:var(--muted);
+  font-size:6px;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+nav {
+  display:flex;
+  align-items:center;
+  gap:23px;
+}
+
+nav a {
+  color:#7f8d98;
+  font-size:9px;
+  text-decoration:none;
+}
+
+nav a:hover {
+  color:#d0d7dc;
+}
+
+nav a.active {
+  color:var(--text);
+}
+
+.header-status {
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.status-badge {
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:#0b1015;
+  color:#8e9aa4;
+  font-size:7px;
+}
+
+.status-badge.verified {
+  color:var(--green);
+  border-color:rgba(97,227,166,.22);
+}
+
+.page {
+  width:min(1550px,100%);
+  margin:0 auto;
+  padding:32px 28px 46px;
+}
+
+.eyebrow {
+  color:#7b8994;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+
+.page-title {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:22px;
+}
+
+h1 {
+  margin:8px 0 7px;
+  font-size:37px;
+  line-height:1;
+  letter-spacing:-.035em;
+}
+
+.lead {
+  max-width:760px;
+  margin:0;
+  color:#83919c;
+  font-size:10px;
+  line-height:1.6;
+}
+
+.snapshot-note {
+  color:#687681;
+  font-family:ui-monospace,monospace;
+  font-size:7px;
+  text-align:right;
+}
+
+.summary-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:11px;
+  margin-top:24px;
+}
+
+.summary-card {
+  min-height:125px;
+  padding:17px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--panel);
+}
+
+.summary-card.green {
+  border-color:rgba(97,227,166,.21);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(97,227,166,.055),
+      var(--panel) 55%
+    );
+}
+
+.summary-card.red {
+  border-color:rgba(255,116,113,.21);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,116,113,.055),
+      var(--panel) 55%
+    );
+}
+
+.summary-card.amber {
+  border-color:rgba(239,196,99,.23);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(239,196,99,.055),
+      var(--panel) 55%
+    );
+}
+
+.summary-card.blue {
+  border-color:rgba(121,175,255,.21);
+}
+
+.summary-label {
+  color:#74828d;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.summary-value {
+  margin-top:9px;
+  font-size:24px;
+  font-weight:850;
+}
+
+.summary-value.green { color:var(--green); }
+.summary-value.red { color:var(--red); }
+.summary-value.amber { color:var(--amber); }
+.summary-value.blue { color:var(--blue); }
+
+.summary-note {
+  margin-top:7px;
+  color:#71808b;
+  font-size:8px;
+  line-height:1.45;
+}
+
+.section {
+  margin-top:13px;
+  padding:20px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--panel);
+}
+
+.section-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:18px;
+  margin-bottom:17px;
+}
+
+.section h2 {
+  margin:0;
+  font-size:17px;
+}
+
+.section-copy {
+  margin-top:5px;
+  color:#74828d;
+  font-size:8px;
+}
+
+.section-tag {
+  padding:6px 8px;
+  border:1px solid var(--line);
+  border-radius:6px;
+  color:#7f8d98;
+  font-size:6px;
+  font-weight:900;
+  letter-spacing:.07em;
+}
+
+.account-empty {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:15px;
+  align-items:center;
+  padding:16px;
+  border:1px dashed #34424c;
+  border-radius:9px;
+  background:#0a1014;
+}
+
+.empty-icon {
+  width:48px;
+  height:48px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line2);
+  border-radius:50%;
+  background:#111820;
+  font-size:21px;
+}
+
+.account-empty strong {
+  display:block;
+  font-size:10px;
+}
+
+.account-empty span {
+  display:block;
+  margin-top:5px;
+  color:#71808b;
+  font-size:8px;
+  line-height:1.45;
+}
+
+.read-state {
+  color:var(--amber);
+  font-size:7px;
+  font-weight:900;
+  text-align:right;
+}
+
+.idea-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.idea-card {
+  display:block;
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--panel3);
+  text-decoration:none;
+  transition:.15s ease;
+}
+
+.idea-card:hover {
+  transform:translateY(-2px);
+  border-color:#40505c;
+  background:#0d151b;
+}
+
+.idea-card.primary {
+  border-color:rgba(239,196,99,.28);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(239,196,99,.06),
+      var(--panel3) 45%
+    );
+}
+
+.idea-top {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.idea-symbol {
+  font-size:17px;
+  font-weight:900;
+}
+
+.idea-status {
+  color:var(--amber);
+  font-size:7px;
+  font-weight:900;
+}
+
+.idea-company {
+  margin-top:4px;
+  color:#71808b;
+  font-size:7px;
+}
+
+.idea-metrics {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:14px;
+}
+
+.idea-metric {
+  padding:8px;
+  border:1px solid #19242c;
+  border-radius:6px;
+  background:#080d11;
+}
+
+.idea-metric span,
+.idea-metric strong {
+  display:block;
+}
+
+.idea-metric span {
+  color:#687680;
+  font-size:6px;
+}
+
+.idea-metric strong {
+  margin-top:4px;
+  font-size:11px;
+}
+
+.good { color:var(--green); }
+.bad { color:var(--red); }
+.warn { color:var(--amber); }
+
+.opportunity-row {
+  display:grid;
+  grid-template-columns:85px 120px 1fr 62px;
+  gap:12px;
+  align-items:center;
+  padding:10px 0;
+  border-top:1px solid var(--line);
+}
+
+.opportunity-row:first-child {
+  border-top:0;
+}
+
+.opportunity-label {
+  color:#84919b;
+  font-size:7px;
+}
+
+.opportunity-track {
+  height:8px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#19242c;
+}
+
+.opportunity-fill {
+  height:100%;
+  border-radius:inherit;
+}
+
+.opportunity-fill.green {
+  background:var(--green);
+}
+
+.opportunity-fill.blue {
+  background:var(--blue);
+}
+
+.opportunity-value {
+  font-family:ui-monospace,monospace;
+  font-size:8px;
+  font-weight:900;
+  text-align:right;
+}
+
+/* Trades */
+
+.pipeline {
+  display:grid;
+  grid-template-columns:1fr 36px 1fr 36px 1fr 36px 1fr 36px 1fr;
+  align-items:stretch;
+  gap:0;
+}
+
+.pipe-stage {
+  min-height:150px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#090e12;
+}
+
+.pipe-stage.pass {
+  border-color:rgba(97,227,166,.27);
+  background:var(--green-bg);
+}
+
+.pipe-stage.watch {
+  border-color:rgba(239,196,99,.33);
+  background:var(--amber-bg);
+}
+
+.pipe-stage.blocked {
+  border-color:rgba(255,116,113,.28);
+  background:var(--red-bg);
+}
+
+.pipe-stage.waiting {
+  opacity:.7;
+}
+
+.pipe-stage.broker {
+  border-color:rgba(113,215,193,.30);
+  background:var(--teal-bg);
+}
+
+.pipe-icon {
+  width:37px;
+  height:37px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line2);
+  border-radius:50%;
+  background:#111820;
+  font-size:16px;
+}
+
+.pipe-stage h3 {
+  margin:12px 0 0;
+  font-size:10px;
+}
+
+.pipe-status {
+  margin-top:6px;
+  font-size:12px;
+  font-weight:900;
+}
+
+.pipe-stage.pass .pipe-status {
+  color:var(--green);
+}
+
+.pipe-stage.watch .pipe-status {
+  color:var(--amber);
+}
+
+.pipe-stage.blocked .pipe-status {
+  color:var(--red);
+}
+
+.pipe-stage.broker .pipe-status {
+  color:var(--teal);
+}
+
+.pipe-stage p {
+  margin:7px 0 0;
+  color:#71808b;
+  font-size:7px;
+  line-height:1.5;
+}
+
+.pipe-arrow {
+  display:grid;
+  place-items:center;
+  color:#51606b;
+  font-size:17px;
+}
+
+.trade-workspace {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 360px;
+  gap:12px;
+}
+
+.order-ticket {
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#090e12;
+}
+
+.ticket-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.ticket-symbol {
+  font-size:26px;
+  font-weight:900;
+}
+
+.ticket-lock {
+  padding:6px 8px;
+  border-radius:6px;
+  background:var(--red-bg);
+  color:var(--red);
+  font-size:7px;
+  font-weight:900;
+}
+
+.ticket-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin-top:17px;
+}
+
+.ticket-field {
+  padding:11px;
+  border:1px solid #1b2730;
+  border-radius:7px;
+  background:#080d11;
+}
+
+.ticket-field span,
+.ticket-field strong {
+  display:block;
+}
+
+.ticket-field span {
+  color:#687681;
+  font-size:6px;
+  text-transform:uppercase;
+}
+
+.ticket-field strong {
+  margin-top:5px;
+  font-size:10px;
+}
+
+.ticket-action {
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  border:1px solid rgba(255,116,113,.23);
+  border-radius:7px;
+  background:var(--red-bg);
+  color:var(--red);
+  font-size:8px;
+  font-weight:900;
+  text-align:center;
+}
+
+.blockers {
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#090e12;
+}
+
+.blockers h3 {
+  margin:0;
+  font-size:11px;
+}
+
+.blocker {
+  margin-top:10px;
+  padding:11px;
+  border:1px solid rgba(255,116,113,.16);
+  border-radius:7px;
+  background:rgba(255,116,113,.035);
+}
+
+.blocker strong {
+  display:block;
+  color:#d8dfe4;
+  font-size:8px;
+}
+
+.blocker span {
+  display:block;
+  margin-top:5px;
+  color:#7e8b95;
+  font-size:7px;
+  line-height:1.45;
+}
+
+.activity-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:8px;
+}
+
+.activity-table th,
+.activity-table td {
+  padding:11px 8px;
+  border-top:1px solid var(--line);
+  text-align:left;
+}
+
+.activity-table th {
+  border-top:0;
+  color:#6d7b86;
+  font-size:6px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.activity-table td {
+  color:#aeb7be;
+}
+
+/* History */
+
+.lifecycle-hero {
+  display:grid;
+  grid-template-columns:1fr 45px 1fr 45px 1fr 45px 1fr;
+  align-items:center;
+  gap:0;
+}
+
+.life-card {
+  min-height:180px;
+  padding:17px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#090e12;
+}
+
+.life-card.invest {
+  border-color:rgba(97,227,166,.30);
+  background:var(--green-bg);
+}
+
+.life-card.expired {
+  border-color:rgba(255,116,113,.27);
+  background:var(--red-bg);
+}
+
+.life-card.watch {
+  border-color:rgba(239,196,99,.32);
+  background:var(--amber-bg);
+}
+
+.life-card.capital {
+  border-color:rgba(255,116,113,.27);
+}
+
+.life-icon {
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line2);
+  border-radius:50%;
+  background:#111820;
+  font-size:18px;
+}
+
+.life-label {
+  margin-top:12px;
+  color:#75838e;
+  font-size:6px;
+  font-weight:900;
+  letter-spacing:.07em;
+}
+
+.life-value {
+  margin-top:5px;
+  font-family:ui-monospace,monospace;
+  font-size:18px;
+  font-weight:900;
+}
+
+.invest .life-value { color:var(--green); }
+.expired .life-value { color:var(--red); }
+.watch .life-value { color:var(--amber); }
+.capital .life-value { color:var(--red); }
+
+.life-card p {
+  margin:8px 0 0;
+  color:#788691;
+  font-size:7px;
+  line-height:1.55;
+}
+
+.life-arrow {
+  display:grid;
+  place-items:center;
+  color:#566571;
+  font-size:20px;
+}
+
+.reason-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:9px;
+}
+
+.reason-card {
+  padding:14px;
+  border:1px solid rgba(239,196,99,.17);
+  border-radius:8px;
+  background:rgba(239,196,99,.035);
+}
+
+.reason-card strong {
+  display:block;
+  font-size:9px;
+}
+
+.reason-card span {
+  display:block;
+  margin-top:6px;
+  color:#788691;
+  font-size:7px;
+  line-height:1.5;
+}
+
+.result-strip {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+.result-cell {
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#090e12;
+}
+
+.result-cell span,
+.result-cell strong {
+  display:block;
+}
+
+.result-cell span {
+  color:#6e7c87;
+  font-size:6px;
+  text-transform:uppercase;
+}
+
+.result-cell strong {
+  margin-top:6px;
+  font-size:12px;
+}
+
+.footer-note {
+  margin-top:14px;
+  padding:11px 13px;
+  border:1px solid rgba(239,196,99,.16);
+  border-radius:8px;
+  background:rgba(239,196,99,.03);
+  color:#8f8161;
+  font-size:7px;
+  line-height:1.55;
+}
+
+@media(max-width:1000px) {
+  .summary-grid,
+  .idea-grid,
+  .reason-grid,
+  .result-strip {
+    grid-template-columns:1fr;
+  }
+
+  .pipeline,
+  .lifecycle-hero {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .pipe-arrow,
+  .life-arrow {
+    transform:rotate(90deg);
+    min-height:24px;
+  }
+
+  .trade-workspace {
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:720px) {
+  nav {
+    display:none;
+  }
+
+  .page {
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  .page-title {
+    display:block;
+  }
+
+  .snapshot-note {
+    margin-top:12px;
+    text-align:left;
+  }
+
+  .account-empty {
+    grid-template-columns:1fr;
+  }
+}
+
+/* V4.8 — semantic icon system */
+
+.icon {
+  width:22px;
+  height:22px;
+  display:block;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.icon-lg {
+  width:26px;
+  height:26px;
+}
+
+.icon-xl {
+  width:30px;
+  height:30px;
+}
+
+.icon-shell {
+  width:48px;
+  height:48px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line2);
+  border-radius:50%;
+  background:#111820;
+  color:#b8c2c9;
+}
+
+.icon-shell.green {
+  color:var(--green);
+  border-color:rgba(97,227,166,.30);
+  background:rgba(97,227,166,.07);
+}
+
+.icon-shell.red {
+  color:var(--red);
+  border-color:rgba(255,116,113,.30);
+  background:rgba(255,116,113,.07);
+}
+
+.icon-shell.amber {
+  color:var(--amber);
+  border-color:rgba(239,196,99,.30);
+  background:rgba(239,196,99,.07);
+}
+
+.icon-shell.blue {
+  color:var(--blue);
+  border-color:rgba(121,175,255,.30);
+  background:rgba(121,175,255,.07);
+}
+
+.icon-shell.violet {
+  color:var(--violet);
+  border-color:rgba(187,167,255,.30);
+  background:rgba(187,167,255,.07);
+}
+
+.icon-shell.teal {
+  color:var(--teal);
+  border-color:rgba(113,215,193,.30);
+  background:rgba(113,215,193,.07);
+}
+
+.real-account-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+  margin-top:14px;
+}
+
+.real-account-card {
+  min-height:112px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#090e12;
+}
+
+.real-account-card span,
+.real-account-card strong,
+.real-account-card small {
+  display:block;
+}
+
+.real-account-card span {
+  color:#6f7d88;
+  font-size:6px;
+  font-weight:900;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+
+.real-account-card strong {
+  margin-top:7px;
+  font-size:20px;
+}
+
+.real-account-card small {
+  margin-top:6px;
+  color:#71808b;
+  font-size:7px;
+  line-height:1.45;
+}
+
+.snapshot-banner {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  margin-top:14px;
+  padding:13px 14px;
+  border:1px solid rgba(121,175,255,.18);
+  border-radius:8px;
+  background:rgba(121,175,255,.035);
+}
+
+.snapshot-banner-copy strong,
+.snapshot-banner-copy span {
+  display:block;
+}
+
+.snapshot-banner-copy strong {
+  font-size:9px;
+}
+
+.snapshot-banner-copy span {
+  margin-top:4px;
+  color:#71808b;
+  font-size:7px;
+}
+
+.cash-state {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:14px;
+  align-items:center;
+  margin-top:12px;
+  padding:15px;
+  border:1px solid rgba(97,227,166,.18);
+  border-radius:8px;
+  background:rgba(97,227,166,.035);
+}
+
+.cash-state strong,
+.cash-state span {
+  display:block;
+}
+
+.cash-state strong {
+  font-size:10px;
+}
+
+.cash-state span {
+  margin-top:4px;
+  color:#71808b;
+  font-size:7px;
+  line-height:1.45;
+}
+
+.capital-distinction {
+  display:grid;
+  grid-template-columns:1fr 45px 1fr;
+  align-items:center;
+  gap:0;
+  margin-top:13px;
+}
+
+.capital-state-card {
+  min-height:145px;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#090e12;
+}
+
+.capital-state-card.available {
+  border-color:rgba(97,227,166,.25);
+  background:rgba(97,227,166,.045);
+}
+
+.capital-state-card.locked {
+  border-color:rgba(255,116,113,.25);
+  background:rgba(255,116,113,.045);
+}
+
+.capital-state-card h3 {
+  margin:12px 0 0;
+  font-size:10px;
+}
+
+.capital-state-card strong {
+  display:block;
+  margin-top:7px;
+  font-size:18px;
+}
+
+.capital-state-card.available strong {
+  color:var(--green);
+}
+
+.capital-state-card.locked strong {
+  color:var(--red);
+}
+
+.capital-state-card p {
+  margin:6px 0 0;
+  color:#74828d;
+  font-size:7px;
+  line-height:1.5;
+}
+
+.capital-vs {
+  display:grid;
+  place-items:center;
+  color:#64727d;
+  font-size:8px;
+  font-weight:900;
+}
+
+/* Make stage icons more deliberate */
+
+.pipe-icon,
+.life-icon,
+.empty-icon {
+  width:48px !important;
+  height:48px !important;
+  display:grid !important;
+  place-items:center !important;
+  border:1px solid var(--line2) !important;
+  border-radius:50% !important;
+  background:#111820 !important;
+  font-size:0 !important;
+}
+
+.pipe-stage.pass .pipe-icon {
+  color:var(--green);
+  border-color:rgba(97,227,166,.28) !important;
+}
+
+.pipe-stage.watch .pipe-icon {
+  color:var(--amber);
+  border-color:rgba(239,196,99,.28) !important;
+}
+
+.pipe-stage.blocked .pipe-icon {
+  color:var(--red);
+  border-color:rgba(255,116,113,.28) !important;
+}
+
+.pipe-stage.waiting .pipe-icon {
+  color:#84929d;
+}
+
+.pipe-stage.broker .pipe-icon {
+  color:var(--teal);
+  border-color:rgba(113,215,193,.28) !important;
+}
+
+.life-card.invest .life-icon {
+  color:var(--green);
+  border-color:rgba(97,227,166,.28) !important;
+}
+
+.life-card.expired .life-icon {
+  color:var(--red);
+  border-color:rgba(255,116,113,.28) !important;
+}
+
+.life-card.watch .life-icon {
+  color:var(--amber);
+  border-color:rgba(239,196,99,.28) !important;
+}
+
+.life-card.capital .life-icon {
+  color:var(--red);
+  border-color:rgba(255,116,113,.28) !important;
+}
+
+@media(max-width:900px) {
+  .real-account-grid {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .capital-distinction {
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .capital-vs {
+    min-height:24px;
+  }
+}
+
+
+/* V4.9 MARKET-SCALE TYPOGRAPHY */
+
+/*
+  Markets is the visual reference.
+  Product surfaces intentionally use the same density,
+  typography scale, card radius and spacing.
+*/
+
+body {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+}
+
+.topbar {
+  height:68px;
+  gap:26px;
+  padding:0 26px;
+}
+
+.brand {
+  min-width:auto;
+}
+
+.brand strong {
+  font-size:12px;
+}
+
+.brand span {
+  margin-top:3px;
+  font-size:7px;
+}
+
+nav {
+  gap:18px;
+}
+
+nav a {
+  font-size:9px;
+}
+
+.status-badge {
+  padding:8px 10px;
+  border-radius:7px;
+  font-size:7px;
+}
+
+.page {
+  width:min(1650px,100%);
+  padding:22px 26px 32px;
+}
+
+.page-title {
+  min-height:88px;
+  align-items:flex-end;
+  padding:4px 2px 16px;
+}
+
+.eyebrow {
+  font-size:7px;
+  letter-spacing:.12em;
+}
+
+h1 {
+  margin:6px 0 5px;
+  font-size:27px;
+  line-height:1;
+  letter-spacing:-.025em;
+}
+
+.lead {
+  max-width:760px;
+  font-size:9px;
+  line-height:1.5;
+}
+
+.snapshot-note {
+  font-size:7px;
+  line-height:1.45;
+}
+
+.summary-grid {
+  gap:9px;
+  margin-top:0;
+}
+
+.summary-card {
+  min-height:108px;
+  padding:14px;
+  border-radius:9px;
+}
+
+.summary-label {
+  font-size:6px;
+}
+
+.summary-value {
+  margin-top:7px;
+  font-size:20px;
+}
+
+.summary-note {
+  margin-top:6px;
+  font-size:7px;
+  line-height:1.4;
+}
+
+.section {
+  margin-top:12px;
+  padding:17px;
+  border-radius:10px;
+}
+
+.section-head {
+  margin-bottom:14px;
+}
+
+.section h2 {
+  font-size:16px;
+}
+
+.section-copy {
+  margin-top:4px;
+  font-size:7px;
+  line-height:1.45;
+}
+
+.section-tag {
+  padding:6px 8px;
+  border-radius:6px;
+  font-size:6px;
+}
+
+/* Real broker cards */
+
+.snapshot-banner {
+  margin-top:10px;
+  padding:11px 12px;
+}
+
+.snapshot-banner-copy strong {
+  font-size:9px;
+}
+
+.snapshot-banner-copy span {
+  font-size:7px;
+}
+
+.real-account-grid {
+  gap:8px;
+  margin-top:11px;
+}
+
+.real-account-card {
+  min-height:94px;
+  padding:12px;
+  border-radius:7px;
+}
+
+.real-account-card span {
+  font-size:6px;
+}
+
+.real-account-card strong {
+  margin-top:6px;
+  font-size:17px;
+}
+
+.real-account-card small {
+  margin-top:5px;
+  font-size:6px;
+}
+
+.cash-state {
+  margin-top:10px;
+  padding:12px;
+}
+
+.cash-state strong {
+  font-size:9px;
+}
+
+.cash-state span {
+  font-size:7px;
+}
+
+/* Capital distinction */
+
+.capital-distinction {
+  margin-top:10px;
+}
+
+.capital-state-card {
+  min-height:125px;
+  padding:14px;
+  border-radius:8px;
+}
+
+.capital-state-card h3 {
+  margin-top:10px;
+  font-size:9px;
+}
+
+.capital-state-card strong {
+  margin-top:6px;
+  font-size:16px;
+}
+
+.capital-state-card p {
+  margin-top:5px;
+  font-size:7px;
+}
+
+/* Opportunity cards */
+
+.idea-grid {
+  gap:8px;
+}
+
+.idea-card {
+  padding:13px;
+  border-radius:8px;
+}
+
+.idea-symbol {
+  font-size:15px;
+}
+
+.idea-status {
+  font-size:6px;
+}
+
+.idea-company {
+  font-size:6px;
+}
+
+.idea-metrics {
+  gap:6px;
+  margin-top:11px;
+}
+
+.idea-metric {
+  padding:7px;
+}
+
+.idea-metric span {
+  font-size:6px;
+}
+
+.idea-metric strong {
+  font-size:10px;
+}
+
+.opportunity-row {
+  grid-template-columns:75px 105px 1fr 55px;
+  gap:10px;
+  padding:9px 0;
+}
+
+.opportunity-label {
+  font-size:6px;
+}
+
+.opportunity-value {
+  font-size:7px;
+}
+
+/* Execution */
+
+.pipeline {
+  grid-template-columns:
+    1fr 30px
+    1fr 30px
+    1fr 30px
+    1fr 30px
+    1fr;
+}
+
+.pipe-stage {
+  min-height:126px;
+  padding:12px;
+  border-radius:8px;
+}
+
+.pipe-icon,
+.life-icon,
+.empty-icon {
+  width:42px !important;
+  height:42px !important;
+}
+
+.pipe-icon .icon,
+.life-icon .icon {
+  width:22px;
+  height:22px;
+}
+
+.pipe-stage h3 {
+  margin-top:10px;
+  font-size:9px;
+}
+
+.pipe-status {
+  margin-top:5px;
+  font-size:10px;
+}
+
+.pipe-stage p {
+  margin-top:6px;
+  font-size:6px;
+  line-height:1.45;
+}
+
+.pipe-arrow {
+  font-size:14px;
+}
+
+.trade-workspace {
+  grid-template-columns:minmax(0,1fr) 330px;
+  gap:10px;
+}
+
+.order-ticket,
+.blockers {
+  padding:15px;
+  border-radius:8px;
+}
+
+.ticket-symbol {
+  font-size:21px;
+}
+
+.ticket-lock {
+  font-size:6px;
+}
+
+.ticket-grid {
+  gap:7px;
+  margin-top:13px;
+}
+
+.ticket-field {
+  padding:9px;
+}
+
+.ticket-field span {
+  font-size:6px;
+}
+
+.ticket-field strong {
+  font-size:9px;
+}
+
+.ticket-action {
+  margin-top:10px;
+  padding:10px;
+  font-size:7px;
+}
+
+.blockers h3 {
+  font-size:10px;
+}
+
+.blocker {
+  margin-top:8px;
+  padding:9px;
+}
+
+.blocker strong {
+  font-size:8px;
+}
+
+.blocker span {
+  font-size:6px;
+}
+
+.activity-table {
+  font-size:7px;
+}
+
+.activity-table th,
+.activity-table td {
+  padding:9px 7px;
+}
+
+/* History */
+
+.lifecycle-hero {
+  grid-template-columns:
+    1fr 36px
+    1fr 36px
+    1fr 36px
+    1fr;
+}
+
+.life-card {
+  min-height:150px;
+  padding:14px;
+  border-radius:8px;
+}
+
+.life-label {
+  margin-top:10px;
+  font-size:6px;
+}
+
+.life-value {
+  margin-top:5px;
+  font-size:15px;
+}
+
+.life-card p {
+  margin-top:6px;
+  font-size:6px;
+  line-height:1.5;
+}
+
+.life-arrow {
+  font-size:16px;
+}
+
+.reason-grid {
+  gap:8px;
+}
+
+.reason-card {
+  padding:12px;
+}
+
+.reason-card strong {
+  font-size:8px;
+}
+
+.reason-card span {
+  margin-top:5px;
+  font-size:6px;
+}
+
+.result-strip {
+  gap:7px;
+}
+
+.result-cell {
+  padding:11px;
+}
+
+.result-cell span {
+  font-size:6px;
+}
+
+.result-cell strong {
+  margin-top:5px;
+  font-size:10px;
+}
+
+.footer-note {
+  margin-top:12px;
+  padding:10px 12px;
+  font-size:6px;
+}
+
+/* Semantic icon sizes */
+
+.icon-shell {
+  width:42px;
+  height:42px;
+}
+
+.icon-shell .icon {
+  width:22px;
+  height:22px;
+}
+
+/* Judge gets the same gold identity everywhere */
+
+.life-card.watch .life-icon {
+  color:var(--amber);
+  border-color:rgba(239,196,99,.36) !important;
+  background:rgba(239,196,99,.08) !important;
+}
+
+@media(max-width:1000px) {
+  .pipeline,
+  .lifecycle-hero {
+    grid-template-columns:1fr;
+  }
+
+  .pipe-arrow,
+  .life-arrow {
+    min-height:20px;
+  }
+}
+
+
+/* V4.10 APPROVED VARIANT A ARTWORK */
+
+.mj-product-icon {
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  border-radius:50%;
+}
+
+.icon-shell,
+.pipe-icon,
+.life-icon,
+.empty-icon {
+  overflow:hidden !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+
+.icon-shell {
+  width:48px !important;
+  height:48px !important;
+}
+
+.pipe-icon,
+.life-icon,
+.empty-icon {
+  width:50px !important;
+  height:50px !important;
+}
+
+.pipe-stage.pass .pipe-icon,
+.pipe-stage.watch .pipe-icon,
+.pipe-stage.blocked .pipe-icon,
+.pipe-stage.waiting .pipe-icon,
+.pipe-stage.broker .pipe-icon,
+.life-card.invest .life-icon,
+.life-card.expired .life-icon,
+.life-card.watch .life-icon,
+.life-card.capital .life-icon {
+  border:0 !important;
+  background:transparent !important;
+}
+
+/* State color remains in cards; artwork itself is always the approved asset. */
+
+
+/* V4.12 FINAL NO-RING ICON ARTWORK */
+
+.mj-product-icon {
+  object-fit:contain !important;
+  border-radius:0 !important;
+}
+
+.icon-shell,
+.pipe-icon,
+.life-icon,
+.empty-icon {
+  overflow:visible !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.icon-shell {
+  width:54px !important;
+  height:54px !important;
+}
+
+.pipe-icon,
+.life-icon,
+.empty-icon {
+  width:58px !important;
+  height:58px !important;
+}
+
+
+/* MARKET JURY V5 LIVE PRODUCT UI */
+
+.mj-product-live {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+  padding:8px 10px;
+  border:1px solid rgba(97,227,166,.18);
+  border-radius:7px;
+  background:rgba(97,227,166,.035);
+  color:#8d9aa4;
+  font-size:7px;
+}
+
+.mj-product-live strong {
+  color:var(--green);
+}
+
+.mj-product-dot {
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:
+    0 0 10px rgba(97,227,166,.45);
+  animation:mj-product-pulse 1.5s infinite;
+}
+
+@keyframes mj-product-pulse {
+  0%,100% { opacity:1; }
+  50% { opacity:.35; }
+}
+
+.mj-live-idea {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid #19242c;
+  font-size:7px;
+}
+
+.mj-live-idea strong {
+  font-size:10px;
+}
+
+.mj-live-market-context {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px;
+  align-items:center;
+  margin-top:12px;
+  padding:12px 14px;
+  border:1px solid rgba(239,196,99,.18);
+  border-radius:8px;
+  background:rgba(239,196,99,.035);
+}
+
+.mj-live-market-context strong,
+.mj-live-market-context span {
+  display:block;
+}
+
+.mj-live-market-context strong {
+  font-size:11px;
+}
+
+.mj-live-market-context span {
+  margin-top:4px;
+  color:#74828d;
+  font-size:7px;
+}
+
+.mj-live-market-value {
+  color:var(--amber);
+  font-family:ui-monospace,monospace;
+  font-size:13px;
+  font-weight:900;
+}
+
+.mj-position-table {
+  width:100%;
+  margin-top:12px;
+  border-collapse:collapse;
+}
+
+.mj-position-table th,
+.mj-position-table td {
+  padding:9px 8px;
+  border-top:1px solid var(--line);
+  text-align:left;
+  font-size:7px;
+}
+
+.mj-position-table th {
+  color:#687681;
+  font-size:6px;
+  text-transform:uppercase;
+}
+
+.mj-trade-live-price {
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin-top:7px;
+}
+
+.mj-trade-live-price strong {
+  color:var(--green);
+  font-size:17px;
+}
+
+.mj-trade-live-price span {
+  color:#7b8994;
+  font-size:7px;
+}
+
+
+.mj-session-pill {
+  display:inline-flex;
+  align-items:center;
+  min-height:22px;
+  padding:0 8px;
+  margin-left:8px;
+  border:1px solid rgba(70,214,190,.28);
+  border-radius:999px;
+  background:rgba(70,214,190,.06);
+  color:#79d9c8;
+  font-size:7px;
+  font-weight:800;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+
+</style>
+</head>
+
+<body data-surface="{{ surface }}">
+
+<header class="topbar">
+  <div class="brand">
+    <div class="jury-mark" aria-hidden="true">
+      <i class="jury-dot jury-bull"></i>
+      <i class="jury-dot jury-bear"></i>
+      <i class="jury-dot jury-red"></i>
+      <i class="jury-dot jury-judge"></i>
+    </div>
+
+    <div>
+      <strong>MARKET JURY</strong>
+      <span>Multi-Agent Investing</span>
+    </div>
+  </div>
+
+  <nav>
+    <a href="/">Markets</a>
+
+    <a
+      href="/portfolio"
+      class="{% if surface == 'portfolio' %}active{% endif %}"
+    >
+      Portfolio
+    </a>
+
+    <a
+      href="/trades"
+      class="{% if surface == 'trades' %}active{% endif %}"
+    >
+      Trades
+    </a>
+
+    <a
+      href="/history"
+      class="{% if surface == 'history' %}active{% endif %}"
+    >
+      History
+    </a>
+  </nav>
+
+  <div class="header-status">
+    <div class="status-badge">
+      Alpaca Paper
+    </div>
+
+    <div class="status-badge verified">
+      VERIFIED STATE
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-title">
+    <div>
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 id="title">Loading…</h1>
+      <p class="lead" id="lead"></p>
+    </div>
+
+    <div class="snapshot-note">
+      REAL DECISION STATE<br>
+      MARKET SNAPSHOT · AUG 28 2026
+    </div>
+  </div>
+
+  <section id="summary" class="summary-grid"></section>
+  <div id="body"></div>
+</main>
+
+<script>
+const surface =
+  document.body.dataset.surface;
+
+const $ = (selector) =>
+  document.querySelector(selector);
+
+const MJ_ICON = {
+  bull:"/static/icons/market-jury/v3/bull.webp",
+  bear:"/static/icons/market-jury/v3/bear.webp",
+  redTeam:"/static/icons/market-jury/v3/red-team.webp",
+  judge:"/static/icons/market-jury/v3/judge.webp",
+  capitalLocked:"/static/icons/market-jury/v3/capital-locked.webp",
+  alpacaPaper:"/static/icons/market-jury/v3/alpaca-paper.webp",
+  brokerAccount:"/static/icons/market-jury/v3/broker-account.webp",
+  research:"/static/icons/market-jury/v3/research.webp",
+  capital:"/static/icons/market-jury/v3/capital.webp",
+  approval:"/static/icons/market-jury/v3/approval.webp",
+  history:"/static/icons/market-jury/v3/history.webp",
+  ttlExpired:"/static/icons/market-jury/v3/ttl-expired.webp",
+  invest:"/static/icons/market-jury/v3/invest.webp",
+  watch:"/static/icons/market-jury/v3/watch.webp",
+  verified:"/static/icons/market-jury/v3/verified-state.webp",
+};
+
+function mjIcon(key, className="mj-product-icon") {
+  const src = MJ_ICON[key];
+  return src
+    ? `<img class="${className}" src="${src}" alt="">`
+    : "";
+}
+
+
+
+const esc = (value) =>
+  String(value ?? "—")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
+
+function svgIcon(name, className="icon") {
+  const common =
+    `class="${className}" viewBox="0 0 24 24" `
+    + `aria-hidden="true"`;
+
+  const icons = {
+    wallet: `
+      <svg ${common}>
+        <path d="M3 7.5h14.5a2.5 2.5 0 0 1 2.5 2.5v7a2.5 2.5 0 0 1-2.5 2.5H5.5A2.5 2.5 0 0 1 3 17V7.5Z"/>
+        <path d="M3.5 7.5 6 4.5h10"/>
+        <path d="M15.5 12h4.5"/>
+        <circle cx="15.5" cy="12" r=".6"/>
+      </svg>
+    `,
+
+    research: `
+      <svg ${common}>
+        <path d="M4 3.5h10l3 3V13"/>
+        <path d="M14 3.5V7h3"/>
+        <path d="M7 9.5h6"/>
+        <path d="M7 13h4"/>
+        <circle cx="16.5" cy="16.5" r="3.2"/>
+        <path d="m19 19 2 2"/>
+      </svg>
+    `,
+
+    scales: `
+      <svg ${common}>
+        <path d="M12 3v17"/>
+        <path d="M7 5h10"/>
+        <path d="m7 5-3 6h6L7 5Z"/>
+        <path d="m17 5-3 6h6l-3-6Z"/>
+        <path d="M8 20h8"/>
+      </svg>
+    `,
+
+    capital: `
+      <svg ${common}>
+        <ellipse cx="9" cy="7" rx="5" ry="2.2"/>
+        <path d="M4 7v3c0 1.2 2.2 2.2 5 2.2"/>
+        <path d="M4 10v3c0 1.2 2.2 2.2 5 2.2"/>
+        <rect x="13" y="11.5" width="7" height="7" rx="1.5"/>
+        <path d="M15 11.5V10a1.5 1.5 0 0 1 3 0v1.5"/>
+      </svg>
+    `,
+
+    approval: `
+      <svg ${common}>
+        <path d="M12 3 19 6v5c0 4.8-3 8-7 10-4-2-7-5.2-7-10V6l7-3Z"/>
+        <path d="m8.5 12 2.2 2.2 4.8-5"/>
+      </svg>
+    `,
+
+    gavel: `
+      <svg ${common}>
+        <path d="m14.2 4.2 5.6 5.6"/>
+        <path d="m12.4 6 3.6-3.6 5.6 5.6-3.6 3.6Z"/>
+        <path d="m6.2 13.2 4.2-4.2 3.6 3.6-4.2 4.2Z"/>
+        <path d="m8.3 15.8-4.6 4.6"/>
+        <path d="M3 21h10"/>
+      </svg>
+    `,
+
+    broker: `
+      <svg ${common}>
+        <path d="M5 17V8"/>
+        <path d="M10 17V5"/>
+        <path d="M15 17v-6"/>
+        <path d="M20 17V3"/>
+        <path d="M3 20h19"/>
+      </svg>
+    `,
+
+    rising: `
+      <svg ${common}>
+        <path d="M4 18 9 13l3 3 7-9"/>
+        <path d="M14 7h5v5"/>
+      </svg>
+    `,
+
+    expired: `
+      <svg ${common}>
+        <circle cx="12" cy="12" r="8"/>
+        <path d="M12 7v5l3 2"/>
+        <path d="M5 5 3.5 3.5"/>
+        <path d="M19 5 20.5 3.5"/>
+        <path d="m6 19-2 2"/>
+        <path d="m18 19 2 2"/>
+      </svg>
+    `,
+
+    lock: `
+      <svg ${common}>
+        <rect x="5" y="10" width="14" height="10" rx="2"/>
+        <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+        <path d="M12 14v2"/>
+      </svg>
+    `,
+
+    positions: `
+      <svg ${common}>
+        <rect x="4" y="5" width="16" height="14" rx="2"/>
+        <path d="M8 9h8"/>
+        <path d="M8 13h3"/>
+        <path d="M14 13h2"/>
+      </svg>
+    `,
+  };
+
+  return icons[name] || "";
+}
+
+
+let MJ_PRODUCT_SESSION = null;
+
+function mjActiveSymbol() {
+  return (
+    MJ_PRODUCT_SESSION?.symbol
+    || "NVDA"
+  );
+}
+
+function mjRenderProductSessionBadge() {
+  const nav =
+    document.querySelector(".topbar nav");
+
+  if (!nav) {
+    return;
+  }
+
+  let pill =
+    document.getElementById(
+      "mjActiveSession"
+    );
+
+  if (!pill) {
+    pill =
+      document.createElement("span");
+
+    pill.id = "mjActiveSession";
+    pill.className = "mj-session-pill";
+
+    nav.appendChild(pill);
+  }
+
+  pill.textContent =
+    "ACTIVE SESSION · "
+    + mjActiveSymbol();
+}
+
+async function mjProductSessionBootstrap() {
+  try {
+    const response =
+      await fetch(
+        "/api/product/session",
+        {
+          cache:"no-store",
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "Product session fetch failed"
+      );
+    }
+
+    MJ_PRODUCT_SESSION =
+      await response.json();
+
+  } catch (error) {
+    console.error(
+      "Market Jury product session:",
+      error
+    );
+
+    MJ_PRODUCT_SESSION = {
+      symbol:"NVDA",
+      status:"FALLBACK",
+    };
+  }
+
+  mjRenderProductSessionBadge();
+}
+
+
+
+function analytics(state, symbol) {
+  return state.market.analytics?.[symbol] || null;
+}
+
+function metric(state, symbol, key) {
+  const block = analytics(state, symbol);
+
+  if (!block) {
+    return null;
+  }
+
+  return block.metrics.find(
+    (item) => item.key === key
+  ) || null;
+}
+
+function metricDisplay(state, symbol, key) {
+  return metric(state, symbol, key)?.display || "—";
+}
+
+function metricNumber(state, symbol, key) {
+  const value = metric(state, symbol, key)?.value;
+
+  return Number.isFinite(Number(value))
+    ? Number(value)
+    : 0;
+}
+
+function summaryCard(
+  label,
+  value,
+  note,
+  tone=""
+) {
+  return `
+    <article class="summary-card ${tone}">
+      <div class="summary-label">
+        ${esc(label)}
+      </div>
+
+      <div class="summary-value ${tone}">
+        ${esc(value)}
+      </div>
+
+      <div class="summary-note">
+        ${esc(note)}
+      </div>
+    </article>
+  `;
+}
+
+function companyName(symbol) {
+  const names = {
+    NVDA:"NVIDIA Corporation",
+    MSFT:"Microsoft Corporation",
+    META:"Meta Platforms",
+  };
+
+  return names[symbol] || symbol;
+}
+
+function money(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "—";
+  }
+
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      style:"currency",
+      currency:"USD",
+      maximumFractionDigits:2,
+    }
+  ).format(number);
+}
+
+function renderPortfolio(state, broker) {
+  $("#eyebrow").textContent =
+    "CAPITAL & OPPORTUNITIES";
+
+  $("#title").textContent =
+    "Portfolio";
+
+  $("#lead").textContent =
+    "Live Alpaca Paper state plus persisted broker evidence and the investment opportunities monitored by Market Jury.";
+
+  const account =
+    broker.account || {};
+
+  const buyingPower =
+    account.buying_power
+    ?? account.options_buying_power
+    ?? null;
+
+  $("#summary").innerHTML =
+    summaryCard(
+      "Broker equity",
+      money(account.equity),
+      "Cached verified value until the live Alpaca Paper account refresh succeeds.",
+      "green"
+    )
+    + summaryCard(
+      "Broker cash",
+      money(account.cash),
+      "Cached verified value until the live Alpaca Paper account refresh succeeds.",
+      "blue"
+    )
+    + summaryCard(
+      "Broker positions",
+      String(broker.position_count),
+      "Cached verified count until the live Alpaca Paper account refresh succeeds.",
+      broker.position_count === 0
+        ? "green"
+        : "amber"
+    );
+
+  const candidates =
+    state.monitor.watch_candidates;
+
+  const cards = candidates.map(
+    (symbol, index) => {
+      const status =
+        symbol === state.decision.symbol
+          ? state.decision.current_verdict
+          : "WATCH LIST";
+
+      return `
+        <a
+          class="
+            idea-card
+            ${symbol === mjActiveSymbol() ? "primary" : ""}
+          "
+          href="/?symbol=${encodeURIComponent(symbol)}"
+        >
+          <div class="idea-top">
+            <div>
+              <div class="idea-symbol">
+                ${esc(symbol)}
+              </div>
+
+              <div class="idea-company">
+                ${esc(companyName(symbol))}
+              </div>
+            </div>
+
+            <div class="idea-status">
+              ${esc(status)}
+            </div>
+          </div>
+
+          <div class="idea-metrics">
+            <div class="idea-metric">
+              <span>20D Return</span>
+              <strong class="good">
+                ${esc(metricDisplay(
+                  state,
+                  symbol,
+                  "return_20s"
+                ))}
+              </strong>
+            </div>
+
+            <div class="idea-metric">
+              <span>Max Drawdown</span>
+              <strong class="bad">
+                ${esc(metricDisplay(
+                  state,
+                  symbol,
+                  "max_drawdown_20s"
+                ))}
+              </strong>
+            </div>
+
+            <div class="idea-metric">
+              <span>Revenue Growth</span>
+              <strong>
+                ${esc(metricDisplay(
+                  state,
+                  symbol,
+                  "revenue_growth"
+                ))}
+              </strong>
+            </div>
+
+            <div class="idea-metric">
+              <span>Operating Margin</span>
+              <strong>
+                ${esc(metricDisplay(
+                  state,
+                  symbol,
+                  "operating_margin"
+                ))}
+              </strong>
+            </div>
+          </div>
+        </a>
+      `;
+    }
+  ).join("");
+
+  const maximumReturn =
+    Math.max(
+      ...candidates.map(
+        (symbol) =>
+          metricNumber(
+            state,
+            symbol,
+            "return_20s"
+          )
+      ),
+      1
+    );
+
+  const comparison =
+    candidates.map(
+      (symbol) => {
+        const value =
+          metricNumber(
+            state,
+            symbol,
+            "return_20s"
+          );
+
+        const width =
+          Math.max(
+            3,
+            value / maximumReturn * 100
+          );
+
+        return `
+          <div class="opportunity-row">
+            <strong>${esc(symbol)}</strong>
+
+            <div class="opportunity-label">
+              20D performance
+            </div>
+
+            <div class="opportunity-track">
+              <div
+                class="opportunity-fill green"
+                style="width:${width}%"
+              ></div>
+            </div>
+
+            <div class="opportunity-value good">
+              ${esc(metricDisplay(
+                state,
+                symbol,
+                "return_20s"
+              ))}
+            </div>
+          </div>
+        `;
+      }
+    ).join("");
+
+  $("#body").innerHTML = `
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Cached broker audit snapshot</h2>
+
+          <div class="section-copy">
+            Persisted verified Alpaca Paper evidence. This section is not the live account surface.
+          </div>
+        </div>
+
+        <div class="section-tag">
+          ${esc(
+            new Date(
+              broker.verified_at_utc
+            )
+            .toLocaleString(
+              "en-US",
+              {
+                month:"short",
+                day:"2-digit",
+                hour:"2-digit",
+                minute:"2-digit",
+                timeZone:"UTC",
+              }
+            )
+          )} UTC
+        </div>
+      </div>
+
+      <div class="snapshot-banner">
+        <div class="icon-shell blue">
+          ${mjIcon("brokerAccount")}
+        </div>
+
+        <div class="snapshot-banner-copy">
+          <strong>
+            Alpaca Paper · cached verified audit snapshot
+          </strong>
+
+          <span>
+            This is persisted broker evidence, not the current live
+            Alpaca Paper account state.
+          </span>
+        </div>
+      </div>
+
+      <div class="real-account-grid">
+        <article class="real-account-card">
+          <span>Equity</span>
+          <strong class="good">
+            ${money(account.equity)}
+          </strong>
+          <small>Total paper-account equity.</small>
+        </article>
+
+        <article class="real-account-card">
+          <span>Cash</span>
+          <strong>
+            ${money(account.cash)}
+          </strong>
+          <small>Cash balance in the broker snapshot.</small>
+        </article>
+
+        <article class="real-account-card">
+          <span>Buying power</span>
+          <strong>
+            ${money(buyingPower)}
+          </strong>
+          <small>Broker capacity · not Market Jury authorization.</small>
+        </article>
+
+        <article class="real-account-card">
+          <span>Open positions</span>
+          <strong>
+            ${esc(broker.position_count)}
+          </strong>
+          <small>
+            No holdings or P&amp;L are fabricated.
+          </small>
+        </article>
+      </div>
+
+      <div class="cash-state">
+        <div class="icon-shell green">
+          ${mjIcon("brokerAccount")}
+        </div>
+
+        <div>
+          <strong>
+            No open positions in this verified snapshot
+          </strong>
+
+          <span>
+            The paper account held no open positions at
+            ${esc(broker.verified_at_utc)}.
+          </span>
+        </div>
+
+        <div class="read-state good">
+          0 POSITIONS
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Broker capacity vs investment authority</h2>
+
+          <div class="section-copy">
+            Available money is not the same thing as permission
+            to deploy it.
+          </div>
+        </div>
+      </div>
+
+      <div class="capital-distinction">
+        <article class="capital-state-card available">
+          <div class="icon-shell green">
+            ${mjIcon("brokerAccount")}
+          </div>
+
+          <h3>Broker capacity</h3>
+
+          <strong>
+            ${money(buyingPower)}
+          </strong>
+
+          <p>
+            Alpaca Paper buying power at the verified snapshot.
+          </p>
+        </article>
+
+        <div class="capital-vs">
+          ≠
+        </div>
+
+        <article class="capital-state-card locked">
+          <div class="icon-shell red">
+            ${mjIcon("capitalLocked")}
+          </div>
+
+          <h3>Decision capital</h3>
+
+          <strong>
+            NOT RELEASED
+          </strong>
+
+          <p>
+            The current ${esc(state.decision.current_verdict)}
+            jury outcome does not authorize downstream deployment.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Active opportunities</h2>
+
+          <div class="section-copy">
+            Ideas under active Market Jury monitoring.
+          </div>
+        </div>
+
+        <div class="section-tag">
+          ${esc(candidates.length)} MONITORED
+        </div>
+      </div>
+
+      <div class="idea-grid">
+        ${cards}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Opportunity momentum</h2>
+
+          <div class="section-copy">
+            Verified trailing 20-session price return.
+          </div>
+        </div>
+      </div>
+
+      ${comparison}
+    </section>
+
+    <div class="footer-note">
+      The audit section above is persisted verified Alpaca Paper evidence.
+      Current investment authority remains governed by the fresh
+      Market Jury decision.
+    </div>
+  `;
+}
+
+function renderTrades(state) {
+  $("#eyebrow").textContent =
+    "DECISION → CAPITAL → ORDER";
+
+  $("#title").textContent =
+    "Trades";
+
+  $("#lead").textContent =
+    "Follow the current investment idea through the jury, capital gates and Alpaca execution layer.";
+
+  const activeSymbol =
+    mjActiveSymbol();
+
+  const canonicalSymbol =
+    state.decision.symbol;
+
+  const hasSessionDecision =
+    activeSymbol === canonicalSymbol;
+
+  const sessionVerdict =
+    hasSessionDecision
+      ? state.decision.current_verdict
+      : "NOT RUN";
+
+  const sessionDirective =
+    hasSessionDecision
+      ? state.council.judge.next_directive
+      : "ANALYZE REQUIRED";
+
+  $("#summary").innerHTML =
+    summaryCard(
+      "Active investment session",
+      activeSymbol,
+      hasSessionDecision
+        ? `A canonical Jury decision exists for ${activeSymbol}.`
+        : `No saved Market Jury decision exists for ${activeSymbol} yet.`,
+      hasSessionDecision
+        ? "amber"
+        : "blue"
+    )
+    + summaryCard(
+      "Latest canonical decision",
+      `${canonicalSymbol} · ${state.decision.current_verdict}`,
+      `Stored directive: ${state.council.judge.next_directive}.`,
+      "amber"
+    )
+    + summaryCard(
+      "Alpaca orders",
+      String(state.broker.orders),
+      `Broker writes: ${state.broker.broker_writes}.`,
+      "red"
+    );
+
+  const blockers =
+    hasSessionDecision
+      ? (
+          state.monitor.blocking_reasons
+          || []
+        )
+      : [
+          {
+            label:
+              `No Jury run for ${activeSymbol}`,
+            detail:
+              `Analyze ${activeSymbol} with Market Jury before a trade intent or capital decision can exist.`,
+          },
+        ];
+
+  const blockerCards =
+    blockers.length
+      ? blockers.map(
+          (reason) => `
+            <div class="blocker">
+              <strong>
+                ${esc(reason.label)}
+              </strong>
+
+              <span>
+                ${esc(reason.detail)}
+              </span>
+            </div>
+          `
+        ).join("")
+      : `
+        <div class="blocker">
+          <strong>No blocking reason loaded</strong>
+        </div>
+      `;
+
+  $("#body").innerHTML = `
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Latest canonical decision pipeline</h2>
+
+          <div class="section-copy">
+            This stored pipeline belongs to the latest canonical decision, not automatically to the active investment session.
+          </div>
+        </div>
+
+        <div class="section-tag">
+          ${esc(canonicalSymbol)} · CANONICAL
+        </div>
+      </div>
+
+      <div class="pipeline">
+        <article class="pipe-stage pass">
+          <div class="pipe-icon">
+          ${mjIcon("research")}
+        </div>
+          <h3>Research</h3>
+          <div class="pipe-status">COMPLETE</div>
+          <p>
+            Market, fundamentals and jury evidence assembled.
+          </p>
+        </article>
+
+        <div class="pipe-arrow">→</div>
+
+        <article class="pipe-stage watch">
+          <div class="pipe-icon">
+          ${mjIcon("judge")}
+        </div>
+          <h3>AI Jury</h3>
+          <div class="pipe-status">
+            ${esc(state.decision.current_verdict)}
+          </div>
+          <p>
+            ${esc(state.council.judge.next_directive)}
+            is the fresh adjudicated directive.
+          </p>
+        </article>
+
+        <div class="pipe-arrow">→</div>
+
+        <article class="pipe-stage blocked">
+          <div class="pipe-icon">
+          ${mjIcon("capital")}
+        </div>
+          <h3>Capital</h3>
+          <div class="pipe-status">NOT RELEASED</div>
+          <p>
+            Current downstream capital path is closed.
+          </p>
+        </article>
+
+        <div class="pipe-arrow">→</div>
+
+        <article class="pipe-stage waiting">
+          <div class="pipe-icon">
+          ${mjIcon("approval")}
+        </div>
+          <h3>Approval</h3>
+          <div class="pipe-status">NOT REACHED</div>
+          <p>
+            No production candidate reached approval.
+          </p>
+        </article>
+
+        <div class="pipe-arrow">→</div>
+
+        <article class="pipe-stage broker">
+          <div class="pipe-icon">
+          ${mjIcon("alpacaPaper")}
+        </div>
+          <h3>Alpaca Paper</h3>
+          <div class="pipe-status">NO ORDER</div>
+          <p>
+            ${esc(state.broker.orders)} orders ·
+            ${esc(state.broker.broker_writes)} writes.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Order workspace</h2>
+
+          <div class="section-copy">
+            What the order surface looks like before execution authority exists.
+          </div>
+        </div>
+      </div>
+
+      <div class="trade-workspace">
+        <div class="order-ticket">
+          <div class="ticket-head">
+            <div class="ticket-symbol">
+              ${esc(mjActiveSymbol())}
+            </div>
+
+            <div class="ticket-lock">
+              ${
+                hasSessionDecision
+                  ? "🔒 NO ELIGIBLE TRADE"
+                  : "◌ ANALYSIS REQUIRED"
+              }
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top:14px;
+              padding:11px;
+              border:1px solid rgba(97,227,166,.18);
+              border-radius:7px;
+              background:rgba(97,227,166,.035);
+            "
+          >
+            <div style="
+              color:#71808b;
+              font-size:6px;
+              text-transform:uppercase;
+            ">
+              VERIFIED BROKER BUYING POWER
+            </div>
+
+            <strong
+              id="tradeBuyingPower"
+              style="
+                display:block;
+                margin-top:5px;
+                color:var(--green);
+                font-size:17px;
+              "
+            >
+              —
+            </strong>
+
+            <div style="
+              margin-top:4px;
+              color:#71808b;
+              font-size:7px;
+            ">
+              Broker capacity does not override a closed capital gate.
+            </div>
+          </div>
+
+          <div class="ticket-grid">
+            <div class="ticket-field">
+              <span>Session Jury decision</span>
+              <strong class="warn">
+                ${esc(sessionVerdict)}
+              </strong>
+            </div>
+
+            <div class="ticket-field">
+              <span>Session directive</span>
+              <strong>
+                ${esc(sessionDirective)}
+              </strong>
+            </div>
+
+            <div class="ticket-field">
+              <span>Strategy</span>
+              <strong>—</strong>
+            </div>
+
+            <div class="ticket-field">
+              <span>Quantity</span>
+              <strong>—</strong>
+            </div>
+
+            <div class="ticket-field">
+              <span>Order type</span>
+              <strong>—</strong>
+            </div>
+
+            <div class="ticket-field">
+              <span>Max risk</span>
+              <strong>—</strong>
+            </div>
+          </div>
+
+          <div class="ticket-action">
+            WATCH · CAPITAL NOT RELEASED
+          </div>
+        </div>
+
+        <aside class="blockers">
+          <h3>Why the path is blocked</h3>
+
+          ${blockerCards}
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Latest canonical activity</h2>
+        </div>
+      </div>
+
+      <table class="activity-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Stage</th>
+            <th>Status</th>
+            <th>Broker effect</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>${esc(state.decision.symbol)}</td>
+            <td>Fresh Jury Decision</td>
+            <td class="warn">
+              ${esc(state.decision.current_verdict)}
+            </td>
+            <td>
+              0 orders · 0 writes
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  `;
+}
+
+function renderHistory(state) {
+  $("#eyebrow").textContent =
+    "DECISION FRESHNESS";
+
+  $("#title").textContent =
+    "History";
+
+  $("#lead").textContent =
+    "Canonical decision history is shown separately from the currently active investment session.";
+
+  const canonicalSymbol =
+    state.decision.symbol;
+
+  $("#summary").innerHTML =
+    summaryCard(
+      "Canonical prior decision",
+      `${canonicalSymbol} · ${state.decision.prior_outcome}`,
+      "Historical favorable upstream outcome.",
+      "green"
+    )
+    + summaryCard(
+      "Canonical fresh decision",
+      `${canonicalSymbol} · ${state.decision.current_verdict}`,
+      `Current directive: ${state.council.judge.next_directive}.`,
+      "amber"
+    )
+    + summaryCard(
+      "Current capital",
+      "NOT RELEASED",
+      "No eligible downstream continuation.",
+      "red"
+    );
+
+  const blockers =
+    state.monitor.blocking_reasons || [];
+
+  const reasons =
+    blockers.length
+      ? blockers.map(
+          (reason) => `
+            <article class="reason-card">
+              <strong>
+                ${esc(reason.label)}
+              </strong>
+
+              <span>
+                ${esc(reason.detail)}
+              </span>
+            </article>
+          `
+        ).join("")
+      : `
+        <article class="reason-card">
+          <strong>No blocking reasons loaded</strong>
+        </article>
+      `;
+
+  $("#body").innerHTML = `
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Canonical decision lifecycle</h2>
+
+          <div class="section-copy">
+            Stored decision lineage. It does not change when a different investment session is selected.
+          </div>
+        </div>
+
+        <div class="section-tag">
+          ${esc(canonicalSymbol)} · STORED
+        </div>
+      </div>
+
+      <div class="lifecycle-hero">
+        <article class="life-card invest">
+          <div class="life-icon">
+          ${mjIcon("invest")}
+        </div>
+
+          <div class="life-label">
+            PRIOR JURY OUTCOME
+          </div>
+
+          <div class="life-value">
+            ${esc(state.decision.prior_outcome)}
+          </div>
+
+          <p>
+            A favorable investment decision existed
+            inside its original decision-validity window.
+          </p>
+        </article>
+
+        <div class="life-arrow">→</div>
+
+        <article class="life-card expired">
+          <div class="life-icon">
+          ${mjIcon("ttlExpired")}
+        </div>
+
+          <div class="life-label">
+            FRESHNESS GATE
+          </div>
+
+          <div class="life-value">
+            ${esc(state.decision.ttl_status)}
+          </div>
+
+          <p>
+            The prior decision became invalid for
+            downstream continuation after expiry.
+          </p>
+        </article>
+
+        <div class="life-arrow">→</div>
+
+        <article class="life-card watch">
+          <div class="life-icon">
+          ${mjIcon("watch")}
+        </div>
+
+          <div class="life-label">
+            FRESH JURY OUTCOME
+          </div>
+
+          <div class="life-value">
+            ${esc(state.decision.current_verdict)}
+          </div>
+
+          <p>
+            Fresh adjudication changed the path to
+            ${esc(state.council.judge.next_directive)}.
+          </p>
+        </article>
+
+        <div class="life-arrow">→</div>
+
+        <article class="life-card capital">
+          <div class="life-icon">
+          ${mjIcon("capitalLocked")}
+        </div>
+
+          <div class="life-label">
+            CAPITAL
+          </div>
+
+          <div class="life-value">
+            NOT RELEASED
+          </div>
+
+          <p>
+            B5 handoff is
+            ${esc(state.decision.b5_handoff_eligible)} and
+            Alpaca orders remain ${esc(state.broker.orders)}.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Why the canonical decision changed</h2>
+
+          <div class="section-copy">
+            Evidence gaps surfaced by the latest adjudication.
+          </div>
+        </div>
+      </div>
+
+      <div class="reason-grid">
+        ${reasons}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2>Outcome</h2>
+        </div>
+      </div>
+
+      <div class="result-strip">
+        <div class="result-cell">
+          <span>B5 handoff</span>
+          <strong class="bad">
+            ${state.decision.b5_handoff_eligible
+              ? "ELIGIBLE"
+              : "NOT REACHED"}
+          </strong>
+        </div>
+
+        <div class="result-cell">
+          <span>Broker writes</span>
+          <strong>
+            ${esc(state.broker.broker_writes)}
+          </strong>
+        </div>
+
+        <div class="result-cell">
+          <span>Alpaca orders</span>
+          <strong>
+            ${esc(state.broker.orders)}
+          </strong>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+        This stored lifecycle belongs to ${esc(canonicalSymbol)}.
+        Selecting another active investment session does not rewrite
+        or relabel canonical decision history.
+      </div>
+  `;
+}
+
+async function boot() {
+  const [
+    stateResponse,
+    brokerResponse,
+  ] = await Promise.all([
+    fetch(
+      "/api/state",
+      {cache:"no-store"}
+    ),
+
+    fetch(
+      "/api/broker-snapshot",
+      {cache:"no-store"}
+    ),
+  ]);
+
+  if (!stateResponse.ok) {
+    throw new Error(
+      "Product state API failed"
+    );
+  }
+
+  if (!brokerResponse.ok) {
+    throw new Error(
+      "Broker snapshot API failed"
+    );
+  }
+
+  const state =
+    await stateResponse.json();
+
+  const broker =
+    await brokerResponse.json();
+
+  if (surface === "portfolio") {
+    renderPortfolio(
+      state,
+      broker
+    );
+
+    return;
+  }
+
+  if (surface === "trades") {
+    renderTrades(state);
+
+    const account =
+      broker.account || {};
+
+    const buyingPower =
+      account.buying_power
+      ?? account.options_buying_power
+      ?? null;
+
+    const node =
+      document.querySelector(
+        "#tradeBuyingPower"
+      );
+
+    if (node) {
+      node.textContent =
+        money(buyingPower);
+    }
+
+    return;
+  }
+
+  renderHistory(state);
+}
+
+mjProductSessionBootstrap()
+  .then(() => boot())
+  .catch((error) => {
+  $("#title").textContent =
+    "Failed closed";
+
+  $("#lead").textContent =
+    error.message;
+});
+</script>
+
+
+<script>
+/* MARKET JURY V5 LIVE PRODUCT CLIENT */
+
+const MJ_PRODUCT_LIVE = {
+  market: null,
+  account: null,
+  marketLastMs: 0,
+  accountLastMs: 0,
+};
+
+function mjLiveMoney(value) {
+  const n = Number(value);
+
+  if (!Number.isFinite(n)) {
+    return "—";
+  }
+
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      style:"currency",
+      currency:"USD",
+      minimumFractionDigits:2,
+      maximumFractionDigits:2,
+    }
+  ).format(n);
+}
+
+function mjLivePct(value) {
+  const n = Number(value);
+
+  if (!Number.isFinite(n)) {
+    return "—";
+  }
+
+  return (
+    (n >= 0 ? "+" : "")
+    + n.toFixed(2)
+    + "%"
+  );
+}
+
+function mjLiveSymbol(symbol) {
+  return (
+    MJ_PRODUCT_LIVE
+    .market
+    ?.symbols
+    ?.[symbol]
+    || null
+  );
+}
+
+function mjEnsurePageLiveStatus() {
+  const pageTitle =
+    document.querySelector(
+      ".page-title > div:first-child"
+    );
+
+  if (!pageTitle) {
+    return null;
+  }
+
+  let node =
+    document.getElementById(
+      "mjProductLive"
+    );
+
+  if (!node) {
+    node =
+      document.createElement(
+        "div"
+      );
+
+    node.id = "mjProductLive";
+    node.className =
+      "mj-product-live";
+
+    pageTitle.appendChild(node);
+  }
+
+  return node;
+}
+
+function mjUpdatePageStatus() {
+  const node =
+    mjEnsurePageLiveStatus();
+
+  if (!node) {
+    return;
+  }
+
+  const marketAge =
+    MJ_PRODUCT_LIVE.marketLastMs
+      ? (
+          Date.now()
+          - MJ_PRODUCT_LIVE.marketLastMs
+        ) / 1000
+      : null;
+
+  const accountAge =
+    MJ_PRODUCT_LIVE.accountLastMs
+      ? (
+          Date.now()
+          - MJ_PRODUCT_LIVE.accountLastMs
+        ) / 1000
+      : null;
+
+  const marketConnecting =
+    marketAge === null;
+
+  const marketStale =
+    marketAge !== null
+    && marketAge > 12;
+
+  const marketState =
+    marketConnecting
+      ? "CONNECTING"
+      : (
+          marketStale
+            ? "STALE READ-ONLY"
+            : "LIVE READ-ONLY"
+        );
+
+  let accountState = "";
+
+  if (
+    surface === "portfolio"
+    || surface === "trades"
+  ) {
+    accountState =
+      accountAge === null
+        ? " · account connecting / cached evidence shown"
+        : ` · account ${accountAge.toFixed(0)}s ago`;
+  }
+
+  node.innerHTML = `
+    <span class="mj-product-dot"></span>
+
+    <strong>
+      ${marketState}
+    </strong>
+
+    <span>
+      Alpaca Paper + IEX
+      ${
+        marketAge === null
+          ? "· market connecting"
+          : `· market ${marketAge.toFixed(0)}s ago`
+      }
+      ${accountState}
+    </span>
+  `;
+
+  const header =
+    document.querySelector(
+      ".status-badge.verified"
+    );
+
+  if (header) {
+    header.textContent =
+      `● ${marketState}`;
+  }
+}
+
+function mjPortfolioMarket() {
+  if (surface !== "portfolio") {
+    return;
+  }
+
+  for (
+    const symbol
+    of ["NVDA", "MSFT", "META"]
+  ) {
+    const card =
+      document.querySelector(
+        `.idea-card[href*="symbol=${symbol}"]`
+      );
+
+    const live =
+      mjLiveSymbol(symbol);
+
+    if (
+      !card
+      || !live?.available
+    ) {
+      continue;
+    }
+
+    let node =
+      card.querySelector(
+        ".mj-live-idea"
+      );
+
+    if (!node) {
+      node =
+        document.createElement(
+          "div"
+        );
+
+      node.className =
+        "mj-live-idea";
+
+      card.appendChild(node);
+    }
+
+    node.innerHTML = `
+      <span>
+        <span class="mj-product-dot"></span>
+        LIVE
+      </span>
+
+      <strong>
+        ${mjLiveMoney(
+          live.latest_trade_price
+        )}
+        ·
+        ${mjLivePct(
+          live.day_change_pct
+        )}
+      </strong>
+    `;
+  }
+}
+
+function mjPortfolioAccount() {
+  if (
+    surface !== "portfolio"
+    || !MJ_PRODUCT_LIVE.account
+  ) {
+    return;
+  }
+
+  const payload =
+    MJ_PRODUCT_LIVE.account;
+
+  const account =
+    payload.account || {};
+
+  const buyingPower =
+    account.buying_power
+    ?? account.options_buying_power;
+
+  const summary =
+    document.querySelector(
+      "#summary"
+    );
+
+  if (summary) {
+    summary.innerHTML =
+      summaryCard(
+        "LIVE PAPER EQUITY",
+        mjLiveMoney(
+          account.equity
+        ),
+        "Current Alpaca Paper account.",
+        "green"
+      )
+      + summaryCard(
+        "LIVE CASH",
+        mjLiveMoney(
+          account.cash
+        ),
+        "Current Alpaca Paper cash.",
+        "blue"
+      )
+      + summaryCard(
+        "OPEN POSITIONS",
+        String(
+          payload.position_count
+        ),
+        "Current paper-account positions.",
+        payload.position_count === 0
+          ? "green"
+          : "amber"
+      );
+  }
+
+  const cards =
+    document.querySelectorAll(
+      ".real-account-card strong"
+    );
+
+  const values = [
+    account.equity,
+    account.cash,
+    buyingPower,
+    payload.position_count,
+  ];
+
+  cards.forEach(
+    (node, index) => {
+      if (index >= values.length) {
+        return;
+      }
+
+      node.textContent =
+        index === 3
+          ? String(values[index])
+          : mjLiveMoney(values[index]);
+    }
+  );
+
+  const capacity =
+    document.querySelector(
+      ".capital-state-card.available strong"
+    );
+
+  if (capacity) {
+    capacity.textContent =
+      mjLiveMoney(
+        buyingPower
+      );
+  }
+
+  const firstSection =
+    document.querySelector(
+      "#body .section"
+    );
+
+  if (firstSection) {
+    const title =
+      firstSection.querySelector(
+        "h2"
+      );
+
+    if (title) {
+      title.textContent =
+        "Live broker account";
+    }
+
+    const tag =
+      firstSection.querySelector(
+        ".section-tag"
+      );
+
+    if (tag) {
+      tag.textContent =
+        "● LIVE PAPER";
+    }
+  }
+
+  const existing =
+    document.getElementById(
+      "mjLivePositions"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+  if (
+    firstSection
+    && payload.positions?.length
+  ) {
+    const wrapper =
+      document.createElement(
+        "div"
+      );
+
+    wrapper.id =
+      "mjLivePositions";
+
+    wrapper.innerHTML = `
+      <table class="mj-position-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Market value</th>
+            <th>Unrealized P&amp;L</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${payload.positions.map(
+            (position) => `
+              <tr>
+                <td>
+                  ${esc(position.symbol)}
+                </td>
+
+                <td>
+                  ${esc(position.qty)}
+                </td>
+
+                <td>
+                  ${mjLiveMoney(
+                    position.current_price
+                  )}
+                </td>
+
+                <td>
+                  ${mjLiveMoney(
+                    position.market_value
+                  )}
+                </td>
+
+                <td>
+                  ${mjLiveMoney(
+                    position.unrealized_pl
+                  )}
+                </td>
+              </tr>
+            `
+          ).join("")}
+        </tbody>
+      </table>
+    `;
+
+    firstSection.appendChild(
+      wrapper
+    );
+  }
+}
+
+function mjTradesMarket() {
+  if (surface !== "trades") {
+    return;
+  }
+
+  const live =
+    mjLiveSymbol(mjActiveSymbol());
+
+  if (!live?.available) {
+    return;
+  }
+
+  const ticket =
+    document.querySelector(
+      ".order-ticket"
+    );
+
+  if (!ticket) {
+    return;
+  }
+
+  let node =
+    ticket.querySelector(
+      ".mj-trade-live-price"
+    );
+
+  if (!node) {
+    node =
+      document.createElement(
+        "div"
+      );
+
+    node.className =
+      "mj-trade-live-price";
+
+    const head =
+      ticket.querySelector(
+        ".ticket-head"
+      );
+
+    if (head) {
+      head.insertAdjacentElement(
+        "afterend",
+        node
+      );
+    }
+  }
+
+  node.innerHTML = `
+    <strong>
+      ${mjLiveMoney(
+        live.latest_trade_price
+      )}
+    </strong>
+
+    <span>
+      ${mjLivePct(
+        live.day_change_pct
+      )} today ·
+      bid ${mjLiveMoney(live.bid_price)} ·
+      ask ${mjLiveMoney(live.ask_price)}
+    </span>
+  `;
+}
+
+function mjTradesAccount() {
+  if (
+    surface !== "trades"
+    || !MJ_PRODUCT_LIVE.account
+  ) {
+    return;
+  }
+
+  const account =
+    MJ_PRODUCT_LIVE
+    .account
+    .account || {};
+
+  const buyingPower =
+    account.buying_power
+    ?? account.options_buying_power;
+
+  const node =
+    document.getElementById(
+      "tradeBuyingPower"
+    );
+
+  if (node) {
+    node.textContent =
+      mjLiveMoney(
+        buyingPower
+      );
+  }
+}
+
+function mjHistoryMarket() {
+  if (surface !== "history") {
+    return;
+  }
+
+  const live =
+    mjLiveSymbol(mjActiveSymbol());
+
+  if (!live?.available) {
+    return;
+  }
+
+  let node =
+    document.getElementById(
+      "mjHistoryMarket"
+    );
+
+  if (!node) {
+    node =
+      document.createElement(
+        "div"
+      );
+
+    node.id =
+      "mjHistoryMarket";
+
+    node.className =
+      "mj-live-market-context";
+
+    const pageTitle =
+      document.querySelector(
+        ".page-title"
+      );
+
+    if (pageTitle) {
+      pageTitle.insertAdjacentElement(
+        "afterend",
+        node
+      );
+    }
+  }
+
+  node.innerHTML = `
+    <div class="mj-product-dot"></div>
+
+    <div>
+      <strong>
+        Current ${esc(
+          mjActiveSymbol()
+        )} market telemetry
+      </strong>
+
+      <span>
+        Active-session telemetry only.
+        Canonical decision history is displayed separately below.
+      </span>
+    </div>
+
+    <div class="mj-live-market-value">
+      ${mjLiveMoney(
+        live.latest_trade_price
+      )}
+      ·
+      ${mjLivePct(
+        live.day_change_pct
+      )}
+    </div>
+  `;
+}
+
+function mjApplyLiveProduct() {
+  mjUpdatePageStatus();
+  mjPortfolioMarket();
+  mjPortfolioAccount();
+  mjTradesMarket();
+  mjTradesAccount();
+  mjHistoryMarket();
+}
+
+async function mjProductPollMarket() {
+  if (
+    document.visibilityState
+    !== "visible"
+  ) {
+    return;
+  }
+
+  try {
+    const response =
+      await fetch(
+        "/api/live/market",
+        {
+          cache:"no-store",
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "market unavailable"
+      );
+    }
+
+    MJ_PRODUCT_LIVE.market =
+      await response.json();
+
+    MJ_PRODUCT_LIVE.marketLastMs =
+      Date.now();
+
+    mjApplyLiveProduct();
+
+  } catch (error) {
+    console.warn(
+      "Product live market read failed",
+      error
+    );
+  }
+}
+
+async function mjProductPollAccount() {
+  if (
+    document.visibilityState
+    !== "visible"
+  ) {
+    return;
+  }
+
+  if (
+    surface !== "portfolio"
+    && surface !== "trades"
+  ) {
+    return;
+  }
+
+  try {
+    const response =
+      await fetch(
+        "/api/live/account",
+        {
+          cache:"no-store",
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "account unavailable"
+      );
+    }
+
+    MJ_PRODUCT_LIVE.account =
+      await response.json();
+
+    MJ_PRODUCT_LIVE.accountLastMs =
+      Date.now();
+
+    mjApplyLiveProduct();
+
+  } catch (error) {
+    console.warn(
+      "Product live account read failed",
+      error
+    );
+  }
+}
+
+setTimeout(
+  () => {
+    mjProductPollMarket();
+    mjProductPollAccount();
+  },
+  450
+);
+
+setInterval(
+  mjProductPollMarket,
+  3000
+);
+
+setInterval(
+  mjProductPollAccount,
+  30000
+);
+
+setInterval(
+  mjUpdatePageStatus,
+  1000
+);
+</script>
+
+</body>
+</html>
