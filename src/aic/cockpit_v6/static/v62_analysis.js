@@ -6,8 +6,11 @@
     preflight: null,
     run: null,
     initialPreflight: null,
+    initialApproval: null,
     preflightBusy: false,
     preflightError: null,
+    approvalBusy: false,
+    approvalError: null,
     looping: false,
   };
 
@@ -248,6 +251,38 @@
         font-size:6px;
       }
 
+      .v62-approval-box {
+        margin-top:8px;
+        padding:8px;
+        border:1px solid rgba(239,196,99,.22);
+        border-radius:7px;
+        background:rgba(239,196,99,.04);
+      }
+
+      .v62-approval-box.approved {
+        border-color:rgba(97,227,166,.30);
+        background:rgba(97,227,166,.055);
+      }
+
+      .v62-approval-title {
+        color:#efc463;
+        font-size:7px;
+        font-weight:900;
+        letter-spacing:.05em;
+      }
+
+      .v62-approval-box.approved
+      .v62-approval-title {
+        color:#75e6b1;
+      }
+
+      .v62-approval-copy {
+        margin-top:5px;
+        color:#7f8d97;
+        font-size:6px;
+        line-height:1.55;
+      }
+
       @media(max-width:900px) {
         .v62-stages {
           grid-template-columns:
@@ -281,6 +316,14 @@
 
     const hasInitialPreflight =
       initial?.available === true;
+
+    const approval =
+      STATE.initialApproval;
+
+    const approved =
+      approval?.available === true
+      && approval?.owner_approval_granted === true
+      && approval?.preflight_id === initial?.preflight_id;
 
     const running =
       STATE.run?.status === "RUNNING";
@@ -335,10 +378,67 @@
               · request set
               ${esc(shortHash(initial.request_set_hash))}
               <br>
-              OWNER APPROVAL: NOT GRANTED
+              OWNER APPROVAL:
+              ${approved ? "GRANTED" : "NOT GRANTED"}
               · MODEL AUTHORITY: NO
               · AUTOMATIC RETRIES: 0
             </div>
+
+            ${
+              approved
+                ? `
+                  <div class="v62-approval-box approved">
+                    <div class="v62-approval-title">
+                      ✓ INITIAL PREFLIGHT APPROVED
+                    </div>
+
+                    <div class="v62-approval-copy">
+                      Approval
+                      ${esc(shortHash(approval.approval_hash))}
+                      is bound to this exact request set
+                      and MAX $${esc(approval.approved_max_cost_usd)}.
+                      <br>
+                      NO CHARGE YET · EXECUTOR: NOT PRESENT
+                      · MODEL AUTHORITY: NO
+                    </div>
+                  </div>
+                `
+                : `
+                  <div class="v62-approval-box">
+                    <div class="v62-approval-title">
+                      OWNER APPROVAL REQUIRED
+                    </div>
+
+                    <div class="v62-approval-copy">
+                      This approval only records permission
+                      for the exact frozen Initial request set.
+                      It does not call OpenAI and cannot spend money.
+                    </div>
+
+                    <button
+                      class="v62-button"
+                      id="v62InitialApproval"
+                      ${STATE.approvalBusy ? "disabled" : ""}
+                    >
+                      ${
+                        STATE.approvalBusy
+                          ? "RECORDING HASH-BOUND APPROVAL"
+                          : `APPROVE INITIAL PREFLIGHT · MAX $${esc(initial.estimated_max_cost_usd)} · NO CHARGE YET`
+                      }
+                    </button>
+
+                    ${
+                      STATE.approvalError
+                        ? `
+                          <div class="v62-preflight-error">
+                            ${esc(STATE.approvalError)}
+                          </div>
+                        `
+                        : ""
+                    }
+                  </div>
+                `
+            }
 
             <button
               class="v62-button"
@@ -348,7 +448,9 @@
               ${
                 STATE.preflightBusy
                   ? "FREEZING READ-ONLY EVIDENCE"
-                  : "REFRESH INITIAL COST PREFLIGHT"
+                  : approved
+                    ? "REFRESH PREFLIGHT · CREATES NEW APPROVAL GATE"
+                    : "REFRESH INITIAL COST PREFLIGHT"
               }
             </button>
 
@@ -425,7 +527,7 @@
 
     return `
       <div class="v62-analysis-kicker">
-        INTERACTIVE COUNCIL · V6.2A
+        INTERACTIVE COUNCIL · V6.2B
       </div>
 
       <h3>
@@ -434,10 +536,11 @@
       </h3>
 
       <div class="v62-analysis-copy">
-        This build validates the complete
-        product workflow using local fake
-        transport. It cannot create a real
-        investment decision or broker action.
+        Real Initial requests are gated by
+        a frozen cost preflight and explicit
+        hash-bound owner approval.
+        No paid model executor exists yet.
+        The simulation controls below remain local-only.
       </div>
 
       <div class="v62-call-plan">
@@ -465,8 +568,8 @@
           running
             ? "SIMULATION RUNNING"
             : completed
-              ? `RUN ${esc(symbol)} FLOW AGAIN`
-              : `ANALYZE ${esc(symbol)} WITH MARKET JURY`
+              ? `RUN LOCAL SIMULATION FOR ${esc(symbol)} AGAIN`
+              : `RUN LOCAL SIMULATION FOR ${esc(symbol)}`
         }
       </button>
 
@@ -524,6 +627,16 @@
     if (preflightButton) {
       preflightButton.onclick =
         captureInitialPreflight;
+    }
+
+    const approvalButton =
+      document.getElementById(
+        "v62InitialApproval"
+      );
+
+    if (approvalButton) {
+      approvalButton.onclick =
+        approveInitialPreflight;
     }
   }
 
@@ -595,6 +708,7 @@
       preflight,
       run,
       initialPreflight,
+      initialApproval,
     ] = await Promise.all([
       json("/api/product/session"),
       json(
@@ -606,6 +720,9 @@
       json(
         "/api/product/analysis/initial/preflight"
       ),
+      json(
+        "/api/product/analysis/initial/approval"
+      ),
     ]);
 
     STATE.session = session;
@@ -613,6 +730,8 @@
     STATE.run = run;
     STATE.initialPreflight =
       initialPreflight;
+    STATE.initialApproval =
+      initialApproval;
 
     render();
 
@@ -655,6 +774,67 @@
         );
     } finally {
       STATE.preflightBusy = false;
+      render();
+    }
+  }
+
+
+  async function approveInitialPreflight() {
+    if (
+      STATE.approvalBusy
+      || STATE.initialPreflight?.available !== true
+    ) {
+      return;
+    }
+
+    const initial =
+      STATE.initialPreflight;
+
+    STATE.approvalBusy = true;
+    STATE.approvalError = null;
+
+    render();
+
+    try {
+      const value =
+        await json(
+          "/api/product/analysis/initial/approval",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              preflight_id:
+                initial.preflight_id,
+
+              preflight_artifact_hash:
+                initial.artifact_hash,
+
+              request_set_hash:
+                initial.request_set_hash,
+
+              approved_max_cost_usd:
+                initial.estimated_max_cost_usd,
+
+              confirmation:
+                "APPROVE_INITIAL_PREFLIGHT_NO_EXECUTION",
+            }),
+          }
+        );
+
+      STATE.initialApproval = {
+        ...value,
+        available: true,
+      };
+    } catch (error) {
+      STATE.approvalError =
+        String(
+          error?.message
+          || error
+        );
+    } finally {
+      STATE.approvalBusy = false;
       render();
     }
   }
