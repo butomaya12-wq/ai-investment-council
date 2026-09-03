@@ -1015,3 +1015,49 @@ def v6_product_session_select(
             status_code=422,
             detail=str(exc),
         ) from exc
+
+
+# ============================================================
+# Market Jury V6.2A
+# Product Council orchestration — fake transport only.
+#
+# These endpoints have zero OpenAI/provider/broker authority.
+# ============================================================
+
+from .analysis_state import (
+    advance_fake_analysis as _v62_advance_fake_analysis,
+    analysis_preflight as _v62_analysis_preflight,
+    latest_analysis as _v62_latest_analysis,
+    start_fake_analysis as _v62_start_fake_analysis,
+)
+
+
+@app.get("/api/product/analysis/preflight")
+def v62_analysis_preflight():
+    return _v62_analysis_preflight()
+
+
+@app.get("/api/product/analysis/current")
+def v62_analysis_current():
+    return _v62_latest_analysis()
+
+
+@app.post("/api/product/analysis/fake/start")
+def v62_analysis_fake_start():
+    return _v62_start_fake_analysis()
+
+
+@app.post("/api/product/analysis/fake/{run_id}/step")
+def v62_analysis_fake_step(
+    run_id: str,
+):
+    try:
+        return _v62_advance_fake_analysis(
+            run_id
+        )
+
+    except ValueError as exc:
+        raise _V6HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc

@@ -2963,7 +2963,11 @@ function renderTrades(state) {
           </div>
 
           <div class="ticket-action">
-            WATCH · CAPITAL NOT RELEASED
+            ${
+              hasSessionDecision
+                ? `${esc(sessionVerdict)} · CAPITAL NOT RELEASED`
+                : "ANALYSIS REQUIRED · CAPITAL NOT RELEASED"
+            }
           </div>
         </div>
 
@@ -4006,5 +4010,6 @@ setInterval(
 );
 </script>
 
+<script src="/static/v62_analysis.js"></script>
 </body>
 </html>
