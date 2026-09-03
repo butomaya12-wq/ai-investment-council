@@ -5,6 +5,9 @@
     session: null,
     preflight: null,
     run: null,
+    initialPreflight: null,
+    preflightBusy: false,
+    preflightError: null,
     looping: false,
   };
 
@@ -41,6 +44,20 @@
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;");
+  }
+
+  function shortHash(value) {
+    const text = String(value ?? "");
+
+    if (text.length <= 20) {
+      return text;
+    }
+
+    return (
+      text.slice(0, 9)
+      + "…"
+      + text.slice(-9)
+    );
   }
 
   function style() {
@@ -192,6 +209,45 @@
         color:#77d9c4;
       }
 
+      .v62-paid-preflight {
+        margin-top:9px;
+        padding:9px;
+        border:1px solid rgba(111,216,192,.20);
+        border-radius:7px;
+        background:rgba(111,216,192,.035);
+      }
+
+      .v62-paid-preflight-head {
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:8px;
+      }
+
+      .v62-paid-preflight-head strong {
+        color:#dce6e9;
+        font-size:8px;
+      }
+
+      .v62-paid-preflight-cost {
+        color:#75e6b1;
+        font-size:11px;
+        font-weight:900;
+      }
+
+      .v62-paid-preflight-meta {
+        margin-top:6px;
+        color:#7f8d97;
+        font-size:6px;
+        line-height:1.55;
+      }
+
+      .v62-preflight-error {
+        margin-top:6px;
+        color:#ef9a8a;
+        font-size:6px;
+      }
+
       @media(max-width:900px) {
         .v62-stages {
           grid-template-columns:
@@ -219,6 +275,12 @@
     const plan =
       STATE.preflight
         ?.real_council_call_plan;
+
+    const initial =
+      STATE.initialPreflight;
+
+    const hasInitialPreflight =
+      initial?.available === true;
 
     const running =
       STATE.run?.status === "RUNNING";
@@ -252,6 +314,96 @@
           `;
         }
       ).join("");
+
+    const paidPreflight =
+      hasInitialPreflight
+        ? `
+          <div class="v62-paid-preflight">
+            <div class="v62-paid-preflight-head">
+              <strong>
+                INITIAL COST PREFLIGHT ·
+                ${esc(initial.call_count_planned)} CALLS
+              </strong>
+              <span class="v62-paid-preflight-cost">
+                MAX $${esc(initial.estimated_max_cost_usd)}
+              </span>
+            </div>
+
+            <div class="v62-paid-preflight-meta">
+              ${esc(initial.model)}
+              · ${esc(initial.reasoning_effort)}
+              · request set
+              ${esc(shortHash(initial.request_set_hash))}
+              <br>
+              OWNER APPROVAL: NOT GRANTED
+              · MODEL AUTHORITY: NO
+              · AUTOMATIC RETRIES: 0
+            </div>
+
+            <button
+              class="v62-button"
+              id="v62InitialPreflight"
+              ${STATE.preflightBusy ? "disabled" : ""}
+            >
+              ${
+                STATE.preflightBusy
+                  ? "FREEZING READ-ONLY EVIDENCE"
+                  : "REFRESH INITIAL COST PREFLIGHT"
+              }
+            </button>
+
+            ${
+              STATE.preflightError
+                ? `
+                  <div class="v62-preflight-error">
+                    ${esc(STATE.preflightError)}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        `
+        : `
+          <div class="v62-paid-preflight">
+            <div class="v62-paid-preflight-head">
+              <strong>
+                REAL INITIAL · ZERO-CALL GATE
+              </strong>
+              <span class="v62-paid-preflight-cost">
+                NOT FROZEN
+              </span>
+            </div>
+
+            <div class="v62-paid-preflight-meta">
+              Freeze read-only market/account evidence,
+              build the exact 9 bounded Initial requests,
+              hash them and calculate the maximum cost.
+              OpenAI calls remain 0.
+            </div>
+
+            <button
+              class="v62-button"
+              id="v62InitialPreflight"
+              ${STATE.preflightBusy ? "disabled" : ""}
+            >
+              ${
+                STATE.preflightBusy
+                  ? "FREEZING READ-ONLY EVIDENCE"
+                  : "FREEZE INITIAL COST PREFLIGHT"
+              }
+            </button>
+
+            ${
+              STATE.preflightError
+                ? `
+                  <div class="v62-preflight-error">
+                    ${esc(STATE.preflightError)}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        `;
 
     const result =
       completed
@@ -297,6 +449,8 @@
         Real paid authority: NO.
         This simulation: $0.
       </div>
+
+      ${paidPreflight}
 
       <div class="v62-stages">
         ${stages}
@@ -360,6 +514,16 @@
     if (button) {
       button.onclick =
         start;
+    }
+
+    const preflightButton =
+      document.getElementById(
+        "v62InitialPreflight"
+      );
+
+    if (preflightButton) {
+      preflightButton.onclick =
+        captureInitialPreflight;
     }
   }
 
@@ -430,6 +594,7 @@
       session,
       preflight,
       run,
+      initialPreflight,
     ] = await Promise.all([
       json("/api/product/session"),
       json(
@@ -438,11 +603,16 @@
       json(
         "/api/product/analysis/current"
       ),
+      json(
+        "/api/product/analysis/initial/preflight"
+      ),
     ]);
 
     STATE.session = session;
     STATE.preflight = preflight;
     STATE.run = run;
+    STATE.initialPreflight =
+      initialPreflight;
 
     render();
 
@@ -453,6 +623,42 @@
       void loop();
     }
   }
+
+  async function captureInitialPreflight() {
+    if (STATE.preflightBusy) {
+      return;
+    }
+
+    STATE.preflightBusy = true;
+    STATE.preflightError = null;
+
+    render();
+
+    try {
+      const value =
+        await json(
+          "/api/product/analysis/initial/preflight/capture",
+          {
+            method: "POST",
+          }
+        );
+
+      STATE.initialPreflight = {
+        ...value,
+        available: true,
+      };
+    } catch (error) {
+      STATE.preflightError =
+        String(
+          error?.message
+          || error
+        );
+    } finally {
+      STATE.preflightBusy = false;
+      render();
+    }
+  }
+
 
   async function start() {
     if (STATE.looping) {

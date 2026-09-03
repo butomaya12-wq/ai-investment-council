@@ -1061,3 +1061,116 @@ def v62_analysis_fake_step(
             status_code=422,
             detail=str(exc),
         ) from exc
+
+
+# ============================================================
+# Market Jury V6.2B
+# Durable Initial cost preflight.
+#
+# Capture may use existing read-only Alpaca endpoints.
+# No OpenAI transport and no broker-write authority exist here.
+# ============================================================
+
+from .initial_preflight import (
+    create_initial_preflight as _v62b_create_initial_preflight,
+    latest_initial_preflight as _v62b_latest_initial_preflight,
+    resolve_code_commit_sha as _v62b_resolve_code_commit_sha,
+    tracked_worktree_clean as _v62b_tracked_worktree_clean,
+)
+
+
+def _v62b_response_object(
+    response,
+):
+    value = json.loads(
+        response.body.decode("utf-8")
+    )
+
+    if not isinstance(value, dict):
+        raise _V6HTTPException(
+            status_code=500,
+            detail="Internal live payload malformed.",
+        )
+
+    return value
+
+
+@app.get(
+    "/api/product/analysis/initial/preflight"
+)
+def v62b_initial_preflight_current():
+    return _v62b_latest_initial_preflight()
+
+
+@app.post(
+    "/api/product/analysis/initial/preflight/capture"
+)
+def v62b_initial_preflight_capture():
+    if not _v62b_tracked_worktree_clean():
+        raise _V6HTTPException(
+            status_code=409,
+            detail=(
+                "Initial paid preflight requires "
+                "a clean tracked worktree."
+            ),
+        )
+
+    code_sha = (
+        _v62b_resolve_code_commit_sha()
+    )
+
+    before = dict(
+        _LIVE_READ_COUNTS
+    )
+
+    market = _v62b_response_object(
+        live_market()
+    )
+
+    account = _v62b_response_object(
+        live_account()
+    )
+
+    after = dict(
+        _LIVE_READ_COUNTS
+    )
+
+    read_delta = {
+        key:
+            int(
+                after.get(key, 0)
+            )
+            - int(
+                before.get(key, 0)
+            )
+
+        for key in (
+            "market_gets",
+            "account_gets",
+            "positions_gets",
+        )
+    }
+
+    try:
+        return _v62b_create_initial_preflight(
+            market_payload=
+                market,
+
+            account_payload=
+                account,
+
+            code_commit_sha=
+                code_sha,
+
+            provider_read_delta=
+                read_delta,
+        )
+
+    except (
+        ValueError,
+        RuntimeError,
+    ) as exc:
+        raise _V6HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
