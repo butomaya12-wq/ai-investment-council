@@ -1309,8 +1309,15 @@ def parse_args(
 ) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group()
+
+    mode.add_argument(
         "--audit-only",
+        action="store_true",
+    )
+
+    mode.add_argument(
+        "--materialize-recovery",
         action="store_true",
     )
 
@@ -1455,7 +1462,10 @@ def main(
         "NEW_COST_USD=0"
     )
 
-    if args.audit_only:
+    if (
+        args.audit_only
+        or not args.materialize_recovery
+    ):
         print(
             "RECOVERY_WRITE_PERFORMED=NO"
         )

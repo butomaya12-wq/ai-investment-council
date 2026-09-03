@@ -296,3 +296,97 @@ def test_recovery_paths_are_request_hash_scoped():
             "recovery_receipt"
         ].name
     )
+
+
+def test_cli_defaults_to_audit_only_and_requires_positive_materialize_flag():
+    default_args = MODULE.parse_args([])
+    assert default_args.audit_only is False
+    assert default_args.materialize_recovery is False
+
+    materialize_args = MODULE.parse_args(
+        ["--materialize-recovery"]
+    )
+    assert materialize_args.materialize_recovery is True
+
+    with pytest.raises(SystemExit):
+        MODULE.parse_args(
+            [
+                "--audit-only",
+                "--materialize-recovery",
+            ]
+        )
+
+
+def test_default_main_never_reaches_write_path(
+    monkeypatch,
+    tmp_path,
+    capsys,
+):
+    monkeypatch.chdir(tmp_path)
+
+    monkeypatch.setattr(
+        MODULE,
+        "_git",
+        lambda *args, **kwargs: "test-head",
+    )
+
+    result = {
+        "actual_cost_usd": "0.153417",
+        "source_model_authored_outcome": "WATCH",
+        "source_model_authored_next_directive": "MONITOR",
+        "source_model_authored_research_reopen_required": True,
+        "source_model_authored_research_reopen_reason_codes": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE",
+            "VALUATION_EVIDENCE_NOT_SUPPLIED",
+        ],
+        "normalized_fields": [
+            "research_reopen_required",
+            "research_reopen_reason_codes",
+        ],
+        "processed_record": {
+            "outcome": "WATCH",
+            "next_directive": "MONITOR",
+        },
+    }
+
+    monkeypatch.setattr(
+        MODULE,
+        "build_recovery",
+        lambda **kwargs: (
+            result,
+            {"artifact_hash": "receipt"},
+        ),
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "_paths",
+        lambda repository: {},
+    )
+
+    def forbidden_write(*args, **kwargs):
+        raise AssertionError(
+            "default CLI reached materialization path"
+        )
+
+    monkeypatch.setattr(
+        MODULE,
+        "_require_write_authority",
+        forbidden_write,
+    )
+
+    monkeypatch.setattr(
+        MODULE,
+        "_persist_or_verify",
+        forbidden_write,
+    )
+
+    assert MODULE.main([]) == 0
+
+    output = capsys.readouterr().out
+
+    assert "RECOVERY_WRITE_PERFORMED=NO" in output
+    assert (
+        "B4_TTL_CAPTURED_WATCH_RECOVERY_AUDIT=PASS"
+        in output
+    )
