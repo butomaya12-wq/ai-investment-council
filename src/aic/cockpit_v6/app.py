@@ -1268,3 +1268,98 @@ def v62b_initial_owner_approval_create(
             status_code=422,
             detail=str(exc),
         ) from exc
+
+
+# ============================================================
+# Market Jury V6.2B.3
+# Initial executor rehearsal — FAKE TRANSPORT ONLY.
+#
+# These routes cannot call OpenAI, cannot spend money and
+# cannot create broker writes/orders.
+# ============================================================
+
+from .initial_execution import (
+    advance_fake_initial_execution as _v62b3_advance_fake_initial_execution,
+    latest_initial_execution_rehearsal as _v62b3_latest_initial_execution_rehearsal,
+    start_fake_initial_execution as _v62b3_start_fake_initial_execution,
+)
+
+
+class _V62B3RehearsalStartRequest(
+    _V6BaseModel
+):
+    approval_id: str
+
+
+@app.get(
+    "/api/product/analysis/initial/execution/rehearsal"
+)
+def v62b3_initial_execution_rehearsal_current():
+    return (
+        _v62b3_latest_initial_execution_rehearsal()
+    )
+
+
+@app.post(
+    "/api/product/analysis/initial/execution/rehearsal/start"
+)
+def v62b3_initial_execution_rehearsal_start(
+    payload: _V62B3RehearsalStartRequest,
+):
+    if not _v62b_tracked_worktree_clean():
+        raise _V6HTTPException(
+            status_code=409,
+            detail=(
+                "Execution rehearsal requires "
+                "a clean tracked worktree."
+            ),
+        )
+
+    code_sha = (
+        _v62b_resolve_code_commit_sha()
+    )
+
+    try:
+        return _v62b3_start_fake_initial_execution(
+            approval_id=
+                payload.approval_id,
+
+            current_code_sha=
+                code_sha,
+
+            git_worktree_clean=
+                True,
+        )
+
+    except (
+        ValueError,
+        RuntimeError,
+    ) as exc:
+        raise _V6HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
+
+
+@app.post(
+    "/api/product/analysis/initial/execution/rehearsal/"
+    "{run_id}/dispatch/{dispatch_index}"
+)
+def v62b3_initial_execution_rehearsal_dispatch(
+    run_id: str,
+    dispatch_index: int,
+):
+    try:
+        return _v62b3_advance_fake_initial_execution(
+            run_id=
+                run_id,
+
+            dispatch_index=
+                dispatch_index,
+        )
+
+    except ValueError as exc:
+        raise _V6HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
