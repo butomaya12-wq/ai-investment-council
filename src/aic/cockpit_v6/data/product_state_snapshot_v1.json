@@ -1,0 +1,1047 @@
+{
+  "application": {
+    "broker_writes_this_session": 0,
+    "mode": "LOCAL EVIDENCE WORKSPACE",
+    "model_calls_this_session": 0,
+    "name": "AI Investment Council",
+    "provider_calls_this_session": 0,
+    "read_only": true,
+    "snapshot_runtime": "TRACKED_DISPLAY_PROJECTION"
+  },
+  "audit": {
+    "demo_snapshot_hash": "cab20e9db13da9c1695fb53e58bb3a0cf17c1a7713c3ce40367ed2d0241b4bb6",
+    "fresh_blocking_reason_codes": [
+      "ALPACA_NEWS_PAGINATION_INCOMPLETE",
+      "VALUATION_EVIDENCE_NOT_SUPPLIED"
+    ],
+    "fresh_provider_response_id": "resp_0834ff1ad19231de016a990a8ec75887d289d44e41e077cd36",
+    "fresh_raw_response_hash": "7c18d1e76e89524a94609fda10a61421bb867b2c7ea708b25dbe4f4f05c22fb9",
+    "prior_provider_response_id": "resp_071e5625bc07e951016a96927b756087d28fc9b9eba67c2780",
+    "prior_raw_response_hash": "fc4d73a86a178c03e1acbda64f176df4bd4fe225227832fcd5b286fa2c77e37d",
+    "product_snapshot_authority": false,
+    "product_snapshot_version": "MARKET_JURY_PRODUCT_STATE_SNAPSHOT_v1",
+    "recovered_result_hash": "8f8a02b957e721063002d71cd68b4e5382b55167ffc854b9cb34f36bd8c36002",
+    "recovery_receipt_hash": "3543f3202ded62e428138aea66075ad3e57f44a6982f9d5917a462af7dbbb611",
+    "ttl_expiry_preflight_hash": "cd2b28d5fda200733eb9b22db204152a5bfeec67d3d3b371890cca54ce607191",
+    "ttl_lineage_receipt_hash": "ab87e61720ce955fb7cce79bad7e49ac6b92e550e2b659c7b88c1b6ba4789435"
+  },
+  "broker": {
+    "account_read_state": "NOT REFRESHED THIS SESSION",
+    "broker_writes": 0,
+    "environment": "PAPER",
+    "integration": "AVAILABLE",
+    "live_money": "PROHIBITED",
+    "order_lock_reason": "Fresh Council verdict is WATCH; B5 handoff is not eligible.",
+    "order_submission_state": "LOCKED",
+    "orders": 0,
+    "portfolio_read_state": "NOT REFRESHED THIS SESSION",
+    "provider": "ALPACA"
+  },
+  "council": {
+    "agents": {
+      "META": [
+        {
+          "challenge_claims": [
+            "The supplied record lacks valuation-specific and portfolio-interaction evidence, and recent-developments coverage remains incomplete; therefore, the positive operating thesis does not establish valuation attractiveness or portfolio fit."
+          ],
+          "claim_count": 10,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The strongest positive thesis element is an advertising-led growth engine: supplied evidence attributes revenue growth principally to advertising revenue, supported by higher ad impressions and average price per ad.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The supplied operating-margin computation, alongside the reported revenue-growth computation, supports a positive financial-quality premise, although management identified employee-compensation and infrastructure costs as offsets to operating-income growth.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Meta's advertising-centered Family of Apps business and its planned AI and core-business capital expenditures support a bull premise that the company is deploying resources to reinforce its principal business, but the benefits of that deployment remain unproven.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull thesis critically assumes that user engagement, marketer spending, and targeting and measurement data-signal availability remain sufficient to sustain the advertising-led growth premise.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull thesis critically assumes that AI infrastructure spending and continuing Reality Labs losses remain financially manageable and ultimately provide sufficient benefits without materially undermining profitability.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull thesis critically assumes that evolving privacy, data-use, content, competition, youth-safety, and AI regulation does not cause materially adverse product changes, compliance costs, fines, or advertising-operating effects.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Material deterioration in user engagement, marketer spending, or the availability of targeting and measurement data signals that weakens advertising revenue would materially weaken the bull case.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Evidence that AI and Reality Labs spending reduces profitability without generating anticipated long-term benefits would materially weaken the bull case.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Materially adverse regulatory-driven product changes, compliance costs, fines, or advertising-operating effects would materially weaken the bull case.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "SUPPORTING",
+              "source_count": 0,
+              "support": "INSUFFICIENT",
+              "text": "The supplied record lacks valuation-specific and portfolio-interaction evidence, and recent-developments coverage remains incomplete; therefore, the positive operating thesis does not establish valuation attractiveness or portfolio fit.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 90,
+          "insufficient_count": 1,
+          "lane": "BULL",
+          "mandate": "Build the strongest evidence-backed upside case without suppressing material assumptions.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_META_BULL_L2_36a2a71583fe",
+          "open_challenges": 1,
+          "opinion_id": "META_BULL_INITIAL_001",
+          "role_name": "Upside & Growth Analyst",
+          "stage": "BULL_INITIAL",
+          "supported_count": 9,
+          "thesis": "The strongest positive thesis element is an advertising-led growth engine: supplied evidence attributes revenue growth principally to advertising revenue, supported by higher ad impressions and average price per ad."
+        },
+        {
+          "challenge_claims": [],
+          "claim_count": 4,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Meta's advertising-led growth premise is fragile because it generates substantially all revenue from advertising, while user engagement, marketer spending, and targeting and measurement data-signal availability are disclosed material risks to advertising revenue.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The planned AI and core-business capital-expenditure program and continuing Reality Labs losses create an execution risk: substantial infrastructure and personnel spending may reduce profitability and may not generate anticipated long-term benefits.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Evolving privacy, data-use, content, competition, youth-safety, and AI regulation can require product changes, compliance costs, fines, and adverse effects on advertising operations; this risk is compounded by significant competition across Meta's businesses.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "FACT",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The supplied annual revenue-growth computation is 0.221670384982462112692324058820311 and the supplied annual operating-margin computation is 0.4143785515957923230795258899515341; these favorable reported metrics materially soften, but do not resolve, the advertising-concentration and investment-execution challenges.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 100,
+          "insufficient_count": 0,
+          "lane": "BEAR",
+          "mandate": "Identify downside, fragility and evidence that can invalidate the investment thesis.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_META_BEAR_L2_36a2a71583fe",
+          "open_challenges": 0,
+          "opinion_id": "META_BEAR_INITIAL_01",
+          "role_name": "Risk & Downside Analyst",
+          "stage": "BEAR_INITIAL",
+          "supported_count": 4,
+          "thesis": "Meta's advertising-led growth premise is fragile because it generates substantially all revenue from advertising, while user engagement, marketer spending, and targeting and measurement data-signal availability are disclosed material risks to advertising revenue."
+        },
+        {
+          "challenge_claims": [],
+          "claim_count": 4,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Decision integrity remains incomplete because the CandidatePacket research status is INCOMPLETE, identifies META_Q4_RECENT_DEVELOPMENTS as unresolved, and preserves a material gap that reported regulatory developments lack primary company or regulatory evidence establishing their terms, status, or financial and operating effects.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The supplied packet lacks valuation-specific evidence, computed valuation measures, and portfolio-interaction evidence; the supplied return, drawdown, and liquidity computations do not resolve those omitted decision-context dimensions.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Any reliance on advertising-led growth requires the unestablished assumption that advertising demand, user engagement, and targeting and measurement data-signal availability remain sufficiently durable despite the disclosed advertising-revenue risks.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The advertising-led growth premise is falsified if adverse changes in user engagement, marketer spending, or the availability of targeting and measurement data signals materially impair advertising revenue.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 100,
+          "insufficient_count": 0,
+          "lane": "RED_TEAM",
+          "mandate": "Attack both sides, expose missing evidence and preserve unresolved disputes before adjudication.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_META_RED_TEAM_L2_36a2a71583fe",
+          "open_challenges": 0,
+          "opinion_id": "RT_META_INITIAL_001",
+          "role_name": "Adversarial Verification",
+          "stage": "RED_TEAM_INITIAL",
+          "supported_count": 4,
+          "thesis": "Decision integrity remains incomplete because the CandidatePacket research status is INCOMPLETE, identifies META_Q4_RECENT_DEVELOPMENTS as unresolved, and preserves a material gap that reported regulatory developments lack primary company or regulatory evidence establishing their terms, status, or financial and operating effects."
+        }
+      ],
+      "MSFT": [
+        {
+          "challenge_claims": [
+            "No valuation evidence or valuation computed value was supplied, and recent-developments research remains incomplete because news pagination is incomplete; therefore the supplied evidence does not establish valuation attractiveness or fully resolve current developments."
+          ],
+          "claim_count": 8,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Microsoft's diversified business model, spanning cloud services, software licensing and support, advertising, and devices across three reported segments, provides multiple operating foundations for the bull case.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Management's identification of cloud and AI adoption as central growth drivers, together with the described integrated cloud stack, global datacenter scale, hybrid-cloud capabilities, and identity and security portfolio, supports a bull case centered on Microsoft Cloud execution and competitive capabilities.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The supplied annual revenue-growth and operating-margin computed values, alongside management's attribution of revenue and operating-income growth principally to Microsoft Cloud, support the view that Microsoft has recently combined growth with substantial operating profitability.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull case critically assumes that demand, customer usage, pricing, monetization, adoption pace, capacity alignment, component costs, and energy costs will permit returns on substantial cloud and AI investment; this outcome is not established by the supplied evidence.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull case would be materially weakened if substantial cloud and AI capital and operating investment fails to produce adequate returns because demand, usage, pricing, monetization, adoption, capacity alignment, component costs, or energy costs develop unfavorably.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull case would be materially weakened by cybersecurity, data-privacy, product-security, or AI-misuse events that cause service disruptions, reputational harm, increased costs, legal or regulatory exposure, or adverse operating effects.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull case would be materially weakened if infrastructure deployment constraints or evolving legal and regulatory requirements materially impede operations, increase costs, constrain capacity, or require adverse operational changes.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "SUPPORTING",
+              "source_count": 0,
+              "support": "INSUFFICIENT",
+              "text": "No valuation evidence or valuation computed value was supplied, and recent-developments research remains incomplete because news pagination is incomplete; therefore the supplied evidence does not establish valuation attractiveness or fully resolve current developments.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 88,
+          "insufficient_count": 1,
+          "lane": "BULL",
+          "mandate": "Build the strongest evidence-backed upside case without suppressing material assumptions.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_MSFT_BULL_L2_df49b67f7049",
+          "open_challenges": 1,
+          "opinion_id": "MSFT_BULL_INITIAL_OPINION_001",
+          "role_name": "Upside & Growth Analyst",
+          "stage": "BULL_INITIAL",
+          "supported_count": 7,
+          "thesis": "Microsoft's diversified business model, spanning cloud services, software licensing and support, advertising, and devices across three reported segments, provides multiple operating foundations for the bull case."
+        },
+        {
+          "challenge_claims": [],
+          "claim_count": 5,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Microsoft's cloud and AI growth requires substantial investment ahead of fully developed revenue streams, while returns depend on uncertain demand, usage, pricing, monetization, competition, adoption pace, capacity alignment, component costs, and energy costs. This creates execution risk if investment and capacity buildout outpace monetization.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Management's attribution of fiscal 2026 growth to Microsoft Cloud, including Azure and Microsoft 365 Commercial cloud, alongside reported pressure on gross-margin percentages from AI-infrastructure investment and growing AI product usage, makes the growth-and-margin outcome dependent on successful AI monetization and cost absorption.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Expected continuing capital expenditures for cloud offerings and AI training and infrastructure, combined with increased fiscal 2026 cash used in investing for property-and-equipment additions and component purchases, heighten sensitivity to deployment execution, capacity utilization, and investment returns.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Cybersecurity, data-privacy, product-security, AI-misuse, and evolving legal and regulatory requirements create pathways to service disruption, reputational harm, increased costs, legal exposure, and operational changes that could weaken the cloud-and-AI growth thesis.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "FACT",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Microsoft reported annual revenue growth of 0.177886867998466584316565148869106 and annual operating margin of 0.4678081840892722073053498835278554; management also identified cloud and AI adoption as central growth drivers and described an integrated cloud technology stack, global datacenter scale, hybrid-cloud capabilities, and a broad identity and security portfolio. These facts materially soften the Bear case but do not establish durability of current growth or margin.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 100,
+          "insufficient_count": 0,
+          "lane": "BEAR",
+          "mandate": "Identify downside, fragility and evidence that can invalidate the investment thesis.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_MSFT_BEAR_L2_df49b67f7049",
+          "open_challenges": 0,
+          "opinion_id": "MSFT_BEAR_INITIAL_01",
+          "role_name": "Risk & Downside Analyst",
+          "stage": "BEAR_INITIAL",
+          "supported_count": 5,
+          "thesis": "Microsoft's cloud and AI growth requires substantial investment ahead of fully developed revenue streams, while returns depend on uncertain demand, usage, pricing, monetization, competition, adoption pace, capacity alignment, component costs, and energy costs. This creates execution risk if investment and capacity buildout outpace monetization."
+        },
+        {
+          "challenge_claims": [],
+          "claim_count": 4,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Decision integrity is materially constrained because the supplied packet contains no valuation evidence or valuation computed value; the supplied financial-quality and market-context observations do not establish valuation attractiveness, forward earnings power, or fair value.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Any reliance on reported cloud and AI growth or operating performance requires the unverified assumption that AI infrastructure spending, demand, usage, pricing, monetization, capacity alignment, component costs, and energy costs will support adequate returns.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The cloud-and-AI growth premise is falsified if the disclosed uncertainties around demand, customer usage, pricing and monetization, competition, adoption pace, capacity alignment, component costs, or energy costs prevent adequate returns on the required investment.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Recent-developments coverage remains materially incomplete because the supplied news-pagination gap is unresolved; therefore, the packet cannot be treated as complete current-developments coverage.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 100,
+          "insufficient_count": 0,
+          "lane": "RED_TEAM",
+          "mandate": "Attack both sides, expose missing evidence and preserve unresolved disputes before adjudication.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_MSFT_RED_TEAM_L2_df49b67f7049",
+          "open_challenges": 0,
+          "opinion_id": "RT_MSFT_INITIAL_001",
+          "role_name": "Adversarial Verification",
+          "stage": "RED_TEAM_INITIAL",
+          "supported_count": 4,
+          "thesis": "Decision integrity is materially constrained because the supplied packet contains no valuation evidence or valuation computed value; the supplied financial-quality and market-context observations do not establish valuation attractiveness, forward earnings power, or fair value."
+        }
+      ],
+      "NVDA": [
+        {
+          "challenge_claims": [
+            "Current-developments coverage remains nonexhaustive because terminal pagination was not claimed; the ALPACA_NEWS_PAGINATION_INCOMPLETE gap must remain preserved and prevents treating supplied current coverage as a complete verified set of material developments."
+          ],
+          "claim_count": 10,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "NVIDIA's integrated data-center offering spanning accelerated computing, networking, systems, CUDA-based software, and related services provides a supported foundation for a differentiated platform-oriented data-center thesis.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The supplied annual revenue-growth and operating-margin values support a bull case grounded in demonstrated growth and profitability, while not establishing their future persistence.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Management's attribution of fiscal-2026 growth to data-center compute and networking platforms supports the proposition that the platform portfolio has been a material driver of recent financial performance, notwithstanding transition-related margin pressure.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull case assumes that data-center availability, energy access, customer capital availability, product transitions, supply conditions, and adoption timing do not materially impair revenue timing or financial performance.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The bull case assumes that competitive offerings and customer-developed internal solutions do not materially erode NVIDIA demand, market share, or financial results.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Material loss of demand or market share from rapid technological change, competitor offerings, or customer-developed internal solutions would falsify or materially weaken the differentiated-platform bull thesis.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Supply disruption, forecasting error, adverse effects from non-cancellable supply commitments, or margin pressure tied to third-party manufacturing dependence would materially weaken the growth-and-profitability bull case.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Further export-control or licensing constraints that materially harm demand, competitive position, supply-chain operations, or financial results would materially weaken the bull case.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "SUPPORTING",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Customer concentration is a material fragility: deterioration in purchasing by concentrated direct or indirect customers would weaken the evidence that recent data-center-driven performance is durable.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "SUPPORTING",
+              "source_count": 0,
+              "support": "INSUFFICIENT",
+              "text": "Current-developments coverage remains nonexhaustive because terminal pagination was not claimed; the ALPACA_NEWS_PAGINATION_INCOMPLETE gap must remain preserved and prevents treating supplied current coverage as a complete verified set of material developments.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 90,
+          "insufficient_count": 1,
+          "lane": "BULL",
+          "mandate": "Build the strongest evidence-backed upside case without suppressing material assumptions.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_NVDA_BULL_L2_cbd4aafcaf2b",
+          "open_challenges": 1,
+          "opinion_id": "NVDA_BULL_INITIAL_001",
+          "role_name": "Upside & Growth Analyst",
+          "stage": "BULL_INITIAL",
+          "supported_count": 9,
+          "thesis": "NVIDIA's integrated data-center offering spanning accelerated computing, networking, systems, CUDA-based software, and related services provides a supported foundation for a differentiated platform-oriented data-center thesis."
+        },
+        {
+          "challenge_claims": [],
+          "claim_count": 6,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The Bear case is that revenue timing and financial performance remain exposed to data-center availability, energy and customer-capital constraints, product-transition complexity, supply constraints, and customer adoption timing; failure in one or more of these dependencies could disrupt the continuation of recent growth.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The Bear case is that the fabless model creates execution sensitivity to third-party fabrication, assembly, testing, packaging, supply commitments, and geographic concentration; demand-forecasting error or supply disruption could create excess inventory, margin pressure, delivery disruption, or revenue volatility.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The Bear case is that customer concentration and export-control exposure increase downside sensitivity: two direct customers represented material portions of fiscal-2026 revenue, while China data-center restrictions and licensing requirements could continue to harm demand, competitive position, operations, and financial results.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The Bear case is that recent growth and profitability must be sustained despite rapid technological change, intensifying competition, competitor offerings, and customer-developed internal solutions; the reported Blackwell transition and H20-related charge show that transitions can pressure gross margin.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "FACT",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Annual revenue growth was 0.654735357900947914511444707541170 and annual operating margin was 0.6038168363141272031786901795885856 in the supplied computed values; these results materially soften a Bear thesis centered on weak current operating performance.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "FACT",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Management reported fiscal-2026 revenue growth driven by data-center compute and networking platforms; this directly softens the Bear case if those platforms continue to support demand through product transitions.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 100,
+          "insufficient_count": 0,
+          "lane": "BEAR",
+          "mandate": "Identify downside, fragility and evidence that can invalidate the investment thesis.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_NVDA_BEAR_L2_cbd4aafcaf2b",
+          "open_challenges": 0,
+          "opinion_id": "NVDA_BEAR_INITIAL_001",
+          "role_name": "Risk & Downside Analyst",
+          "stage": "BEAR_INITIAL",
+          "supported_count": 6,
+          "thesis": "The Bear case is that revenue timing and financial performance remain exposed to data-center availability, energy and customer-capital constraints, product-transition complexity, supply constraints, and customer adoption timing; failure in one or more of these dependencies could disrupt the continuation of recent growth."
+        },
+        {
+          "challenge_claims": [],
+          "claim_count": 3,
+          "claims": [
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Decision integrity is materially constrained because the immutable CandidatePacket retains research_status INCOMPLETE, Q4_RECENT_DEVELOPMENTS unresolved, and the ALPACA_NEWS_PAGINATION_INCOMPLETE source gap, while no canonical current-developments material claim is present in the supplied material-claim set.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "Any decision use of the supplied packet requires the assumption that the unresolved and nonexhaustive current-developments coverage does not omit a material development that would alter the relevance of the supplied operating, risk, or export-control claims.",
+              "type": "CLAIM"
+            },
+            {
+              "kind": "INFERENCE",
+              "materiality": "MATERIAL",
+              "source_count": 0,
+              "support": "SUPPORTED",
+              "text": "The assumption is falsified if canonical current-developments research identifies a material company-specific development omitted by the nonexhaustive coverage that changes the interpretation of the supplied financial-quality, supply, competition, customer-concentration, or export-control risk claims.",
+              "type": "CLAIM"
+            }
+          ],
+          "conflicted_count": 0,
+          "data_gaps": [
+            "ALPACA_NEWS_PAGINATION_INCOMPLETE"
+          ],
+          "effective_model": "gpt-5.6-terra",
+          "evidence_coverage_pct": 100,
+          "insufficient_count": 0,
+          "lane": "RED_TEAM",
+          "mandate": "Attack both sides, expose missing evidence and preserve unresolved disputes before adjudication.",
+          "model_run_ref": "B4_POST_RESEARCH_REOPEN_INITIAL_NVDA_RED_TEAM_L2_cbd4aafcaf2b",
+          "open_challenges": 0,
+          "opinion_id": "RT_NVDA_INITIAL_001",
+          "role_name": "Adversarial Verification",
+          "stage": "RED_TEAM_INITIAL",
+          "supported_count": 3,
+          "thesis": "Decision integrity is materially constrained because the immutable CandidatePacket retains research_status INCOMPLETE, Q4_RECENT_DEVELOPMENTS unresolved, and the ALPACA_NEWS_PAGINATION_INCOMPLETE source gap, while no canonical current-developments material claim is present in the supplied material-claim set."
+        }
+      ]
+    },
+    "candidate_order": [
+      "NVDA",
+      "MSFT",
+      "META"
+    ],
+    "initial_opinion_count": 9,
+    "judge": {
+      "cost_usd": "0.153417",
+      "model_calls": 1,
+      "new_model_calls": 0,
+      "next_directive": "MONITOR",
+      "outcome": "WATCH",
+      "primary": "NVDA",
+      "response_id": "resp_0834ff1ad19231de016a990a8ec75887d289d44e41e077cd36"
+    },
+    "rebuttal_artifact_hash": "18b854261c9b49c1fcd2addfd66af52fda54e71b0949416f7dc1cdfed3e8fd9e",
+    "rebuttal_available": true
+  },
+  "decision": {
+    "b5_handoff_eligible": false,
+    "b5_started": false,
+    "b6_started": false,
+    "capital_status": "DENIED",
+    "created_at": "2026-09-01T08:53:32Z",
+    "current_verdict": "WATCH",
+    "expires_at": "2026-09-01T10:53:32Z",
+    "prior_outcome": "INVEST",
+    "symbol": "NVDA",
+    "ttl_status": "TTL_EXPIRED"
+  },
+  "journal": {
+    "real": [
+      {
+        "detail": "Prior investment decision created for NVDA.",
+        "stage": "PRIOR_DECISION",
+        "time": "2026-09-01T08:53:32Z",
+        "title": "INVEST",
+        "tone": "green"
+      },
+      {
+        "detail": "Prior decision could no longer continue downstream toward capital.",
+        "stage": "TTL_EXPIRY",
+        "time": "2026-09-01T10:53:32Z",
+        "title": "TTL EXPIRED",
+        "tone": "red"
+      },
+      {
+        "detail": "Fresh Judge did not renew downstream capital eligibility.",
+        "stage": "FRESH_ADJUDICATION",
+        "time": null,
+        "title": "WATCH → MONITOR",
+        "tone": "amber"
+      },
+      {
+        "detail": "B5 handoff false; B6 not reached; no Alpaca order.",
+        "stage": "CAPITAL_AUTHORITY",
+        "time": null,
+        "title": "CAPITAL NOT RELEASED",
+        "tone": "red"
+      }
+    ]
+  },
+  "market": {
+    "analytics": {
+      "META": {
+        "metrics": [
+          {
+            "display": "5.9%",
+            "key": "return_20s",
+            "label": "20-session return",
+            "rank": 3,
+            "rank_total": 3,
+            "value": 5.9
+          },
+          {
+            "display": "-9.3%",
+            "key": "max_drawdown_20s",
+            "label": "Max drawdown",
+            "rank": 3,
+            "rank_total": 3,
+            "value": -9.3
+          },
+          {
+            "display": "$9.4B",
+            "key": "adv_20s",
+            "label": "Average dollar volume",
+            "rank": 3,
+            "rank_total": 3,
+            "value": 9400000000.0
+          },
+          {
+            "display": "22.2%",
+            "key": "revenue_growth",
+            "label": "Revenue growth",
+            "rank": 2,
+            "rank_total": 3,
+            "value": 22.2
+          },
+          {
+            "display": "41.4%",
+            "key": "operating_margin",
+            "label": "Operating margin",
+            "rank": 3,
+            "rank_total": 3,
+            "value": 41.4
+          }
+        ],
+        "sec_accession": "0001628280-26-003942"
+      },
+      "MSFT": {
+        "metrics": [
+          {
+            "display": "12.0%",
+            "key": "return_20s",
+            "label": "20-session return",
+            "rank": 2,
+            "rank_total": 3,
+            "value": 12.0
+          },
+          {
+            "display": "-5.1%",
+            "key": "max_drawdown_20s",
+            "label": "Max drawdown",
+            "rank": 1,
+            "rank_total": 3,
+            "value": -5.1
+          },
+          {
+            "display": "$14.8B",
+            "key": "adv_20s",
+            "label": "Average dollar volume",
+            "rank": 2,
+            "rank_total": 3,
+            "value": 14800000000.0
+          },
+          {
+            "display": "17.8%",
+            "key": "revenue_growth",
+            "label": "Revenue growth",
+            "rank": 3,
+            "rank_total": 3,
+            "value": 17.8
+          },
+          {
+            "display": "46.8%",
+            "key": "operating_margin",
+            "label": "Operating margin",
+            "rank": 2,
+            "rank_total": 3,
+            "value": 46.8
+          }
+        ],
+        "sec_accession": "0001193125-26-323660"
+      },
+      "NVDA": {
+        "metrics": [
+          {
+            "display": "16.9%",
+            "key": "return_20s",
+            "label": "20-session return",
+            "rank": 1,
+            "rank_total": 3,
+            "value": 16.9
+          },
+          {
+            "display": "-7.5%",
+            "key": "max_drawdown_20s",
+            "label": "Max drawdown",
+            "rank": 2,
+            "rank_total": 3,
+            "value": -7.5
+          },
+          {
+            "display": "$27.4B",
+            "key": "adv_20s",
+            "label": "Average dollar volume",
+            "rank": 1,
+            "rank_total": 3,
+            "value": 27400000000.0
+          },
+          {
+            "display": "65.5%",
+            "key": "revenue_growth",
+            "label": "Revenue growth",
+            "rank": 1,
+            "rank_total": 3,
+            "value": 65.5
+          },
+          {
+            "display": "60.4%",
+            "key": "operating_margin",
+            "label": "Operating margin",
+            "rank": 1,
+            "rank_total": 3,
+            "value": 60.4
+          }
+        ],
+        "sec_accession": "0001045810-26-000021"
+      }
+    },
+    "decision_cutoff": "2026-08-27T20:00:00Z",
+    "live_quote_state": "NOT REFRESHED",
+    "research_cutoff": "2026-08-28T17:34:00Z",
+    "rows": [
+      {
+        "adv_20s": null,
+        "analysis_action": "PREPARE ANALYSIS",
+        "council_role": "UNIVERSE",
+        "council_state": "NOT ANALYZED",
+        "has_event_metrics": false,
+        "max_drawdown_20s": null,
+        "operating_margin": null,
+        "return_20s": null,
+        "revenue_growth": null,
+        "sec_accession": null,
+        "shortlisted": false,
+        "symbol": "AAPL"
+      },
+      {
+        "adv_20s": "$14.8B",
+        "analysis_action": "OPEN COUNCIL",
+        "council_role": "CANDIDATE",
+        "council_state": "WATCH LIST",
+        "has_event_metrics": true,
+        "max_drawdown_20s": "-5.1%",
+        "operating_margin": "46.8%",
+        "return_20s": "12.0%",
+        "revenue_growth": "17.8%",
+        "sec_accession": "0001193125-26-323660",
+        "shortlisted": true,
+        "symbol": "MSFT"
+      },
+      {
+        "adv_20s": "$27.4B",
+        "analysis_action": "OPEN COUNCIL",
+        "council_role": "PRIMARY",
+        "council_state": "WATCH",
+        "has_event_metrics": true,
+        "max_drawdown_20s": "-7.5%",
+        "operating_margin": "60.4%",
+        "return_20s": "16.9%",
+        "revenue_growth": "65.5%",
+        "sec_accession": "0001045810-26-000021",
+        "shortlisted": true,
+        "symbol": "NVDA"
+      },
+      {
+        "adv_20s": null,
+        "analysis_action": "PREPARE ANALYSIS",
+        "council_role": "UNIVERSE",
+        "council_state": "NOT ANALYZED",
+        "has_event_metrics": false,
+        "max_drawdown_20s": null,
+        "operating_margin": null,
+        "return_20s": null,
+        "revenue_growth": null,
+        "sec_accession": null,
+        "shortlisted": false,
+        "symbol": "AMZN"
+      },
+      {
+        "adv_20s": "$9.4B",
+        "analysis_action": "OPEN COUNCIL",
+        "council_role": "CANDIDATE",
+        "council_state": "WATCH LIST",
+        "has_event_metrics": true,
+        "max_drawdown_20s": "-9.3%",
+        "operating_margin": "41.4%",
+        "return_20s": "5.9%",
+        "revenue_growth": "22.2%",
+        "sec_accession": "0001628280-26-003942",
+        "shortlisted": true,
+        "symbol": "META"
+      },
+      {
+        "adv_20s": null,
+        "analysis_action": "PREPARE ANALYSIS",
+        "council_role": "UNIVERSE",
+        "council_state": "NOT ANALYZED",
+        "has_event_metrics": false,
+        "max_drawdown_20s": null,
+        "operating_margin": null,
+        "return_20s": null,
+        "revenue_growth": null,
+        "sec_accession": null,
+        "shortlisted": false,
+        "symbol": "GOOGL"
+      },
+      {
+        "adv_20s": null,
+        "analysis_action": "PREPARE ANALYSIS",
+        "council_role": "UNIVERSE",
+        "council_state": "NOT ANALYZED",
+        "has_event_metrics": false,
+        "max_drawdown_20s": null,
+        "operating_margin": null,
+        "return_20s": null,
+        "revenue_growth": null,
+        "sec_accession": null,
+        "shortlisted": false,
+        "symbol": "AVGO"
+      },
+      {
+        "adv_20s": null,
+        "analysis_action": "PREPARE ANALYSIS",
+        "council_role": "UNIVERSE",
+        "council_state": "NOT ANALYZED",
+        "has_event_metrics": false,
+        "max_drawdown_20s": null,
+        "operating_margin": null,
+        "return_20s": null,
+        "revenue_growth": null,
+        "sec_accession": null,
+        "shortlisted": false,
+        "symbol": "AMD"
+      }
+    ],
+    "run_id": "AIC-ALPACA-B2-20260828-011",
+    "source": "B2 REAL EVENT HANDOFF",
+    "universe_id": "DEMO_UNIVERSE_V1"
+  },
+  "monitor": {
+    "b5_handoff_created": false,
+    "blocking_reasons": [
+      {
+        "closure": "Complete and verify bounded news coverage.",
+        "code": "ALPACA_NEWS_PAGINATION_INCOMPLETE",
+        "detail": "Terminal pagination was not established, so current-news coverage cannot be treated as exhaustive.",
+        "label": "News coverage incomplete"
+      },
+      {
+        "closure": "Supply decision-grade valuation evidence.",
+        "code": "VALUATION_EVIDENCE_NOT_SUPPLIED",
+        "detail": "The adjudication package did not contain sufficient valuation evidence.",
+        "label": "Valuation evidence missing"
+      }
+    ],
+    "directive": "MONITOR",
+    "evidence_status": "PARTIAL",
+    "research_reopen_created": false,
+    "state": "WATCH",
+    "symbol": "NVDA",
+    "watch_candidates": [
+      "NVDA",
+      "MSFT",
+      "META"
+    ]
+  },
+  "product": {
+    "contract": "FINAL PRODUCT RUNTIME CONTRACT v1.0",
+    "current_capital_authority_mode": "REAL",
+    "default_mode": "REAL",
+    "modes": [
+      "REAL",
+      "REPLAY"
+    ],
+    "projection_authority": false,
+    "projection_can_authorize_capital": false,
+    "projection_can_authorize_orders": false,
+    "projection_kind": "TRACKED_CANONICAL_HISTORY_DISPLAY",
+    "replay_capital_authority": false
+  }
+}

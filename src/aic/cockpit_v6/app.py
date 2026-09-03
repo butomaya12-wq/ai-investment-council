@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
-from aic.cockpit_v2.presenter import build_product_state
+from .product_presenter import build_product_state
 
 
 PACKAGE = Path(__file__).resolve().parent
@@ -65,9 +65,9 @@ def market_refresh_preflight() -> JSONResponse:
     )
 
 BARS_PATH = (
-    Path(__file__).resolve().parents[3]
-    / ".aic-runtime"
-    / "v5_stock_bars.json"
+    PACKAGE
+    / "data"
+    / "historical_bars_snapshot_v1.json"
 )
 
 
@@ -175,9 +175,9 @@ def history_page(request: Request) -> HTMLResponse:
 
 
 BROKER_SNAPSHOT_PATH = (
-    Path(__file__).resolve().parents[3]
-    / ".aic-runtime"
-    / "v48_broker_snapshot_sanitized.json"
+    PACKAGE
+    / "data"
+    / "broker_audit_snapshot_v1.json"
 )
 
 

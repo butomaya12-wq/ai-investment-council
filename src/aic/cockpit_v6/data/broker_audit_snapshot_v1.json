@@ -1,0 +1,26 @@
+{
+  "account": {
+    "buying_power": "400000",
+    "cash": "100000",
+    "currency": "USD",
+    "equity": "100000",
+    "initial_margin": "0",
+    "last_equity": "100000",
+    "long_market_value": "0",
+    "maintenance_margin": "0",
+    "options_buying_power": "100000",
+    "portfolio_value": "100000",
+    "short_market_value": "0",
+    "status": "ACTIVE"
+  },
+  "alpaca_orders": 0,
+  "artifact_version": "MARKET_JURY_BROKER_AUDIT_SNAPSHOT_v1",
+  "broker_writes": 0,
+  "live_money": "PROHIBITED",
+  "position_count": 0,
+  "positions": [],
+  "private_identifiers_included": false,
+  "sanitized": true,
+  "snapshot_kind": "CACHED_SANITIZED_ALPACA_PAPER_AUDIT",
+  "verified_at_utc": "2026-09-01T19:45:35+00:00"
+}
