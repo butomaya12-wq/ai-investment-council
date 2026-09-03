@@ -1174,3 +1174,97 @@ def v62b_initial_preflight_capture():
             status_code=422,
             detail=str(exc),
         ) from exc
+
+
+# ============================================================
+# Market Jury V6.2B.2
+# Hash-bound owner approval.
+#
+# Approval is durable but DOES NOT authorize or execute
+# any model/provider/broker call.
+# ============================================================
+
+from .initial_approval import (
+    APPROVAL_CONFIRMATION as _v62b_approval_confirmation,
+    create_initial_owner_approval as _v62b_create_initial_owner_approval,
+    latest_initial_owner_approval as _v62b_latest_initial_owner_approval,
+)
+
+
+class _V62BInitialApprovalRequest(
+    _V6BaseModel
+):
+    preflight_id: str
+    preflight_artifact_hash: str
+    request_set_hash: str
+    approved_max_cost_usd: str
+    confirmation: str
+
+
+@app.get(
+    "/api/product/analysis/initial/approval"
+)
+def v62b_initial_owner_approval_current():
+    return _v62b_latest_initial_owner_approval()
+
+
+@app.post(
+    "/api/product/analysis/initial/approval"
+)
+def v62b_initial_owner_approval_create(
+    payload: _V62BInitialApprovalRequest,
+):
+    if (
+        payload.confirmation
+        != _v62b_approval_confirmation
+    ):
+        raise _V6HTTPException(
+            status_code=422,
+            detail=(
+                "Explicit Initial owner "
+                "confirmation is required."
+            ),
+        )
+
+    if not _v62b_tracked_worktree_clean():
+        raise _V6HTTPException(
+            status_code=409,
+            detail=(
+                "Owner approval requires "
+                "a clean tracked worktree."
+            ),
+        )
+
+    code_sha = (
+        _v62b_resolve_code_commit_sha()
+    )
+
+    try:
+        return _v62b_create_initial_owner_approval(
+            current_code_sha=
+                code_sha,
+
+            preflight_id=
+                payload.preflight_id,
+
+            preflight_artifact_hash=
+                payload.preflight_artifact_hash,
+
+            request_set_hash=
+                payload.request_set_hash,
+
+            approved_max_cost_usd=
+                payload.approved_max_cost_usd,
+
+            confirmation=
+                payload.confirmation,
+        )
+
+    except (
+        ValueError,
+        RuntimeError,
+    ) as exc:
+        raise _V6HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
