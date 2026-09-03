@@ -1,0 +1,78 @@
+{
+  "artifact_hash": "cab20e9db13da9c1695fb53e58bb3a0cf17c1a7713c3ce40367ed2d0241b4bb6",
+  "authority_result": {
+    "alpaca_orders": 0,
+    "b5_handoff_created": false,
+    "b5_started": false,
+    "b6_started": false,
+    "broker_writes": 0,
+    "capital_status": "DENIED",
+    "fresh_b5_handoff_eligible": false,
+    "live_money": "PROHIBITED",
+    "prior_invest_authority_after_ttl": "EXPIRED"
+  },
+  "canonical_trading_authority": false,
+  "decision_history": [
+    {
+      "authority": "VALID_UNTIL_TTL",
+      "stage": "T0",
+      "verdict": "INVEST"
+    },
+    {
+      "authority": "CAPITAL_AUTHORITY_REVOKED",
+      "stage": "T0_PLUS_TTL",
+      "verdict": "EXPIRED"
+    },
+    {
+      "authority": "NO_EXECUTION_AUTHORITY",
+      "stage": "FRESH_REVIEW",
+      "verdict": "WATCH"
+    }
+  ],
+  "demo_lineage": [
+    "PRIOR_INVEST",
+    "TTL_EXPIRED",
+    "OLD_DECISION_NOT_VALID_FOR_DOWNSTREAM_CAPITAL_PATH",
+    "FRESH_JUDGE_REQUIRED",
+    "WATCH",
+    "B5_NOT_REACHABLE",
+    "CAPITAL_DENIED",
+    "NO_ORDER"
+  ],
+  "fresh_readjudication": {
+    "model_authored_next_directive": "MONITOR",
+    "model_authored_outcome": "WATCH",
+    "new_cost_usd": "0",
+    "new_model_calls": 0,
+    "new_provider_calls": 0,
+    "recovered_next_directive": "MONITOR",
+    "recovered_outcome": "WATCH",
+    "recovered_result_hash": "8f8a02b957e721063002d71cd68b4e5382b55167ffc854b9cb34f36bd8c36002",
+    "recovery_receipt_hash": "3543f3202ded62e428138aea66075ad3e57f44a6982f9d5917a462af7dbbb611",
+    "request_hash": "1850c20fcf2173381b60d5a16589dcddc9400cb85de03bb74cfd3899ffe1cacd",
+    "source_actual_cost_usd": "0.153417",
+    "source_paid_model_calls": 1,
+    "source_provider_response_id": "resp_0834ff1ad19231de016a990a8ec75887d289d44e41e077cd36",
+    "source_raw_response_hash": "7c18d1e76e89524a94609fda10a61421bb867b2c7ea708b25dbe4f4f05c22fb9"
+  },
+  "hero": {
+    "capital_status": "DENIED",
+    "current_verdict": "WATCH",
+    "headline": "A previously approved investment lost capital authority after its decision TTL expired.",
+    "symbol": "NVDA"
+  },
+  "prior_decision": {
+    "decision_created_at_utc": "2026-09-01T08:53:32Z",
+    "decision_expires_at_utc": "2026-09-01T10:53:32Z",
+    "outcome": "INVEST",
+    "primary_candidate_id": "NVDA",
+    "provider_response_id": "resp_071e5625bc07e951016a96927b756087d28fc9b9eba67c2780",
+    "raw_response_hash": "fc4d73a86a178c03e1acbda64f176df4bd4fe225227832fcd5b286fa2c77e37d",
+    "recovered_b4_artifact_hash": "f9a9e08a30b58ebf6fcb358c2b35a82717682ddef3ac5fd58c912d518d3fadf0",
+    "ttl_expiry_preflight_hash": "cd2b28d5fda200733eb9b22db204152a5bfeec67d3d3b371890cca54ce607191",
+    "ttl_lineage_receipt_hash": "ab87e61720ce955fb7cce79bad7e49ac6b92e550e2b659c7b88c1b6ba4789435",
+    "ttl_status": "TTL_EXPIRED"
+  },
+  "snapshot_kind": "SUBMISSION_DEMO_DERIVED_SNAPSHOT",
+  "snapshot_version": "DECISION_AUTHORITY_TTL_WATCH_LINEAGE_V1"
+}
