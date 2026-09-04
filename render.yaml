@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: market-jury-alpaca-2026
+    runtime: python
+    plan: free
+    buildCommand: python -m pip install --disable-pip-version-check uv && uv sync --frozen --no-dev
+    startCommand: bash scripts/render_start_market_jury.sh
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.13
+      - key: ALPACA_API_KEY_ID
+        sync: false
+      - key: ALPACA_API_SECRET_KEY
+        sync: false
+      - key: MARKET_JURY_PRODUCT_DB
+        value: /tmp/market_jury_product_v1.sqlite3
