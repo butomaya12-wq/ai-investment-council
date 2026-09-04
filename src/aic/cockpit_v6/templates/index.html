@@ -1877,10 +1877,448 @@ button {
   white-space:nowrap;
 }
 
+
+/* ============================================================
+   MARKET JURY — JUDGE-FACING WELCOME
+   Presentation-only layer. No provider/broker authority.
+   ============================================================ */
+
+body.mj-welcome-open {
+  overflow:hidden;
+}
+
+.mj-welcome {
+  position:fixed;
+  inset:0;
+  z-index:5000;
+  display:grid;
+  place-items:center;
+  padding:28px;
+  overflow:auto;
+  background:
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(97,227,166,.12),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 82% 76%,
+      rgba(121,175,255,.08),
+      transparent 32%
+    ),
+    rgba(5,8,11,.975);
+  backdrop-filter:blur(14px);
+}
+
+.mj-welcome.is-leaving {
+  opacity:0;
+  transform:scale(1.01);
+  pointer-events:none;
+  transition:
+    opacity .28s ease,
+    transform .28s ease;
+}
+
+.mj-welcome-shell {
+  width:min(1180px,100%);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:22px;
+  overflow:hidden;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(17,24,30,.97),
+      rgba(8,13,17,.99)
+    );
+  box-shadow:
+    0 35px 120px rgba(0,0,0,.58);
+}
+
+.mj-welcome-top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:18px 24px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.mj-welcome-brand {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+
+.mj-welcome-mark {
+  display:grid;
+  grid-template-columns:repeat(2,7px);
+  gap:4px;
+}
+
+.mj-welcome-mark i {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+}
+
+.mj-welcome-mark i:nth-child(1) {
+  background:#61e3a6;
+}
+
+.mj-welcome-mark i:nth-child(2) {
+  background:#ff7471;
+}
+
+.mj-welcome-mark i:nth-child(3) {
+  background:#79afff;
+}
+
+.mj-welcome-mark i:nth-child(4) {
+  background:#efc463;
+}
+
+.mj-welcome-live {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#95a4ad;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+
+.mj-welcome-live::before {
+  content:"";
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#61e3a6;
+  box-shadow:0 0 14px rgba(97,227,166,.65);
+}
+
+.mj-welcome-grid {
+  display:grid;
+  grid-template-columns:minmax(0,1.25fr) minmax(340px,.75fr);
+  min-height:560px;
+}
+
+.mj-welcome-hero {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:64px 62px;
+}
+
+.mj-welcome-kicker {
+  color:#61e3a6;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+
+.mj-welcome h1 {
+  max-width:760px;
+  margin:18px 0 0;
+  font-size:clamp(42px,5vw,72px);
+  line-height:.98;
+  letter-spacing:-.055em;
+}
+
+.mj-welcome-lead {
+  max-width:700px;
+  margin:24px 0 0;
+  color:#9aa8b2;
+  font-size:15px;
+  line-height:1.7;
+}
+
+.mj-welcome-lead strong {
+  color:#e9eef1;
+}
+
+.mj-welcome-badges {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:26px;
+}
+
+.mj-welcome-badge {
+  padding:8px 10px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+  color:#9eabb4;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.06em;
+}
+
+.mj-welcome-badge.live {
+  border-color:rgba(97,227,166,.24);
+  color:#74e6b2;
+}
+
+.mj-welcome-cta {
+  width:min(360px,100%);
+  margin-top:34px;
+  padding:17px 20px;
+  border:1px solid rgba(97,227,166,.48);
+  border-radius:10px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(97,227,166,.20),
+      rgba(97,227,166,.09)
+    );
+  color:#81efbc;
+  cursor:pointer;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.mj-welcome-cta:hover {
+  border-color:rgba(97,227,166,.78);
+  background:rgba(97,227,166,.20);
+}
+
+.mj-welcome-note {
+  max-width:620px;
+  margin-top:17px;
+  color:#657580;
+  font-size:8px;
+  line-height:1.55;
+}
+
+.mj-welcome-flow {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:10px;
+  padding:42px;
+  border-left:1px solid rgba(255,255,255,.07);
+  background:rgba(0,0,0,.13);
+}
+
+.mj-flow-card {
+  padding:18px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  background:#0a1014;
+}
+
+.mj-flow-number {
+  color:#5f707c;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+
+.mj-flow-card strong {
+  display:block;
+  margin-top:7px;
+  color:#e8eef1;
+  font-size:13px;
+}
+
+.mj-flow-card span {
+  display:block;
+  margin-top:6px;
+  color:#74838d;
+  font-size:9px;
+  line-height:1.5;
+}
+
+.mj-flow-card.debate {
+  border-color:rgba(239,196,99,.18);
+}
+
+.mj-flow-card.control {
+  border-color:rgba(97,227,166,.20);
+}
+
+.mj-welcome-principle {
+  margin-top:8px;
+  padding:16px 18px;
+  border:1px solid rgba(255,116,113,.20);
+  border-radius:12px;
+  background:rgba(255,116,113,.045);
+}
+
+.mj-welcome-principle small {
+  display:block;
+  color:#8a7777;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+
+.mj-welcome-principle strong {
+  display:block;
+  margin-top:6px;
+  color:#ff8581;
+  font-size:13px;
+}
+
+.mj-welcome-principle span {
+  display:block;
+  margin-top:5px;
+  color:#81777a;
+  font-size:8px;
+  line-height:1.5;
+}
+
+@media(max-width:850px) {
+  .mj-welcome {
+    padding:14px;
+    place-items:start center;
+  }
+
+  .mj-welcome-grid {
+    grid-template-columns:1fr;
+  }
+
+  .mj-welcome-hero {
+    padding:44px 28px 30px;
+  }
+
+  .mj-welcome-flow {
+    padding:28px;
+    border-top:1px solid rgba(255,255,255,.07);
+    border-left:0;
+  }
+
+  .mj-welcome-top {
+    padding:15px 18px;
+  }
+
+  .mj-welcome h1 {
+    font-size:42px;
+  }
+}
+
 </style>
 </head>
 
 <body>
+
+<div
+  class="mj-welcome"
+  id="mjWelcome"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="mjWelcomeTitle"
+>
+  <div class="mj-welcome-shell">
+    <div class="mj-welcome-top">
+      <div class="mj-welcome-brand">
+        <span class="mj-welcome-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i>
+        </span>
+        MARKET JURY
+      </div>
+
+      <div class="mj-welcome-live">
+        LIVE ALPACA PAPER · READ ONLY
+      </div>
+    </div>
+
+    <div class="mj-welcome-grid">
+      <section class="mj-welcome-hero">
+        <div class="mj-welcome-kicker">
+          AI Investment Council
+        </div>
+
+        <h1 id="mjWelcomeTitle">
+          Your AI Investment Committee.
+        </h1>
+
+        <p class="mj-welcome-lead">
+          Market Jury turns live market data into an
+          <strong>adversarial investment decision process.</strong>
+          Bull builds the case. Bear challenges it.
+          Red Team attacks the evidence. Judge decides
+          whether the idea deserves to move toward capital.
+        </p>
+
+        <div class="mj-welcome-badges">
+          <span class="mj-welcome-badge live">
+            LIVE ALPACA IEX
+          </span>
+          <span class="mj-welcome-badge">
+            PAPER ACCOUNT
+          </span>
+          <span class="mj-welcome-badge">
+            BROKER WRITES · 0
+          </span>
+          <span class="mj-welcome-badge">
+            ORDERS · 0
+          </span>
+        </div>
+
+        <button
+          class="mj-welcome-cta"
+          id="mjWelcomeEnter"
+          type="button"
+        >
+          Enter Live Demo →
+        </button>
+
+        <div class="mj-welcome-note">
+          Working hackathon prototype · Alpaca AI Trading Agents
+          Hackathon 2026. Live market and Paper account data are
+          read-only. Paid AI execution is intentionally gated.
+        </div>
+      </section>
+
+      <aside class="mj-welcome-flow">
+        <div class="mj-flow-card">
+          <div class="mj-flow-number">01 · OBSERVE</div>
+          <strong>Live market + portfolio context</strong>
+          <span>
+            Alpaca IEX prices, Paper account capacity,
+            persisted market and fundamental evidence.
+          </span>
+        </div>
+
+        <div class="mj-flow-card debate">
+          <div class="mj-flow-number">02 · DEBATE</div>
+          <strong>Bull · Bear · Red Team · Judge</strong>
+          <span>
+            Instead of one model making one confident call,
+            opposing roles challenge the thesis and the evidence.
+          </span>
+        </div>
+
+        <div class="mj-flow-card control">
+          <div class="mj-flow-number">03 · CONTROL</div>
+          <strong>Cost gate · approval · capital gate</strong>
+          <span>
+            Exact AI requests can be frozen and priced before
+            permission is granted. Analysis authority is kept
+            separate from execution authority.
+          </span>
+        </div>
+
+        <div class="mj-welcome-principle">
+          <small>CORE PRINCIPLE</small>
+          <strong>Buying power ≠ permission to trade.</strong>
+          <span>
+            Market Jury can observe $400k of Paper buying power
+            while capital remains explicitly NOT RELEASED.
+          </span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
 
 <header class="topbar">
   <div class="brand">
@@ -4913,6 +5351,71 @@ document.addEventListener(
     }
   }
 );
+</script>
+
+<script>
+(() => {
+  "use strict";
+
+  const welcome =
+    document.getElementById("mjWelcome");
+
+  const enter =
+    document.getElementById("mjWelcomeEnter");
+
+  if (!welcome || !enter) {
+    return;
+  }
+
+  const key =
+    "market-jury-welcome-entered-v1";
+
+  let alreadyEntered = false;
+
+  try {
+    alreadyEntered =
+      sessionStorage.getItem(key) === "1";
+  } catch (_) {
+    alreadyEntered = false;
+  }
+
+  if (alreadyEntered) {
+    welcome.remove();
+    return;
+  }
+
+  document.body.classList.add(
+    "mj-welcome-open"
+  );
+
+  enter.addEventListener(
+    "click",
+    () => {
+      try {
+        sessionStorage.setItem(
+          key,
+          "1"
+        );
+      } catch (_) {
+        // Presentation state only.
+      }
+
+      welcome.classList.add(
+        "is-leaving"
+      );
+
+      document.body.classList.remove(
+        "mj-welcome-open"
+      );
+
+      window.setTimeout(
+        () => welcome.remove(),
+        300
+      );
+    },
+    {once:true}
+  );
+})();
 </script>
 
 <script src="/static/v62_analysis.js"></script>
