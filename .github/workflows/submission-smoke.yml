@@ -3,6 +3,7 @@ name: submission-smoke
 on:
   push:
     branches:
+      - main
       - submission/alpaca-2026-market-jury-v1
   workflow_dispatch:
 
