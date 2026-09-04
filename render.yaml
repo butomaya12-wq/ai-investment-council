@@ -3,6 +3,9 @@ services:
     name: market-jury-alpaca-2026
     runtime: python
     plan: free
+    repo: https://github.com/butomaya12-wq/ai-investment-council
+    branch: submission/alpaca-2026-market-jury-v1
+    autoDeploy: false
     buildCommand: python -m pip install --disable-pip-version-check uv && uv sync --frozen --no-dev
     startCommand: bash scripts/render_start_market_jury.sh
     healthCheckPath: /
