@@ -1,0 +1,45 @@
+name: submission-smoke
+
+on:
+  push:
+    branches:
+      - submission/alpaca-2026-market-jury-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Market Jury submission smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout submission commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.13"
+
+      - name: Compile public cockpit Python
+        run: python -m compileall -q src/aic/cockpit_v6
+
+      - name: Validate interactive Council JavaScript syntax
+        run: node --check src/aic/cockpit_v6/static/v62_analysis.js
+
+      - name: Verify judge-facing submission assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f render.yaml
+          test -f README.md
+          test -f src/aic/cockpit_v6/templates/index.html
+          grep -F "Your AI Investment Committee." src/aic/cockpit_v6/templates/index.html
+          grep -F "market-jury-alpaca-2026.onrender.com" README.md
+          grep -F "submission/alpaca-2026-market-jury-v1" render.yaml
+          grep -F "ALPACA_API_KEY_ID" render.yaml
+          grep -F "ALPACA_API_SECRET_KEY" render.yaml
+          echo "SUBMISSION_SMOKE=PASS"
