@@ -25,7 +25,7 @@ A judge can understand the product in about one minute:
 3. Open **Portfolio** to see live Alpaca Paper equity, cash, buying power, and open positions.
 4. See the separation between **broker capacity** and **decision capital** — the account may have buying power while capital remains **NOT RELEASED**.
 5. In the Market Jury panel, press **Freeze Initial Cost Preflight**. This performs read-only evidence capture, freezes the exact 9 Initial Council requests, hashes them, and calculates a worst-case model cost **before any paid model call**.
-6. The current public preflight shows **9 Initial calls** with a maximum cost of **$0.8285805**, followed by an explicit **Owner Approval Required** gate.
+6. A verified public preflight produced **9 Initial calls** with a maximum cost of **$0.8285805**, followed by an explicit **Owner Approval Required** gate.
 7. Open **Trades** and **History** to inspect the blocked execution path and decision lifecycle.
 
 The public deployment is intentionally safety-first: **broker writes = 0, Alpaca orders = 0, live money = prohibited**.
@@ -91,7 +91,7 @@ The public V6 demo currently exposes the exact **9-call Initial cost/approval ga
 | NVDA / MSFT / META comparison | ✅ |
 | Portfolio / Trades / History surfaces | ✅ |
 | Bull / Bear / Red Team / Judge product flow | ✅ |
-| Persistent product session state | ✅ SQLite runtime state |
+| Runtime product session state | ✅ SQLite during service lifetime |
 | Exact 9-request Initial preflight | ✅ |
 | Request-set hashing | ✅ |
 | Worst-case cost calculation before spend | ✅ |
@@ -224,6 +224,8 @@ The public demo is deployed on Render from the submission branch using [`render.
 **Public URL:** https://market-jury-alpaca-2026.onrender.com/?symbol=NVDA
 
 The Render free instance may cold-start after inactivity, so the first request can take longer than subsequent requests.
+
+The public demo uses **ephemeral SQLite runtime storage** on Render. Session and preflight state may reset when the service restarts or is redeployed; a persistent cloud database is part of the next product layer.
 
 ---
 
