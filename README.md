@@ -1,81 +1,247 @@
-# AI Investment Council
+# Market Jury — AI Investment Council
 
-AI Investment Council is an evidence-grounded, multi-agent decision system that separates investment research from the authority to take risk or place an order.
+> **An adversarial AI investment decision system connected to live Alpaca market data and an Alpaca Paper portfolio.**
+>
+> **Live demo:** https://market-jury-alpaca-2026.onrender.com/?symbol=NVDA
 
-## The problem
+Market Jury is a working hackathon prototype built for the **Alpaca AI Trading Agents Hackathon 2026**. Instead of asking one model for a stock pick, it separates investment analysis into opposing roles — **Bull, Bear, Red Team, and Judge** — and keeps analysis authority separate from capital approval and broker execution.
 
-Autonomous trading agents often collapse research, decision-making, risk, and execution into one opaque model loop. That makes it hard to explain a recommendation, challenge a weak thesis, or prevent a plausible-looking model output from becoming a trade.
+The core principle is simple:
 
-AI Investment Council separates those authorities. Evidence is structured before the Council sees it; adversarial agents challenge each other; a bounded Judge chooses an allowed outcome; deterministic risk and explicit human approval sit between a decision and any PAPER broker action.
+> **Buying power ≠ permission to trade.**
 
-## How it works
+The public demo can observe live Alpaca IEX prices and a real Alpaca Paper account while keeping capital explicitly blocked and broker orders at zero.
 
-```text
-Market / SEC / Alpaca evidence
-  -> deterministic eligibility and evidence layer
-  -> exactly 3 candidates
-  -> research
-  -> Bull / Bear / Red Team
-  -> cross-examination / Rebuttal
-  -> bounded Judge
-  -> INVEST / WATCH / ABSTAIN
-  -> only INVEST may proceed toward deterministic options/risk
-  -> explicit human approval
-  -> Alpaca PAPER execution
+---
+
+## Try the live demo
+
+Open **[Market Jury](https://market-jury-alpaca-2026.onrender.com/?symbol=NVDA)**.
+
+A judge can understand the product in about one minute:
+
+1. **Enter Live Demo** from the welcome screen.
+2. Compare **NVDA, MSFT, and META** using live Alpaca IEX prices plus persisted market/fundamental evidence.
+3. Open **Portfolio** to see live Alpaca Paper equity, cash, buying power, and open positions.
+4. See the separation between **broker capacity** and **decision capital** — the account may have buying power while capital remains **NOT RELEASED**.
+5. In the Market Jury panel, press **Freeze Initial Cost Preflight**. This performs read-only evidence capture, freezes the exact 9 Initial Council requests, hashes them, and calculates a worst-case model cost **before any paid model call**.
+6. The current public preflight shows **9 Initial calls** with a maximum cost of **$0.8285805**, followed by an explicit **Owner Approval Required** gate.
+7. Open **Trades** and **History** to inspect the blocked execution path and decision lifecycle.
+
+The public deployment is intentionally safety-first: **broker writes = 0, Alpaca orders = 0, live money = prohibited**.
+
+---
+
+## What problem does Market Jury solve?
+
+A single AI investing agent can be confident, opaque, and difficult to challenge. It can also blur together four very different authorities:
+
+- researching an investment,
+- making a decision,
+- allocating capital,
+- placing a broker order.
+
+Market Jury separates those concerns.
+
+A bullish argument is challenged by a bearish argument. A Red Team attacks evidence quality and process integrity. A Judge adjudicates the competing views. Even after a decision exists, downstream capital and execution remain separate gates.
+
+This makes the system easier to inspect, harder to over-trust, and safer to connect to brokerage infrastructure.
+
+---
+
+## Product flow
+
+```mermaid
+flowchart TD
+    A[Live Alpaca IEX + Paper account + evidence] --> B[Candidate universe: NVDA / MSFT / META]
+    B --> C[Bull]
+    B --> D[Bear]
+    B --> E[Red Team]
+    C --> F[Rebuttal / cross-examination]
+    D --> F
+    E --> F
+    F --> G[Judge]
+    G --> H{Decision authority}
+    H -->|WATCH / ABSTAIN| I[Capital remains blocked]
+    H -->|Eligible INVEST path| J[Risk + owner approval]
+    J --> K[Alpaca Paper execution layer]
+    K --> L[Order only after downstream authority]
 ```
 
-The completed competition run ended at **WATCH**. It did not proceed to B5, risk selection, owner approval, or broker execution.
+### Council topology
 
-See the judge-friendly [architecture diagram](docs/competition/ARCHITECTURE.md) and run the [offline decision replay](docs/competition/DEMO_RUNBOOK.md).
+The intended real Council topology is:
 
-## Completed competition run
+- **Initial:** Bull + Bear + Red Team × 3 candidates = **9 calls**
+- **Rebuttal:** 3 calls
+- **Judge:** 1 call
+- **Total:** **13 calls**
 
-| Evidence | Result |
+The public V6 demo currently exposes the exact **9-call Initial cost/approval gate** and a local zero-cost simulation for the Council interaction. A paid production model executor is **not enabled** in the public demo.
+
+---
+
+## What is working now
+
+| Capability | Status |
 | --- | --- |
-| Candidates | NVDA, MSFT, META |
-| Initial Council opinions | 9 |
-| Rebuttal bundles | 3 |
-| Final Judge | 1 evidence-complete adjudication |
-| Judge context | 3 CandidatePackets, 9 Initial views, 3 Rebuttal bundles, 105 canonical claims, 15 computed values |
-| Verdict | **WATCH** |
-| B5 | Not eligible |
-| Broker writes / Alpaca orders | 0 / 0 |
-| Automatic paid retries | 0 |
-| Known actual valid B4 production-cycle cost | $3.089588 |
+| Public web application | ✅ Live on Render |
+| Alpaca IEX market data | ✅ Live, read-only |
+| Alpaca Paper account | ✅ Live, read-only |
+| NVDA / MSFT / META comparison | ✅ |
+| Portfolio / Trades / History surfaces | ✅ |
+| Bull / Bear / Red Team / Judge product flow | ✅ |
+| Persistent product session state | ✅ SQLite runtime state |
+| Exact 9-request Initial preflight | ✅ |
+| Request-set hashing | ✅ |
+| Worst-case cost calculation before spend | ✅ |
+| Hash-bound owner approval | ✅ |
+| Automatic paid retries | **0** |
+| Broker writes | **0** |
+| Alpaca orders | **0** |
+| Live-money execution | **Prohibited** |
+| Public paid OpenAI executor | **Not enabled** |
 
-The cost above is the known actual cost for the valid B4 production cycle; it is not total project spend.
-
-## Why WATCH is a feature
-
-The deterministic executable-investment policy did not prove positive INVEST authority. The system therefore removed INVEST from the final Judge outcome surface rather than inventing an investment threshold to force a trade. The evidence-complete Judge could select WATCH or ABSTAIN, and selected **WATCH**.
-
-This is a successful safety outcome: the system preserved the evidence and stopped before execution when its policy could not justify executable investment authority.
+---
 
 ## Safety architecture
 
-- A model cannot choose executable quantity, price, or risk.
-- A model cannot place a broker order.
-- B5 is reachable only after INVEST, and WATCH is not B5-eligible.
-- Owner approval gates paid/runtime authority.
-- Raw provider responses are durably captured before local validation.
-- Ambiguous or failed processing is fail-closed; blind retries are not allowed.
-- Execution is PAPER-only by architecture; live money is prohibited.
+Market Jury is deliberately designed so that a plausible model answer cannot silently become a trade.
 
-## Demo
+- **Analysis authority ≠ capital authority ≠ execution authority.**
+- Model outputs do not directly place orders.
+- Live Alpaca integration in the public demo is **GET/read-only**.
+- Paper credentials are stored server-side as deployment secrets, never shipped to the browser.
+- The Initial stage can be frozen and priced before any paid model call.
+- Owner approval is bound to the exact code/evidence/request-set/cost identity.
+- Automatic paid retries are disabled.
+- Evidence gaps are surfaced rather than hidden.
+- A stale or incomplete decision can block downstream capital.
+- Public demo broker writes and Alpaca orders remain **zero**.
+- **Live money is prohibited.**
 
-The replay is local, deterministic, zero-network, and requires no API keys:
+---
 
-```bash
-PYTHONPATH="$PWD/src" uv run --frozen python -B scripts/demo_competition_watch_v1.py
+## Evidence gaps are part of the decision
+
+The current demo intentionally shows two unresolved evidence gaps:
+
+- current-news coverage is not exhaustive,
+- valuation evidence has not been refreshed to production completeness.
+
+Market Jury does not hide those limitations. They are surfaced in the interface and are part of why capital can remain blocked.
+
+This is a feature of the system's decision integrity, not a fabricated claim of complete research coverage.
+
+---
+
+## Demo vs. product roadmap
+
+This repository contains a substantial working prototype, but it is not presented as a finished consumer brokerage product.
+
+### Built in the hackathon
+
+- live Alpaca market and Paper-account integration,
+- multi-agent investment-Council architecture,
+- deterministic evidence and decision contracts,
+- historical decision lifecycle / TTL handling,
+- portfolio, trade, and history product surfaces,
+- cost preflight before paid AI execution,
+- hash-bound owner approval,
+- fail-closed capital/execution gates,
+- public Render deployment.
+
+### Next product layer
+
+- production-grade user authentication,
+- per-user broker connection and secret isolation,
+- fresh news + valuation research ingestion,
+- production real Council execution across Initial / Rebuttal / Judge,
+- persistent cloud database,
+- controlled Alpaca Paper execution after full authority,
+- monitoring and re-evaluation loops,
+- only later, separately governed live-money execution.
+
+---
+
+## Repository map
+
+```text
+src/aic/cockpit_v6/      Public Market Jury FastAPI application
+src/aic/council/         Council contracts, request/runtime/cost logic
+src/aic/domain/          Canonical data and evidence contracts
+config/event/            Frozen hackathon policy, pricing, evidence config
+scripts/                 Replays, preflights, audits, production harnesses
+tests/                   Unit/integration/regression tests
+docs/competition/        Competition evidence and technical documentation
+render.yaml              Public Render deployment blueprint
 ```
 
-It reads a tracked safe derived snapshot, not provider payloads, credentials, paid model responses, or trading authority.
+Useful technical references:
 
-## Repository evidence
-
+- [Architecture](docs/competition/ARCHITECTURE.md)
 - [Build evidence](docs/competition/BUILD_EVIDENCE.md)
 - [Submission readiness](docs/competition/SUBMISSION_READINESS.md)
 - [Demo runbook](docs/competition/DEMO_RUNBOOK.md)
-- [Submission copy](docs/competition/SUBMISSION_COPY.md)
 
-Canonical `FINAL_DECISION_V1` promotion remains blocked because the authoritative `DECISION_DRAFT_B4_v0_4.created_at` source is absent. This is a post-decision persistence/integration gap, not a final Judge failure, and it does not justify rerunning B4 or a trade.
+---
+
+## Local development
+
+Requirements:
+
+- Python **3.12.13**
+- [`uv`](https://docs.astral.sh/uv/)
+
+Install the locked environment:
+
+```bash
+uv sync --frozen
+```
+
+Run the V6 product locally:
+
+```bash
+PYTHONPATH=src uv run uvicorn aic.cockpit_v6.app:app \
+  --host 127.0.0.1 \
+  --port 8788
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8788/?symbol=NVDA
+```
+
+Live Alpaca endpoints require **Alpaca Paper** credentials. Real credentials must never be committed to the repository.
+
+---
+
+## Deployment
+
+The public demo is deployed on Render from the submission branch using [`render.yaml`](render.yaml).
+
+**Public URL:** https://market-jury-alpaca-2026.onrender.com/?symbol=NVDA
+
+The Render free instance may cold-start after inactivity, so the first request can take longer than subsequent requests.
+
+---
+
+## Hackathon submission status
+
+**Market Jury / AI Investment Council**
+
+- Public demo: ✅
+- Live Alpaca Paper/IEX connection: ✅
+- Judge-facing welcome/onboarding: ✅
+- Cost + authority demo: ✅
+- Broker orders: 0
+- Live money: prohibited
+
+Presentation and demo-video links will be added to the repository once the final submission assets are uploaded.
+
+---
+
+## Disclaimer
+
+Market Jury is a hackathon prototype for research and demonstration. It is not investment advice, is not a production brokerage service, and must not be treated as authorization to trade real money.
