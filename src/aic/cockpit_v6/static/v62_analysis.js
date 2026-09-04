@@ -606,8 +606,23 @@
       host.appendChild(panel);
     }
 
-    panel.innerHTML =
+    const nextPanelHtml =
       panelHtml();
+
+    // The product shell refreshes frequently. Do not destroy and
+    // recreate interactive controls unless their actual rendered
+    // state changed; otherwise pointer clicks can be lost between
+    // mousedown and mouseup.
+    if (
+      panel.__v62LastHtml
+      !== nextPanelHtml
+    ) {
+      panel.innerHTML =
+        nextPanelHtml;
+
+      panel.__v62LastHtml =
+        nextPanelHtml;
+    }
 
     const button =
       document.getElementById(
