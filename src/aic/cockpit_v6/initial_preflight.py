@@ -283,6 +283,28 @@ def resolve_code_commit_sha() -> str:
     ):
         return configured
 
+    if (
+        os.environ.get(
+            "RENDER",
+            "",
+        ).strip().lower()
+        == "true"
+    ):
+        render_commit = os.environ.get(
+            "RENDER_GIT_COMMIT",
+            "",
+        ).strip()
+
+        if re.fullmatch(
+            r"[0-9a-f]{40}",
+            render_commit,
+        ):
+            return render_commit
+
+        raise RuntimeError(
+            "Render deployment commit SHA is unavailable."
+        )
+
     try:
         value = subprocess.check_output(
             [
@@ -314,6 +336,46 @@ def resolve_code_commit_sha() -> str:
 
 
 def tracked_worktree_clean() -> bool:
+    if (
+        os.environ.get(
+            "RENDER",
+            "",
+        ).strip().lower()
+        == "true"
+    ):
+        render_commit = os.environ.get(
+            "RENDER_GIT_COMMIT",
+            "",
+        ).strip()
+
+        render_branch = os.environ.get(
+            "RENDER_GIT_BRANCH",
+            "",
+        ).strip()
+
+        render_repo = os.environ.get(
+            "RENDER_GIT_REPO_SLUG",
+            "",
+        ).strip()
+
+        return (
+            re.fullmatch(
+                r"[0-9a-f]{40}",
+                render_commit,
+            )
+            is not None
+            and render_branch
+            == (
+                "submission/"
+                "alpaca-2026-market-jury-v1"
+            )
+            and render_repo
+            == (
+                "butomaya12-wq/"
+                "ai-investment-council"
+            )
+        )
+
     try:
         unstaged = subprocess.run(
             [
